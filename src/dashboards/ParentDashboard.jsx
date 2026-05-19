@@ -3,6 +3,7 @@ import {
 } from 'lucide-react';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
+import Avatar from '../components/Avatar';
 import {
   attendanceHistory, notifications, goals, journalEntries,
 } from '../data/sampleData';
@@ -48,16 +49,7 @@ export default function ParentDashboard({ students }) {
         boxShadow: 'var(--shadow-md)',
         display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap',
       }}>
-        <div style={{
-          width: 60, height: 60, borderRadius: 18, flexShrink: 0,
-          background: child?.present ? 'var(--teal)' : 'var(--red-light)',
-          border: `2px solid ${child?.present ? 'var(--teal-border)' : 'var(--red-border)'}`,
-          color: child?.present ? '#fff' : 'var(--red)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 800, fontSize: '1.4rem',
-        }}>
-          {child?.name?.split(' ').map(p => p[0]).join('')}
-        </div>
+        <Avatar name={child?.name || 'student'} size={60} status={child?.present ? 'present' : 'absent'} ring={child?.present ? 'var(--teal)' : 'var(--red-border)'} />
         <div style={{ flex: 1 }}>
           <h2 style={{ fontSize: '1.375rem', marginBottom: 6 }}>{child?.name}</h2>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>

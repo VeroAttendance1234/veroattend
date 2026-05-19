@@ -6,6 +6,7 @@ import {
 import Card from '../components/Card';
 import StatCard from '../components/StatCard';
 import Badge from '../components/Badge';
+import Avatar from '../components/Avatar';
 import LiveFeed from '../components/LiveFeed';
 import RFIDSimulator from '../components/RFIDSimulator';
 import { teachers, DEMO_TEACHER_ID, teacherTimetable, periods } from '../data/sampleData';
@@ -159,14 +160,7 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap })
                 border: `1px solid ${s.present ? 'var(--green-border)' : 'var(--border)'}`,
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                  <div style={{
-                    width: 28, height: 28, borderRadius: 8,
-                    background: s.present ? 'var(--green)' : 'var(--text-soft)',
-                    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '0.65rem', fontWeight: 700,
-                  }}>
-                    {s.name.split(' ').map(p => p[0]).join('')}
-                  </div>
+                  <Avatar name={s.name} size={32} status={s.present ? 'present' : 'absent'} />
                   <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{s.name}</span>
                 </div>
                 <Badge status={s.present ? 'present' : 'absent'} dot>

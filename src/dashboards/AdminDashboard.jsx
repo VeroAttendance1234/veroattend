@@ -11,6 +11,7 @@ import {
 import Card from '../components/Card';
 import StatCard from '../components/StatCard';
 import Badge from '../components/Badge';
+import Avatar from '../components/Avatar';
 import LiveFeed from '../components/LiveFeed';
 import RFIDSimulator from '../components/RFIDSimulator';
 import {
@@ -484,15 +485,7 @@ export default function AdminDashboard({ students, setStudents, taps, onTap }) {
               border: `1px solid ${s.present ? 'var(--green-border)' : 'var(--border)'}`,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: 9, flexShrink: 0,
-                  background: s.present ? 'var(--green)' : 'var(--text-soft)',
-                  color: '#fff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.02em',
-                }}>
-                  {s.name.split(' ').map(p => p[0]).join('')}
-                </div>
+                <Avatar name={s.name} size={36} status={s.present ? 'present' : 'absent'} />
                 <div>
                   <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{s.name}</div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>

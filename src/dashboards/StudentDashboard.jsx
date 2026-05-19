@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
+import Avatar from '../components/Avatar';
 import { timetable, periods, goals as initialGoals, journalEntries as initialJournal } from '../data/sampleData';
 
 const MOODS = [
@@ -113,17 +114,7 @@ export default function StudentDashboard({ students }) {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: 18,
-            background: student?.present ? 'var(--teal)' : 'var(--red-light)',
-            border: `2px solid ${student?.present ? 'var(--teal-border)' : 'var(--red-border)'}`,
-            color: student?.present ? '#fff' : 'var(--red)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 800, fontSize: '1.2rem',
-            flexShrink: 0,
-          }}>
-            {student?.name?.split(' ').map(p => p[0]).join('')}
-          </div>
+          <Avatar name={student?.name || 'student'} size={56} status={student?.present ? 'present' : 'absent'} ring={student?.present ? 'var(--teal)' : 'var(--red-border)'} />
           <div>
             <h2 style={{ fontSize: '1.375rem', marginBottom: 6 }}>{student?.name}</h2>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
