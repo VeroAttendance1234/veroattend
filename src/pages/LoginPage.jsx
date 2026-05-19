@@ -138,7 +138,7 @@ export default function LoginPage({ onLogin }) {
 
           <h2 style={{ fontSize: '1.6rem', marginBottom: 8 }}>Welcome back</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: 26 }}>
-            Choose your role to continue. This is a demo — pick any.
+            Choose your role to continue.
           </p>
 
           {/* Role picker */}
@@ -192,7 +192,7 @@ export default function LoginPage({ onLogin }) {
           }}>
             {[
               { id: 'password', label: 'Password', icon: Lock },
-              { id: 'card',     label: 'Tap NFC card', icon: CreditCard },
+              { id: 'card',     label: 'NFC Card', icon: CreditCard },
             ].map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
@@ -239,11 +239,29 @@ export default function LoginPage({ onLogin }) {
               </div>
 
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.02em' }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'baseline',
+                  marginBottom: 6,
+                  minHeight: 18,
+                }}>
+                  <label style={{
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                    color: 'var(--text-muted)',
+                    letterSpacing: '0.02em',
+                    lineHeight: 1.2,
+                  }}>
                     Password
                   </label>
-                  <a href="#" style={{ fontSize: '0.74rem', color: 'var(--teal)', fontWeight: 700, textDecoration: 'none' }}>
+                  <a href="#" style={{
+                    fontSize: '0.74rem',
+                    color: 'var(--teal)',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    lineHeight: 1.2,
+                  }}>
                     Forgot?
                   </a>
                 </div>
