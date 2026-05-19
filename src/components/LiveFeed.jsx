@@ -1,20 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Badge from './Badge';
+import Avatar from './Avatar';
 import { CreditCard, Clock } from 'lucide-react';
-
-function initials(name) {
-  return name.split(' ').map(p => p[0]).join('').toUpperCase();
-}
-
-const AVATAR_COLOURS = [
-  '#14B8B8','#2563EB','#16A34A','#D97706','#7C3AED','#DB2777',
-];
-
-function avatarColour(name) {
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
-  return AVATAR_COLOURS[Math.abs(h) % AVATAR_COLOURS.length];
-}
 
 export default function LiveFeed({ taps }) {
   const topRef = useRef(null);
@@ -29,12 +16,20 @@ export default function LiveFeed({ taps }) {
     return (
       <div style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'center', padding: '40px 0', gap: 12,
+        justifyContent: 'center', padding: '36px 0', gap: 10,
         color: 'var(--text-soft)',
       }}>
-        <CreditCard size={32} strokeWidth={1.5} style={{ color: 'var(--border-strong)' }} />
+        <div style={{
+          width: 52, height: 52, borderRadius: 14,
+          background: 'var(--surface-soft)',
+          border: '1px dashed var(--border-strong)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'var(--text-soft)',
+        }}>
+          <CreditCard size={22} strokeWidth={1.6} />
+        </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: 4 }}>
+          <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: 3 }}>
             No scans yet
           </div>
           <div style={{ fontSize: '0.8rem' }}>
@@ -57,25 +52,14 @@ export default function LiveFeed({ taps }) {
             gap: 12,
             padding: '10px 14px',
             borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--border)',
+            border: '1px solid',
             background: i === 0 ? 'var(--teal-glow)' : 'var(--surface-soft)',
             borderColor: i === 0 ? 'var(--teal-border)' : 'var(--border)',
             animation: i === 0 ? 'slideDown 0.25s ease, fadeHighlight 4s ease forwards' : 'none',
             transition: 'background 0.3s',
           }}
         >
-          {/* Avatar */}
-          <div style={{
-            width: 38, height: 38,
-            borderRadius: '50%',
-            background: avatarColour(tap.name),
-            color: '#fff',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 700, fontSize: '0.8rem', flexShrink: 0,
-            letterSpacing: '0.03em',
-          }}>
-            {initials(tap.name)}
-          </div>
+          <Avatar name={tap.name} size={38} status="present" />
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text-primary)', marginBottom: 2 }}>

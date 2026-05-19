@@ -14,7 +14,7 @@ const ROLE_OPTIONS = [
 export default function LoginPage({ onLogin }) {
   const [selectedRole, setSelectedRole]   = useState('Admin');
   const [email, setEmail]                 = useState('admin@shore.nsw.edu.au');
-  const [password, setPassword]           = useState('');
+  const [password, setPassword]           = useState('demo1234');
   const [showPassword, setShowPassword]   = useState(false);
   const [scanning, setScanning]           = useState(false);
   const [error, setError]                 = useState('');
@@ -258,7 +258,7 @@ export default function LoginPage({ onLogin }) {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={e => { setPassword(e.target.value); setError(''); }}
-                    placeholder="Enter any password (demo)"
+                    placeholder="Ready to sign in — demo unlocked"
                     style={{
                       border: 'none', background: 'transparent', padding: '11px 0',
                       width: '100%', fontSize: '0.875rem',
@@ -354,7 +354,7 @@ export default function LoginPage({ onLogin }) {
 
       <style>{`
         @media (max-width: 800px) {
-          .login-brand { display: none; }
+          .login-brand { display: none !important; }
           .login-mobile-logo { display: block !important; }
         }
       `}</style>

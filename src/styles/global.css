@@ -350,7 +350,39 @@ img[src*="vero-"] {
 }
 
 @media (max-width: 600px) {
-  .stats-row   { grid-template-columns: repeat(2, 1fr); }
-  .stats-row-6 { grid-template-columns: repeat(2, 1fr); }
+  .stats-row   { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stats-row-6 { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .grid-3      { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .page          { padding: 12px 12px 80px; }
+  .card          { padding: 16px 16px; border-radius: 14px; }
+  .section-title { font-size: 0.875rem; margin-bottom: 12px; }
+  h1             { font-size: 1.5rem; }
+  h2             { font-size: 1.2rem; }
+  h3             { font-size: 1.05rem; }
+  body           { font-size: 0.9rem; }
+}
+
+/* Ensure tap targets are at least 44×44 on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  button, a, input, select { min-height: 38px; }
+}
+
+/* Hide scrollbars on horizontal scrollers but keep scroll behaviour */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Skeleton loading placeholder */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-soft) 25%, var(--surface) 50%, var(--surface-soft) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
