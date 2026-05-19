@@ -4,6 +4,7 @@ import {
   Play, Code, Cpu, Database, Zap, Award, Calendar,
   CheckCircle, Clock, ArrowRight, Sparkles, ExternalLink, Copy,
 } from 'lucide-react';
+import Modal from '../components/Modal';
 
 /* ─────────────────────────────────────────────────────────────
    DEMO ACCOUNT DATA
@@ -106,129 +107,24 @@ const TIMELINE = [
 ];
 
 /* ─────────────────────────────────────────────────────────────
-   MODAL — feature deep dive for each role
+   FEATURE MODAL — uses shared Modal for consistency
 ───────────────────────────────────────────────────────────── */
 function FeatureModal({ account, onClose, onOpen }) {
   if (!account) return null;
   const Icon = account.icon;
 
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
-  }, []);
-
   return (
-    <div
-      onClick={onClose}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 1001,
-        background: 'rgba(15,30,40,0.55)',
-        backdropFilter: 'blur(6px)',
-        WebkitBackdropFilter: 'blur(6px)',
-        display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-        padding: '40px 16px',
-        overflowY: 'auto',
-        animation: 'fadeIn 0.18s ease',
-      }}
-    >
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          background: 'var(--surface-card)',
-          borderRadius: 20,
-          maxWidth: 640,
-          width: '100%',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
-          animation: 'slideDown 0.25s ease',
-          overflow: 'hidden',
-          marginBottom: 60,
-        }}
-      >
-        {/* Header bar */}
-        <div style={{
-          padding: '24px 26px',
-          borderBottom: '1px solid var(--border)',
-          background: `linear-gradient(135deg, ${account.colour}10 0%, ${account.colour}02 100%)`,
-          display: 'flex', alignItems: 'center', gap: 16,
-        }}>
-          <div style={{
-            width: 50, height: 50, borderRadius: 14,
-            background: `${account.colour}18`,
-            border: `1.5px solid ${account.colour}30`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: account.colour,
-          }}>
-            <Icon size={22} strokeWidth={2.2} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 800, fontSize: '1.2rem', color: 'var(--text-primary)' }}>
-              {account.role} Dashboard
-            </div>
-            <div style={{ fontSize: '0.82rem', color: account.colour, fontWeight: 700, marginTop: 2 }}>
-              {account.name}
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            style={{
-              width: 34, height: 34, borderRadius: '50%',
-              background: 'var(--surface-soft)',
-              color: 'var(--text-muted)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-          >
-            <X size={16} />
-          </button>
-        </div>
-
-        {/* Description */}
-        <div style={{ padding: '20px 26px 0' }}>
-          <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-            {account.description}
-          </p>
-        </div>
-
-        {/* Features list */}
-        <div style={{ padding: '20px 26px 24px' }}>
-          <div style={{
-            fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em',
-            textTransform: 'uppercase', color: 'var(--text-soft)', marginBottom: 12,
-          }}>
-            Key features
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {account.features.map((f, i) => (
-              <div key={i} style={{
-                display: 'flex', gap: 12,
-                padding: '12px 14px',
-                background: 'var(--surface-soft)',
-                border: '1px solid var(--border)',
-                borderRadius: 12,
-              }}>
-                <CheckCircle size={16} style={{ color: account.colour, flexShrink: 0, marginTop: 2 }} strokeWidth={2.5} />
-                <div>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 3 }}>
-                    {f.title}
-                  </div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                    {f.detail}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Footer CTA */}
-        <div style={{
-          padding: '16px 26px',
-          borderTop: '1px solid var(--border)',
-          background: 'var(--surface-soft)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-        }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Ready to explore?
-          </span>
+    <Modal
+      open={!!account}
+      onClose={onClose}
+      width="md"
+      accent={account.colour}
+      icon={<Icon size={20} strokeWidth={2.2} />}
+      title={`${account.role} Dashboard`}
+      subtitle={account.name}
+      footer={
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Ready to explore?</span>
           <button
             onClick={onOpen}
             style={{
@@ -244,8 +140,34 @@ function FeatureModal({ account, onClose, onOpen }) {
             <ArrowRight size={14} strokeWidth={2.8} />
           </button>
         </div>
+      }
+    >
+      <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 18 }}>
+        {account.description}
+      </p>
+      <div className="label-caps" style={{ marginBottom: 10 }}>Key features</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+        {account.features.map((f, i) => (
+          <div key={i} style={{
+            display: 'flex', gap: 11,
+            padding: '11px 13px',
+            background: 'var(--surface-soft)',
+            border: '1px solid var(--border)',
+            borderRadius: 11,
+          }}>
+            <CheckCircle size={15} style={{ color: account.colour, flexShrink: 0, marginTop: 2 }} strokeWidth={2.5} />
+            <div>
+              <div style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
+                {f.title}
+              </div>
+              <div style={{ fontSize: '0.79rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                {f.detail}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
+    </Modal>
   );
 }
 

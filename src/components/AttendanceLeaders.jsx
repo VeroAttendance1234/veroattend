@@ -6,7 +6,7 @@ import Avatar from './Avatar';
  * AttendanceLeaders — compact student leaderboard.
  * Generates a deterministic top-10 from the student list with simulated rates.
  */
-export default function AttendanceLeaders({ students }) {
+export default function AttendanceLeaders({ students, onSelectStudent }) {
   const [scope, setScope] = useState('school'); // 'school' | 'year'
 
   const leaders = useMemo(() => {
@@ -55,12 +55,28 @@ export default function AttendanceLeaders({ students }) {
         {leaders.map((s, i) => {
           const medal = i === 0 ? '#FFD700' : i === 1 ? '#C0C0C0' : i === 2 ? '#CD7F32' : null;
           return (
-            <div key={s.id} style={{
-              display: 'flex', alignItems: 'center', gap: 11,
-              padding: '8px 12px', borderRadius: 11,
-              background: medal ? `${medal}15` : 'var(--surface-soft)',
-              border: medal ? `1px solid ${medal}55` : '1px solid var(--border)',
-            }}>
+            <div
+              key={s.id}
+              onClick={() => onSelectStudent?.(s)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 11,
+                padding: '8px 12px', borderRadius: 11,
+                background: medal ? `${medal}15` : 'var(--surface-soft)',
+                border: medal ? `1px solid ${medal}55` : '1px solid var(--border)',
+                cursor: onSelectStudent ? 'pointer' : 'default',
+                transition: 'transform 0.12s ease, box-shadow 0.12s ease',
+              }}
+              onMouseEnter={e => {
+                if (!onSelectStudent) return;
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(47,62,70,0.08)';
+              }}
+              onMouseLeave={e => {
+                if (!onSelectStudent) return;
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
               {/* Rank */}
               <div style={{
                 width: 26, height: 26, flexShrink: 0,

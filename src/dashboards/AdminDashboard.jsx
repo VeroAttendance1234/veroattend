@@ -16,6 +16,7 @@ import LiveFeed from '../components/LiveFeed';
 import RFIDSimulator from '../components/RFIDSimulator';
 import AbsenceRequestsAdmin from '../components/AbsenceRequestsAdmin';
 import AttendanceLeaders, { CurrentLeaderStrip } from '../components/AttendanceLeaders';
+import StudentDetailModal from '../components/StudentDetailModal';
 import { extraNotifications } from '../data/initialState';
 import {
   notifications, teachers, monthlyAttendance,
@@ -108,6 +109,7 @@ export default function AdminDashboard({
   const [page, setPage]               = useState(1);
   const [chartView, setChartView]     = useState('2Y');
   const [leaderView, setLeaderView]   = useState('All Classes');
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
   const classOptions = useMemo(() => {
     if (yearFilter === 'All') return ['All'];
@@ -151,6 +153,13 @@ export default function AdminDashboard({
 
   return (
     <div className="page">
+
+      {/* Modal — opens when a student row is clicked */}
+      <StudentDetailModal
+        student={selectedStudent}
+        open={!!selectedStudent}
+        onClose={() => setSelectedStudent(null)}
+      />
 
       {/* ── Current Leader strip (replaces fun facts) ─ */}
       <CurrentLeaderStrip students={students} />
@@ -383,7 +392,7 @@ export default function AdminDashboard({
           />
         </Card>
         <Card>
-          <AttendanceLeaders students={students} />
+          <AttendanceLeaders students={students} onSelectStudent={setSelectedStudent} />
         </Card>
       </div>
 
@@ -471,12 +480,26 @@ export default function AdminDashboard({
         {/* Roll list */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
           {paginated.map(s => (
-            <div key={s.id} style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '9px 14px', borderRadius: 10,
-              background: s.present ? 'var(--green-light)' : 'var(--surface-soft)',
-              border: `1px solid ${s.present ? 'var(--green-border)' : 'var(--border)'}`,
-            }}>
+            <div
+              key={s.id}
+              onClick={() => setSelectedStudent(s)}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '9px 14px', borderRadius: 10,
+                background: s.present ? 'var(--green-light)' : 'var(--surface-soft)',
+                border: `1px solid ${s.present ? 'var(--green-border)' : 'var(--border)'}`,
+                cursor: 'pointer',
+                transition: 'transform 0.12s ease, box-shadow 0.12s ease',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(47,62,70,0.08)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Avatar name={s.name} size={36} status={s.present ? 'present' : 'absent'} />
                 <div>

@@ -9,6 +9,7 @@ import Badge from '../components/Badge';
 import Avatar from '../components/Avatar';
 import LiveFeed from '../components/LiveFeed';
 import MessagingPanel from '../components/MessagingPanel';
+import StudentDetailModal from '../components/StudentDetailModal';
 import { MessageSquare } from 'lucide-react';
 import RFIDSimulator from '../components/RFIDSimulator';
 import { teachers, DEMO_TEACHER_ID, teacherTimetable, periods } from '../data/sampleData';
@@ -23,6 +24,7 @@ function todayKey() {
 export default function TeacherDashboard({ students, setStudents, taps, onTap, threads = [], onSendMessage }) {
   const teacher = teachers.find(t => t.id === DEMO_TEACHER_ID);
   const [selectedClass, setSelectedClass] = useState(teacher.classes[0]);
+  const [selectedStudent, setSelectedStudent] = useState(null);
   const today = todayKey();
 
   const classStudents = students.filter(s => s.class === selectedClass);
@@ -33,6 +35,12 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
 
   return (
     <div className="page">
+
+      <StudentDetailModal
+        student={selectedStudent}
+        open={!!selectedStudent}
+        onClose={() => setSelectedStudent(null)}
+      />
 
       {/* ── Teacher hero banner ─────────────────── */}
       <div style={{
@@ -155,12 +163,26 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
           <p className="section-title">Class Roll — {selectedClass}</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 420, overflowY: 'auto' }}>
             {classStudents.map(s => (
-              <div key={s.id} style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '9px 12px', borderRadius: 10,
-                background: s.present ? 'var(--green-light)' : 'var(--surface-soft)',
-                border: `1px solid ${s.present ? 'var(--green-border)' : 'var(--border)'}`,
-              }}>
+              <div
+                key={s.id}
+                onClick={() => setSelectedStudent(s)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '9px 12px', borderRadius: 10,
+                  background: s.present ? 'var(--green-light)' : 'var(--surface-soft)',
+                  border: `1px solid ${s.present ? 'var(--green-border)' : 'var(--border)'}`,
+                  cursor: 'pointer',
+                  transition: 'transform 0.12s ease, box-shadow 0.12s ease',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(47,62,70,0.08)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
                   <Avatar name={s.name} size={32} status={s.present ? 'present' : 'absent'} />
                   <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{s.name}</span>
