@@ -1,0 +1,6 @@
+backend/
+frontend/
+*.py
+*.db
+README.md
+.claude/
