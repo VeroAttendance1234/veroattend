@@ -6,6 +6,8 @@ import {
 import Card from '../components/Card';
 import Badge from '../components/Badge';
 import Avatar from '../components/Avatar';
+import MessagingPanel from '../components/MessagingPanel';
+import { MessageSquare } from 'lucide-react';
 import { timetable, periods, goals as initialGoals, journalEntries as initialJournal } from '../data/sampleData';
 
 const MOODS = [
@@ -44,7 +46,7 @@ function currentPeriodIndex() {
   return -1;
 }
 
-export default function StudentDashboard({ students }) {
+export default function StudentDashboard({ students, threads = [], onSendMessage }) {
   const student = students.find(s => s.id === 'S001') || students[0];
   const today = todayKey();
   const currentPeriod = currentPeriodIndex();
@@ -436,6 +438,15 @@ export default function StudentDashboard({ students }) {
             </button>
           </div>
         </div>
+      </Card>
+
+      {/* ── Messaging ─────────────────────────── */}
+      <Card style={{ marginTop: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
+          <MessageSquare size={16} style={{ color: 'var(--purple)' }} />
+          <p className="section-title" style={{ marginBottom: 0 }}>Messages</p>
+        </div>
+        <MessagingPanel role="student" userName="Aisha Patel" threads={threads} onSend={onSendMessage} />
       </Card>
     </div>
   );

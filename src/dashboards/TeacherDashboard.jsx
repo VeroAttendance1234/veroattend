@@ -8,6 +8,8 @@ import StatCard from '../components/StatCard';
 import Badge from '../components/Badge';
 import Avatar from '../components/Avatar';
 import LiveFeed from '../components/LiveFeed';
+import MessagingPanel from '../components/MessagingPanel';
+import { MessageSquare } from 'lucide-react';
 import RFIDSimulator from '../components/RFIDSimulator';
 import { teachers, DEMO_TEACHER_ID, teacherTimetable, periods } from '../data/sampleData';
 
@@ -18,7 +20,7 @@ function todayKey() {
   return DAYS.includes(d) ? d : 'Mon';
 }
 
-export default function TeacherDashboard({ students, setStudents, taps, onTap }) {
+export default function TeacherDashboard({ students, setStudents, taps, onTap, threads = [], onSendMessage }) {
   const teacher = teachers.find(t => t.id === DEMO_TEACHER_ID);
   const [selectedClass, setSelectedClass] = useState(teacher.classes[0]);
   const today = todayKey();
@@ -222,6 +224,15 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap })
           </div>
         </Card>
       </div>
+
+      {/* ── Messaging with parents ─────────────── */}
+      <Card style={{ marginTop: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
+          <MessageSquare size={16} style={{ color: 'var(--purple)' }} />
+          <p className="section-title" style={{ marginBottom: 0 }}>Parent Messages</p>
+        </div>
+        <MessagingPanel role="teacher" userName="Mr David Chen" threads={threads} onSend={onSendMessage} />
+      </Card>
     </div>
   );
 }

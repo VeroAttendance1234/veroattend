@@ -14,9 +14,12 @@ import Badge from '../components/Badge';
 import Avatar from '../components/Avatar';
 import LiveFeed from '../components/LiveFeed';
 import RFIDSimulator from '../components/RFIDSimulator';
+import AbsenceRequestsAdmin from '../components/AbsenceRequestsAdmin';
+import AttendanceLeaders, { CurrentLeaderStrip } from '../components/AttendanceLeaders';
+import { extraNotifications } from '../data/initialState';
 import {
   notifications, teachers, monthlyAttendance,
-  yearlyStats, yearGroupRates, classLeaderboard, funFacts,
+  yearlyStats, yearGroupRates, classLeaderboard,
 } from '../data/sampleData';
 
 const YEARS   = ['All', 7, 8, 9, 10, 11, 12];
@@ -95,7 +98,10 @@ function QuickActions({ onSimulate, students }) {
   );
 }
 
-export default function AdminDashboard({ students, setStudents, taps, onTap }) {
+export default function AdminDashboard({
+  students, setStudents, taps, onTap,
+  absenceRequests = [], onApproveAbsence, onRejectAbsence,
+}) {
   const [yearFilter, setYearFilter]   = useState('All');
   const [classFilter, setClassFilter] = useState('All');
   const [search, setSearch]           = useState('');
@@ -146,35 +152,8 @@ export default function AdminDashboard({ students, setStudents, taps, onTap }) {
   return (
     <div className="page">
 
-      {/* ── Fun facts strip ─────────────────────── */}
-      <div style={{
-        display: 'flex', gap: 10, overflowX: 'auto',
-        marginBottom: 24, paddingBottom: 4,
-        scrollbarWidth: 'none',
-      }}>
-        {funFacts.map(f => (
-          <div key={f.label} style={{
-            background: 'var(--surface-card)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '14px 18px',
-            minWidth: 130,
-            flexShrink: 0,
-            textAlign: 'center',
-            boxShadow: 'var(--shadow-sm)',
-          }}>
-            <div style={{ fontSize: '1.5rem', marginBottom: 6 }}>{f.icon}</div>
-            <div style={{
-              fontFamily: 'Bricolage Grotesque, sans-serif',
-              fontSize: '1.25rem', fontWeight: 800,
-              color: 'var(--teal)', letterSpacing: '-0.02em', lineHeight: 1,
-              marginBottom: 4,
-            }}>{f.value}</div>
-            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{f.label}</div>
-            <div style={{ fontSize: '0.65rem', color: 'var(--text-soft)' }}>{f.sub}</div>
-          </div>
-        ))}
-      </div>
+      {/* ── Current Leader strip (replaces fun facts) ─ */}
+      <CurrentLeaderStrip students={students} />
 
       {/* ── Hero status widget ──────────────────── */}
       <div style={{
@@ -394,6 +373,20 @@ export default function AdminDashboard({ students, setStudents, taps, onTap }) {
         </div>
       </div>
 
+      {/* ── Absence requests + Leaderboard ────── */}
+      <div className="grid-2" style={{ marginBottom: 20 }}>
+        <Card>
+          <AbsenceRequestsAdmin
+            requests={absenceRequests}
+            onApprove={onApproveAbsence}
+            onReject={onRejectAbsence}
+          />
+        </Card>
+        <Card>
+          <AttendanceLeaders students={students} />
+        </Card>
+      </div>
+
       {/* ── Live feed ──────────────────────────── */}
       <Card style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -532,21 +525,34 @@ export default function AdminDashboard({ students, setStudents, taps, onTap }) {
       <Card>
         <p className="section-title" style={{ marginBottom: 14 }}>Notifications</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {notifications.map(n => (
-            <div key={n.id} style={{
-              display: 'flex', gap: 12, padding: '11px 14px', borderRadius: 10,
-              background: n.type === 'warn' ? 'var(--red-light)' : 'var(--blue-light)',
-              border: `1px solid ${n.type === 'warn' ? 'var(--red-border)' : 'var(--blue-border)'}`,
-            }}>
-              <span style={{ fontSize: '0.95rem', lineHeight: 1 }}>
-                {n.type === 'warn' ? '⚠️' : 'ℹ️'}
-              </span>
-              <div>
-                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>{n.text}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 3 }}>{n.time}</div>
+          {extraNotifications.map(n => {
+            const palette = {
+              absence:    { bg: 'var(--teal-glow)',  border: 'var(--teal-border)',  color: 'var(--teal)'  },
+              message:    { bg: 'var(--purple-light)', border: 'var(--purple-border)', color: 'var(--purple)' },
+              alert:      { bg: 'var(--red-light)',  border: 'var(--red-border)',   color: 'var(--red)'   },
+              system:     { bg: 'var(--blue-light)', border: 'var(--blue-border)',  color: 'var(--blue)'  },
+              milestone:  { bg: 'var(--amber-light)', border: 'var(--amber-border)', color: 'var(--amber)' },
+              wellbeing:  { bg: 'var(--green-light)', border: 'var(--green-border)', color: 'var(--green)' },
+              event:      { bg: 'var(--surface-soft)', border: 'var(--border)',     color: 'var(--text-muted)' },
+            }[n.type] || { bg: 'var(--surface-soft)', border: 'var(--border)', color: 'var(--text-muted)' };
+
+            return (
+              <div key={n.id} style={{
+                display: 'flex', gap: 12, padding: '11px 14px', borderRadius: 10,
+                background: palette.bg,
+                border: `1px solid ${palette.border}`,
+              }}>
+                <span style={{ fontSize: '1.05rem', lineHeight: 1, flexShrink: 0 }}>{n.icon}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
+                    {n.title}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>{n.text}</div>
+                  <div style={{ fontSize: '0.7rem', color: palette.color, marginTop: 4, fontWeight: 700 }}>{n.time}</div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </Card>
 

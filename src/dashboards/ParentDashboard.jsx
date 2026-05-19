@@ -4,6 +4,9 @@ import {
 import Card from '../components/Card';
 import Badge from '../components/Badge';
 import Avatar from '../components/Avatar';
+import AbsenceRequestForm from '../components/AbsenceRequestForm';
+import MessagingPanel from '../components/MessagingPanel';
+import { MessageSquare } from 'lucide-react';
 import {
   attendanceHistory, notifications, goals, journalEntries,
 } from '../data/sampleData';
@@ -30,7 +33,11 @@ function sentimentLabel(moods) {
   return { text: 'Tough week — worth checking in', color: 'var(--amber)', bg: 'var(--amber-light)', border: 'var(--amber-border)' };
 }
 
-export default function ParentDashboard({ students }) {
+export default function ParentDashboard({
+  students,
+  absenceRequests = [], onSubmitAbsence,
+  threads = [], onSendMessage,
+}) {
   const child    = students.find(s => s.id === 'S001') || students[0];
   const rate     = weekRate(attendanceHistory);
   const doneGoals = goals.filter(g => g.done).length;
@@ -152,6 +159,25 @@ export default function ParentDashboard({ students }) {
           </div>
         </Card>
       </div>
+
+      {/* ── Absence request ───────────────────── */}
+      <div style={{ marginBottom: 20 }}>
+        <AbsenceRequestForm
+          student={child}
+          parent="J. Patel"
+          requests={absenceRequests}
+          onSubmit={onSubmitAbsence}
+        />
+      </div>
+
+      {/* ── Messaging ─────────────────────────── */}
+      <Card style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
+          <MessageSquare size={16} style={{ color: 'var(--purple)' }} />
+          <p className="section-title" style={{ marginBottom: 0 }}>Messages</p>
+        </div>
+        <MessagingPanel role="parent" userName="J. Patel" threads={threads} onSend={onSendMessage} />
+      </Card>
 
       {/* ── Recent journal entries ─────────────── */}
       <Card style={{ marginBottom: 20 }}>

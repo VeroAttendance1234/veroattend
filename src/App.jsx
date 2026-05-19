@@ -7,13 +7,9 @@ import ParentDashboard  from './dashboards/ParentDashboard';
 import MarkerPage       from './pages/MarkerPage';
 import LoginPage        from './pages/LoginPage';
 import { students as initialStudents } from './data/sampleData';
+import { initialAbsenceRequests, initialThreads } from './data/initialState';
 import './styles/global.css';
 
-// ============================================================
-// HARDWARE INTEGRATION POINT
-// Auto-detect: localhost = try Pi (real hardware mode)
-//              anywhere else = simulator mode (for deployed demos)
-// ============================================================
 const IS_LOCAL = typeof window !== 'undefined'
   && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.endsWith('.local'));
 
@@ -24,18 +20,55 @@ let tapCounter = 0;
 function now() {
   return new Date().toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: true });
 }
+function timestamp() {
+  return new Date().toISOString().slice(0, 16).replace('T', ' ');
+}
+function shortTime() {
+  return new Date().toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+}
 
 export default function App() {
-  const [authedRole, setAuthedRole]   = useState(null);   // null = not logged in
-  const [role, setRole]               = useState('Admin');
-  const [students, setStudents]       = useState(initialStudents);
-  const [taps, setTaps]               = useState([]);
-  const [showMarker, setShowMarker]   = useState(false);
+  const [authedRole, setAuthedRole] = useState(null);
+  const [role, setRole]             = useState('Admin');
+  const [students, setStudents]     = useState(initialStudents);
+  const [taps, setTaps]             = useState([]);
+  const [showMarker, setShowMarker] = useState(false);
+
+  // ── Shared cross-role state ────────────
+  const [absenceRequests, setAbsenceRequests] = useState(initialAbsenceRequests);
+  const [threads, setThreads]                 = useState(initialThreads);
+
   const socketRef = useRef(null);
 
+  /* Card tap pipeline */
   function handleTap(student) {
     setStudents(prev => prev.map(s => s.id === student.id ? { ...s, present: true } : s));
     setTaps(prev => [{ ...student, id: `tap-${++tapCounter}`, time: now() }, ...prev]);
+  }
+
+  /* Absence request actions */
+  function submitAbsenceRequest(req) {
+    setAbsenceRequests(prev => [req, ...prev]);
+  }
+  function approveAbsenceRequest(id) {
+    setAbsenceRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved' } : r));
+  }
+  function rejectAbsenceRequest(id) {
+    setAbsenceRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'rejected' } : r));
+  }
+
+  /* Messaging actions */
+  function sendMessage(threadId, text) {
+    setThreads(prev => prev.map(t => {
+      if (t.id !== threadId) return t;
+      const newMsg = {
+        id: `M-${Date.now()}`,
+        from: role.toLowerCase(),
+        text,
+        time: `Today ${shortTime()}`,
+      };
+      return { ...t, messages: [...t.messages, newMsg], unread: 0 };
+    }));
   }
 
   useEffect(() => {
@@ -48,30 +81,32 @@ export default function App() {
     return () => socketRef.current?.disconnect();
   }, []);
 
-  // Update browser tab title
   useEffect(() => {
     document.title = authedRole
       ? `VERO · ${authedRole} Dashboard`
       : 'VERO · Sign in';
   }, [authedRole]);
 
-  // ── Not logged in: show login screen ───────────────
   if (!authedRole) {
     return (
-      <LoginPage
-        onLogin={(r) => { setAuthedRole(r); setRole(r); }}
-      />
+      <LoginPage onLogin={(r) => { setAuthedRole(r); setRole(r); }} />
     );
   }
 
-  // ── Logged in: dashboards ──────────────────────────
+  /* Shared bundle to keep dashboards tidy */
+  const sharedProps = {
+    absenceRequests,
+    onSubmitAbsence: submitAbsenceRequest,
+    onApproveAbsence: approveAbsenceRequest,
+    onRejectAbsence: rejectAbsenceRequest,
+    threads,
+    onSendMessage: sendMessage,
+  };
+
   return (
     <>
       {showMarker && (
-        <MarkerPage
-          onClose={() => setShowMarker(false)}
-          setRole={setRole}
-        />
+        <MarkerPage onClose={() => setShowMarker(false)} setRole={setRole} />
       )}
 
       <Nav
@@ -82,10 +117,10 @@ export default function App() {
         onLogout={() => setAuthedRole(null)}
       />
 
-      {role === 'Admin'   && <AdminDashboard   students={students} setStudents={setStudents} taps={taps} onTap={handleTap} />}
-      {role === 'Teacher' && <TeacherDashboard students={students} setStudents={setStudents} taps={taps} onTap={handleTap} />}
-      {role === 'Student' && <StudentDashboard students={students} />}
-      {role === 'Parent'  && <ParentDashboard  students={students} />}
+      {role === 'Admin'   && <AdminDashboard   students={students} setStudents={setStudents} taps={taps} onTap={handleTap} {...sharedProps} />}
+      {role === 'Teacher' && <TeacherDashboard students={students} setStudents={setStudents} taps={taps} onTap={handleTap} {...sharedProps} />}
+      {role === 'Student' && <StudentDashboard students={students} {...sharedProps} />}
+      {role === 'Parent'  && <ParentDashboard  students={students} {...sharedProps} />}
     </>
   );
 }
