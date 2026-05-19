@@ -99,11 +99,14 @@ const SYSTEM_SPECS = [
 ];
 
 const TIMELINE = [
-  { date: 'Jan 2026', title: 'Project Inception', detail: 'Identified school attendance pain points. Defined VERO\'s core: real-time, role-based, hardware-integrated.' },
-  { date: 'Feb 2026', title: 'Design + Prototype', detail: 'Wireframes, brand identity, colour system. Selected tech stack and ordered Raspberry Pi + ACR122U reader.' },
-  { date: 'Mar 2026', title: 'Frontend Build', detail: 'Built 4 role-based dashboards in React. Implemented charts, live feed, search, filters, pagination.' },
-  { date: 'Apr 2026', title: 'Backend + Pi', detail: 'Flask backend, SQLite schema, pyscard integration, WebSocket layer. Pi + reader provisioned and connected.' },
-  { date: 'May 2026', title: 'Integration + Polish', detail: 'End-to-end card-tap pipeline working. UI polish, mobile responsive design, accessibility.' },
+  { date: 'Oct 2025', title: 'Research & Discovery',     detail: 'Surveyed existing school attendance systems (Schoolbox, Sentral, Canvas). Interviewed teachers about manual roll-marking pain points. Researched NFC/RFID hardware options.' },
+  { date: 'Nov 2025', title: 'Feasibility & Hardware R&D', detail: 'Compared RFID readers, evaluated Raspberry Pi vs Arduino, tested NFC card compatibility. Prototyped first card-tap with a USB reader and a Python script.' },
+  { date: 'Dec 2025', title: 'Requirements & Scope',     detail: 'Locked in the 4-role architecture (Admin / Teacher / Student / Parent). Drafted data model, user stories, and non-functional requirements for the HSC project brief.' },
+  { date: 'Jan 2026', title: 'Design + Brand System',    detail: 'Wireframes, brand identity (VERO logo, teal palette), typography. Built the design tokens that drive the live app.' },
+  { date: 'Feb 2026', title: 'Frontend Foundation',      detail: 'React + Vite scaffold, component library (Card, Badge, StatCard, Modal). 1,050 seeded students across 42 classes.' },
+  { date: 'Mar 2026', title: 'Dashboards Built',         detail: 'Four role-based dashboards. Recharts analytics, live feed, search, filters, pagination, attendance leaderboard.' },
+  { date: 'Apr 2026', title: 'Backend + Pi Integration', detail: 'Flask + Flask-SocketIO backend, SQLite schema, pyscard daemon on Raspberry Pi 3B. ACR122U reader provisioned and verified end-to-end.' },
+  { date: 'May 2026', title: 'Polish + Deploy',          detail: 'Mobile-responsive design, accessibility pass, absence requests, parent–teacher messaging, deployment to Vercel. Final folio and documentation.' },
 ];
 
 /* ─────────────────────────────────────────────────────────────
