@@ -1,172 +1,188 @@
 import { useState, useEffect } from 'react';
 import {
-  Monitor, Wifi, CreditCard, Users, BookOpen, Heart, ChevronRight, X,
-  Play, Code, Cpu, Database, Zap, Award, Calendar,
-  CheckCircle, Clock, ArrowRight, Sparkles, ExternalLink, Copy,
+  X, ArrowRight, ArrowDown, Play, ExternalLink, Copy, CheckCircle,
+  Monitor, BookOpen, Heart, Users, CreditCard, Wifi, Cpu, Database,
+  Code, Zap, Calendar, Sparkles, Award, TrendingUp, Shield,
+  MessageSquare, ClipboardList, Activity, GitBranch, Globe,
 } from 'lucide-react';
 import Modal from '../components/Modal';
 import Tagline from '../components/Tagline';
+import Reveal from '../components/Reveal';
+import CountUp from '../components/CountUp';
 
-/* ─────────────────────────────────────────────────────────────
-   DEMO ACCOUNT DATA
-───────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────
+   DATA
+───────────────────────────────────────────── */
 const DEMO_ACCOUNTS = [
   {
-    role: 'Admin',
-    name: 'Administrator',
-    description: 'Full school overview — 1,050 students across Years 7-12',
-    colour: '#14B8B8',
-    icon: Monitor,
-    highlights: ['Live dashboard', 'Analytics charts', 'Class leaderboard', '6 KPI cards'],
+    role: 'Admin', label: 'Administrator', colour: '#14B8B8', icon: Monitor,
+    description: 'Full school overview — 1,050 students, live analytics, system control.',
     features: [
-      { title: 'Live attendance hero', detail: 'Pulsing live indicator showing real-time school-wide rate, present/absent counts, and last scan' },
-      { title: 'Stat cards', detail: '6 colour-coded metrics (total, present, absent, late, staff, classes) with watermark icons' },
-      { title: 'Trend analytics', detail: 'Recharts area chart of monthly attendance over 5 years with toggle (6M/1Y/2Y/5Y)' },
-      { title: 'Year-group breakdown', detail: 'Bar chart comparing Year 7 through Year 12 attendance rates' },
-      { title: 'Class leaderboard', detail: 'Top 12 classes with gold/silver/bronze medals and progress bars' },
-      { title: 'System status', detail: 'Live device monitoring (Pi, ACR122U, WebSocket, Database)' },
-      { title: 'Searchable roll', detail: '1,050 students paginated 30/page with year+class filters and search' },
+      { t: 'Live attendance hero',  d: 'Pulsing real-time rate of every active scan across the school' },
+      { t: 'Six-up stat grid',      d: 'Total students, present, absent, late, staff, classes — all animated count-ups' },
+      { t: 'Trend analytics',       d: 'Recharts area chart of monthly attendance over 5 years with timeframe toggles' },
+      { t: 'Year-group breakdown',  d: 'Bar chart comparing Year 7-12 attendance rates side-by-side' },
+      { t: 'Calendar heatmap',      d: 'Month-grid heatmap with daily rate, today indicator, hover/tap details' },
+      { t: 'Absence inbox',         d: 'Pending requests with one-click approve/reject + expandable parent reasons' },
+      { t: 'Class leaderboard',     d: 'Top 12 classes with medals + animated progress bars' },
+      { t: 'Student leaderboard',   d: 'Top students by attendance % with streak tracking' },
+      { t: 'System status',         d: 'Live device monitoring — Pi, ACR122U, WebSocket, Database' },
+      { t: 'Searchable roll',       d: '1,050 students paginated 30/page with year, class, name filters' },
+      { t: 'Notifications feed',    d: '9 colour-coded notification types — absence, alert, message, system, milestone' },
     ],
   },
   {
-    role: 'Teacher',
-    name: 'Mr David Chen',
-    description: 'Maths teacher — 6 classes across Years 7-12',
-    colour: '#2563EB',
-    icon: BookOpen,
-    highlights: ['Per-class live feed', 'Class roll', 'Weekly timetable', 'Stats'],
+    role: 'Teacher', label: 'Mr David Chen', colour: '#2563EB', icon: BookOpen,
+    description: 'Maths teacher with 6 classes — class management & live attendance.',
     features: [
-      { title: 'Teacher header card', detail: 'Profile with subject, class count, and live class attendance rate' },
-      { title: 'Class switcher', detail: '6 class buttons showing per-class present/total counts at a glance' },
-      { title: 'Live feed by class', detail: 'Filters the school-wide scan stream to just the selected class' },
-      { title: 'Class roll', detail: 'Sortable roll for the selected class with present/absent badges' },
-      { title: 'Weekly timetable', detail: 'Full week timetable highlighting today and the current period' },
+      { t: 'Teacher switcher',      d: 'Search through 30 staff members by name or subject' },
+      { t: 'Class selector',        d: '6 class buttons with per-class present/total counts at a glance' },
+      { t: 'Live feed by class',    d: 'Filters the school-wide scan stream to just the selected class' },
+      { t: 'Class roll',            d: 'Clickable students with DiceBear avatars and live status' },
+      { t: 'Weekly timetable',      d: 'Full week timetable highlighting today and the current period' },
+      { t: 'Parent messages',       d: 'Threaded chat with parents of students in their classes' },
     ],
   },
   {
-    role: 'Student',
-    name: 'Aisha Patel — Year 11A',
-    description: 'Student portal with wellbeing, goals and timetable',
-    colour: '#16A34A',
-    icon: Heart,
-    highlights: ['Wellbeing check-in', 'Journal', 'Goals', 'Timetable'],
+    role: 'Student', label: 'Aisha Patel', colour: '#16A34A', icon: Heart,
+    description: 'Year 11A student — wellbeing, goals, journal, timetable.',
     features: [
-      { title: 'Welcome banner', detail: 'Personalised greeting with today\'s check-in status and current mood' },
-      { title: 'Live timetable', detail: 'Today\'s periods with NOW pulse indicator on the current lesson' },
-      { title: 'Daily mood picker', detail: '5-emoji wellbeing scale (Struggling → Amazing) with optional note' },
-      { title: 'Searchable journal', detail: 'Full mood journal history with search and mood-tagged entries' },
-      { title: 'Goal tracker', detail: 'Filterable goals by category (Academic/Health/Personal/Wellbeing) with priority + due dates' },
+      { t: 'Welcome banner',        d: 'Personalised greeting with today\'s status and current mood' },
+      { t: 'Live timetable',        d: 'Today\'s periods with NOW indicator on the current lesson' },
+      { t: 'Wellbeing check-in',    d: '5-emoji mood scale with optional note — feeds into the journal' },
+      { t: 'Searchable journal',    d: 'Full mood journal history with search and emoji-tagged entries' },
+      { t: 'Goal tracker',          d: 'Filterable goals by category with priority + due dates' },
+      { t: 'Family messaging',      d: 'Chat threads with parents and teachers' },
     ],
   },
   {
-    role: 'Parent',
-    name: 'J. Patel (Parent)',
-    description: "Read-only view of Aisha's attendance and progress",
-    colour: '#7C3AED',
-    icon: Users,
-    highlights: ['Week attendance', 'Wellbeing summary', 'Journal', 'Goals'],
+    role: 'Parent', label: 'J. Patel', colour: '#7C3AED', icon: Users,
+    description: 'Parent of Aisha — attendance, wellbeing, absence requests.',
     features: [
-      { title: 'Child status card', detail: 'Profile card border colour indicates whether child is present today' },
-      { title: 'Week attendance', detail: 'Mon-Fri attendance breakdown with progress bar and weekly rate' },
-      { title: 'Mood summary', detail: 'Visual mood chart for the week with auto-generated sentiment label' },
-      { title: 'Recent journal', detail: 'Read-only view of child\'s 3 most recent journal entries' },
-      { title: 'Goal progress', detail: 'Read-only view of child\'s active goals with completion tracker' },
-      { title: 'School alerts', detail: 'Notification feed (excursion forms, sports news, parent-teacher nights)' },
+      { t: 'Child status card',     d: 'Border colour shows whether child is present today' },
+      { t: 'Week attendance',       d: 'Mon-Fri breakdown with progress bar and weekly rate' },
+      { t: 'Mood summary',          d: 'Visual mood chart with auto-generated sentiment label' },
+      { t: 'Read-only journal',     d: 'Child\'s 3 most recent journal entries' },
+      { t: 'Absence requests',      d: 'Full submission form with type chips, dates, reason, medical cert toggle' },
+      { t: 'Messaging',             d: 'Threaded chat with teachers, school admin, and child' },
     ],
   },
 ];
 
-const SYSTEM_SPECS = [
-  { category: 'Frontend',  items: [
-    { label: 'React 19',           icon: Code },
-    { label: 'Vite 8',             icon: Zap },
-    { label: 'Recharts',           icon: Monitor },
-    { label: 'Lucide Icons',       icon: Sparkles },
-    { label: 'Socket.io Client',   icon: Wifi },
-  ]},
-  { category: 'Backend',   items: [
-    { label: 'Python 3.11',        icon: Code },
-    { label: 'Flask',              icon: Cpu },
-    { label: 'Flask-SocketIO',     icon: Wifi },
-    { label: 'pyscard',            icon: CreditCard },
-    { label: 'SQLite',             icon: Database },
-  ]},
-  { category: 'Hardware',  items: [
-    { label: 'Raspberry Pi 3B',    icon: Cpu },
-    { label: 'ACR122U NFC Reader', icon: CreditCard },
-    { label: 'PC/SC Daemon',       icon: Cpu },
-    { label: 'MIFARE Classic Cards', icon: CreditCard },
-  ]},
+const TECH_GROUPS = [
+  {
+    title: 'Frontend',
+    colour: '#14B8B8',
+    items: [
+      { name: 'React 19',         note: 'Latest React with concurrent features' },
+      { name: 'Vite 8',           note: 'Sub-second HMR build tooling' },
+      { name: 'Recharts',         note: 'Responsive data visualisation' },
+      { name: 'Lucide Icons',     note: '1000+ stroke-based icons' },
+      { name: 'Socket.io Client', note: 'Real-time WebSocket' },
+    ],
+  },
+  {
+    title: 'Backend',
+    colour: '#2563EB',
+    items: [
+      { name: 'Python 3.11',      note: 'Pi-native runtime' },
+      { name: 'Flask',            note: 'Lightweight WSGI framework' },
+      { name: 'Flask-SocketIO',   note: 'Real-time bidirectional events' },
+      { name: 'pyscard',          note: 'PC/SC bindings for NFC' },
+      { name: 'SQLite',           note: 'Embedded relational store' },
+    ],
+  },
+  {
+    title: 'Hardware',
+    colour: '#7C3AED',
+    items: [
+      { name: 'Raspberry Pi 3B',     note: 'Quad-core ARM Cortex-A53' },
+      { name: 'ACR122U NFC Reader',  note: 'USB-powered, ISO 14443A/B' },
+      { name: 'PC/SC Daemon',        note: 'Linux smart-card middleware' },
+      { name: 'MIFARE Classic',      note: '13.56 MHz NFC student cards' },
+    ],
+  },
 ];
 
 const TIMELINE = [
-  { date: 'Oct 2025', title: 'Research & Discovery',     detail: 'Surveyed existing school attendance systems (Schoolbox, Sentral, Canvas). Interviewed teachers about manual roll-marking pain points. Researched NFC/RFID hardware options.' },
-  { date: 'Nov 2025', title: 'Feasibility & Hardware R&D', detail: 'Compared RFID readers, evaluated Raspberry Pi vs Arduino, tested NFC card compatibility. Prototyped first card-tap with a USB reader and a Python script.' },
-  { date: 'Dec 2025', title: 'Requirements & Scope',     detail: 'Locked in the 4-role architecture (Admin / Teacher / Student / Parent). Drafted data model, user stories, and non-functional requirements for the HSC project brief.' },
-  { date: 'Jan 2026', title: 'Design + Brand System',    detail: 'Wireframes, brand identity (VERO logo, teal palette), typography. Built the design tokens that drive the live app.' },
-  { date: 'Feb 2026', title: 'Frontend Foundation',      detail: 'React + Vite scaffold, component library (Card, Badge, StatCard, Modal). 1,050 seeded students across 42 classes.' },
-  { date: 'Mar 2026', title: 'Dashboards Built',         detail: 'Four role-based dashboards. Recharts analytics, live feed, search, filters, pagination, attendance leaderboard.' },
-  { date: 'Apr 2026', title: 'Backend + Pi Integration', detail: 'Flask + Flask-SocketIO backend, SQLite schema, pyscard daemon on Raspberry Pi 3B. ACR122U reader provisioned and verified end-to-end.' },
-  { date: 'May 2026', title: 'Polish + Deploy',          detail: 'Mobile-responsive design, accessibility pass, absence requests, parent–teacher messaging, deployment to Vercel. Final folio and documentation.' },
+  { date: 'Oct 2025', title: 'Research & Discovery',     detail: 'Surveyed Schoolbox, Sentral, Canvas. Interviewed teachers about roll-marking pain points. Researched NFC hardware.' },
+  { date: 'Nov 2025', title: 'Feasibility & Hardware R&D', detail: 'Compared RFID readers, evaluated Pi vs Arduino, tested NFC compatibility. First card-tap prototype with Python.' },
+  { date: 'Dec 2025', title: 'Requirements & Scope',     detail: 'Locked in 4-role architecture. Drafted data model, user stories, non-functional requirements for HSC project brief.' },
+  { date: 'Jan 2026', title: 'Design + Brand System',    detail: 'Wireframes, VERO logo, teal palette, design tokens. Built the visual system that drives every screen.' },
+  { date: 'Feb 2026', title: 'Frontend Foundation',      detail: 'React + Vite scaffold, component library. 1,050 seeded students across 42 classes.' },
+  { date: 'Mar 2026', title: 'Dashboards Built',         detail: 'Four role-based dashboards. Recharts analytics, live feed, search, filters, pagination, leaderboards.' },
+  { date: 'Apr 2026', title: 'Backend + Pi Integration', detail: 'Flask + Flask-SocketIO, SQLite schema, pyscard on Pi 3B. ACR122U verified end-to-end.' },
+  { date: 'May 2026', title: 'Polish + Deploy',          detail: 'Mobile-responsive, accessibility, absence requests, messaging, deployment to Vercel.' },
 ];
 
-/* ─────────────────────────────────────────────────────────────
-   FEATURE MODAL — uses shared Modal for consistency
-───────────────────────────────────────────────────────────── */
+const PROBLEMS = [
+  { icon: '⏱️', title: 'Manual roll wastes time', detail: 'Teachers spend 5–8 minutes per period marking rolls. That\'s ~30 minutes/day of lost teaching.' },
+  { icon: '❌', title: 'Errors and friction',     detail: 'Paper or basic forms get lost, parents are confused, admins chase up missing data.' },
+  { icon: '🔍', title: 'No real-time visibility', detail: 'Schools don\'t know who\'s on campus until rolls are entered hours later.' },
+  { icon: '💬', title: 'Disconnected workflows',  detail: 'Absence requests, messaging, and attendance live in 3+ different systems.' },
+];
+
+const SOLUTIONS = [
+  { icon: <Zap size={18} />,           title: 'Sub-second card tap',  detail: 'Students tap an NFC card on the reader. Their dashboard updates in real-time everywhere.' },
+  { icon: <Shield size={18} />,        title: 'One source of truth',  detail: 'Attendance, absences, messaging — all in one app, all in sync.' },
+  { icon: <Activity size={18} />,      title: 'Live analytics',       detail: 'Admins see school-wide attendance rates updating live. Spot drops the moment they happen.' },
+  { icon: <MessageSquare size={18} />, title: 'Frictionless workflow', detail: 'Parents submit absences from their phone. Admins approve with one click. Everyone is notified.' },
+];
+
+/* ─────────────────────────────────────────────
+   FEATURE MODAL
+───────────────────────────────────────────── */
 function FeatureModal({ account, onClose, onOpen }) {
   if (!account) return null;
   const Icon = account.icon;
-
   return (
     <Modal
       open={!!account}
       onClose={onClose}
-      width="md"
+      width="lg"
       accent={account.colour}
       icon={<Icon size={20} strokeWidth={2.2} />}
       title={`${account.role} Dashboard`}
-      subtitle={account.name}
+      subtitle={account.label}
       footer={
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Ready to explore?</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{account.features.length} features built</span>
           <button
             onClick={onOpen}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '9px 18px', borderRadius: 10,
-              background: account.colour, color: '#fff',
-              fontSize: '0.85rem', fontWeight: 700,
-              boxShadow: `0 4px 16px ${account.colour}40`,
+              padding: '10px 20px', borderRadius: 11,
+              background: `linear-gradient(135deg, ${account.colour} 0%, ${account.colour}dd 100%)`,
+              color: '#fff', fontSize: '0.88rem', fontWeight: 800,
+              boxShadow: `0 6px 20px ${account.colour}55`,
             }}
           >
-            <Play size={13} strokeWidth={2.8} />
+            <Play size={13} strokeWidth={3} />
             Open {account.role} dashboard
-            <ArrowRight size={14} strokeWidth={2.8} />
+            <ArrowRight size={14} strokeWidth={3} />
           </button>
         </div>
       }
     >
-      <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 18 }}>
+      <p style={{ fontSize: '0.93rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 20 }}>
         {account.description}
       </p>
-      <div className="label-caps" style={{ marginBottom: 10 }}>Key features</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+      <div className="label-caps" style={{ marginBottom: 12 }}>Every feature built</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 9 }}>
         {account.features.map((f, i) => (
           <div key={i} style={{
-            display: 'flex', gap: 11,
+            display: 'flex', gap: 10,
             padding: '11px 13px',
             background: 'var(--surface-soft)',
             border: '1px solid var(--border)',
             borderRadius: 11,
           }}>
-            <CheckCircle size={15} style={{ color: account.colour, flexShrink: 0, marginTop: 2 }} strokeWidth={2.5} />
+            <CheckCircle size={14} style={{ color: account.colour, flexShrink: 0, marginTop: 3 }} strokeWidth={2.5} />
             <div>
-              <div style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
-                {f.title}
+              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
+                {f.t}
               </div>
-              <div style={{ fontSize: '0.79rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                {f.detail}
-              </div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>{f.d}</div>
             </div>
           </div>
         ))}
@@ -175,12 +191,11 @@ function FeatureModal({ account, onClose, onOpen }) {
   );
 }
 
-/* ─────────────────────────────────────────────────────────────
-   MAIN MARKER PAGE
-───────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────
+   MAIN PAGE
+───────────────────────────────────────────── */
 export default function MarkerPage({ onClose, setRole }) {
   const [openModal, setOpenModal] = useState(null);
-  const [tab, setTab] = useState('overview'); // overview | tech | timeline
   const [copied, setCopied] = useState(false);
 
   function copyURL() {
@@ -200,28 +215,28 @@ export default function MarkerPage({ onClose, setRole }) {
       position: 'fixed', inset: 0, zIndex: 999,
       background: 'var(--surface)',
       overflowY: 'auto',
-      animation: 'fadeIn 0.2s ease',
+      animation: 'fadeIn 0.22s ease',
     }}>
-      {/* Close button (top-right corner) */}
+      {/* Close FAB */}
       <button
         onClick={onClose}
+        aria-label="Close"
         style={{
           position: 'fixed', top: 16, right: 16, zIndex: 1000,
-          width: 40, height: 40, borderRadius: '50%',
+          width: 42, height: 42, borderRadius: '50%',
           background: 'var(--surface-card)',
           border: '1px solid var(--border)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: 'var(--text-muted)',
           boxShadow: 'var(--shadow-md)',
-          transition: 'all 0.12s ease',
+          transition: 'all 0.14s ease',
         }}
-        onMouseEnter={e => { e.currentTarget.style.color = 'var(--red)'; e.currentTarget.style.borderColor = 'var(--red-border)'; }}
-        onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
+        onMouseEnter={e => { e.currentTarget.style.color = 'var(--red)'; e.currentTarget.style.borderColor = 'var(--red-border)'; e.currentTarget.style.transform = 'scale(1.05)'; }}
+        onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.transform = 'scale(1)'; }}
       >
         <X size={18} />
       </button>
 
-      {/* Feature modal */}
       {openModal && (
         <FeatureModal
           account={openModal}
@@ -230,351 +245,603 @@ export default function MarkerPage({ onClose, setRole }) {
         />
       )}
 
-      <div style={{ maxWidth: 920, margin: '0 auto', padding: '48px 24px 80px' }}>
+      {/* ═══════════════════════════════════════
+          §1 HERO — full-bleed, massive
+      ═══════════════════════════════════════ */}
+      <section style={{
+        minHeight: '85vh',
+        display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        padding: '60px 28px',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Ambient glow */}
+        <div style={{
+          position: 'absolute', top: '-20%', left: '-10%',
+          width: 600, height: 600,
+          background: 'radial-gradient(circle, rgba(20,184,184,0.18) 0%, transparent 70%)',
+          pointerEvents: 'none', filter: 'blur(40px)',
+        }} />
+        <div style={{
+          position: 'absolute', bottom: '-20%', right: '-10%',
+          width: 700, height: 700,
+          background: 'radial-gradient(circle, rgba(124,58,237,0.10) 0%, transparent 70%)',
+          pointerEvents: 'none', filter: 'blur(40px)',
+        }} />
 
-        {/* ─── HERO ───────────────────────────── */}
-        <div style={{ textAlign: 'center', marginBottom: 44 }}>
-          <img
-            src="/vero-logo.png"
-            alt="VERO."
-            style={{ height: 110, objectFit: 'contain', display: 'block', margin: '0 auto 20px' }}
-          />
-          <div style={{ marginBottom: 30 }}>
-            <Tagline size="lg" />
-          </div>
-
+        <div style={{ maxWidth: 1100, margin: '0 auto', width: '100%', position: 'relative' }}>
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 10,
+            display: 'inline-flex', alignItems: 'center', gap: 9,
             background: 'var(--surface-card)',
-            border: '1.5px solid var(--teal-border)',
-            borderRadius: 99, padding: '8px 18px',
-            marginBottom: 20,
+            border: '1px solid var(--teal-border)',
+            borderRadius: 99, padding: '7px 16px',
+            marginBottom: 28,
             boxShadow: 'var(--shadow-sm)',
+            animation: 'taglineWordIn 0.5s cubic-bezier(0.32,0.72,0,1) both',
           }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--green)', animation: 'pulse-dot 2s ease-in-out infinite' }} />
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--teal)', letterSpacing: '0.02em' }}>
-              HSC Software Design & Development · Major Project 2026
+            <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)', animation: 'pulse-dot 2s ease-in-out infinite' }} />
+            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--teal)', letterSpacing: '0.02em' }}>
+              Live · HSC Major Project · 2026
             </span>
           </div>
 
-          <h1 style={{ fontSize: '2rem', marginBottom: 12, letterSpacing: '-0.03em' }}>
-            A real-time school attendance platform
-          </h1>
-          <p style={{ fontSize: '1.02rem', color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: 580, margin: '0 auto 24px' }}>
-            VERO unifies hardware (NFC card reader on Raspberry Pi),
-            backend (Flask + WebSocket), and frontend (React) into a single live system —
-            with four distinct role-based experiences.
+          <img
+            src="/vero-logo.png"
+            alt="VERO."
+            style={{
+              height: 140, objectFit: 'contain', display: 'block', marginBottom: 28,
+              animation: 'taglineWordIn 0.6s 0.1s cubic-bezier(0.32,0.72,0,1) both',
+            }}
+          />
+
+          <div style={{ marginBottom: 32, animation: 'taglineWordIn 0.6s 0.2s cubic-bezier(0.32,0.72,0,1) both' }}>
+            <Tagline size="hero" />
+          </div>
+
+          <p style={{
+            fontSize: '1.2rem',
+            color: 'var(--text-muted)',
+            lineHeight: 1.6,
+            maxWidth: 640,
+            marginBottom: 36,
+            animation: 'taglineWordIn 0.6s 0.3s cubic-bezier(0.32,0.72,0,1) both',
+          }}>
+            A real-time school attendance platform unifying NFC card hardware, a Python backend on Raspberry Pi, and four role-based React dashboards into a single living system.
           </p>
 
-          {/* Quick stats row */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 32, flexWrap: 'wrap', marginTop: 12 }}>
+          <div style={{
+            display: 'flex', gap: 12, flexWrap: 'wrap',
+            animation: 'taglineWordIn 0.6s 0.4s cubic-bezier(0.32,0.72,0,1) both',
+          }}>
+            <button
+              onClick={onClose}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '14px 24px', borderRadius: 12,
+                background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)',
+                color: '#fff', fontSize: '1rem', fontWeight: 800,
+                boxShadow: '0 8px 28px rgba(20,184,184,0.4)',
+                transition: 'transform 0.14s ease',
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+            >
+              Explore the live demo
+              <ArrowRight size={17} strokeWidth={2.8} />
+            </button>
+            <a
+              href="#features"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                padding: '14px 22px', borderRadius: 12,
+                background: 'var(--surface-card)',
+                border: '1.5px solid var(--border)',
+                color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 700,
+                textDecoration: 'none',
+                transition: 'all 0.14s ease',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--teal)'; e.currentTarget.style.color = 'var(--teal)'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+            >
+              Read the case study
+              <ArrowDown size={15} strokeWidth={2.6} />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          §2 NUMBERS — big stats with count-up
+      ═══════════════════════════════════════ */}
+      <section style={{
+        padding: '80px 28px',
+        background: 'linear-gradient(180deg, transparent 0%, rgba(20,184,184,0.04) 100%)',
+        borderTop: '1px solid var(--border)',
+        borderBottom: '1px solid var(--border)',
+      }}>
+        <Reveal>
+          <div style={{
+            maxWidth: 1100, margin: '0 auto',
+            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24,
+          }} className="numbers-grid">
             {[
-              { v: '1,050', l: 'Students' },
-              { v: '42',    l: 'Classes' },
-              { v: '4',     l: 'User roles' },
-              { v: '< 100ms', l: 'Tap → Update' },
-            ].map(({ v, l }) => (
-              <div key={l} style={{ textAlign: 'center' }}>
+              { label: 'Students seeded',  value: 1050,    suffix: ''      },
+              { label: 'Classes',          value: 42,      suffix: ''      },
+              { label: 'Teaching staff',   value: 30,      suffix: ''      },
+              { label: 'Tap → UI latency', value: 100,     suffix: ' ms',  prefix: '<' },
+            ].map(s => (
+              <div key={s.label}>
                 <div style={{
                   fontFamily: 'Bricolage Grotesque, sans-serif',
-                  fontSize: '1.6rem', fontWeight: 800, color: 'var(--teal)',
-                  letterSpacing: '-0.03em', lineHeight: 1,
-                }}>{v}</div>
-                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '0.07em', marginTop: 4 }}>{l}</div>
+                  fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+                  fontWeight: 800,
+                  color: 'var(--text-primary)',
+                  letterSpacing: '-0.04em',
+                  lineHeight: 1,
+                  marginBottom: 8,
+                }}>
+                  <CountUp value={s.value} prefix={s.prefix || ''} suffix={s.suffix} />
+                </div>
+                <div style={{
+                  fontSize: '0.78rem', fontWeight: 800,
+                  color: 'var(--text-soft)',
+                  textTransform: 'uppercase', letterSpacing: '0.1em',
+                }}>
+                  {s.label}
+                </div>
               </div>
             ))}
           </div>
-        </div>
+        </Reveal>
+      </section>
 
-        {/* ─── TAB SWITCHER ───────────────────── */}
-        <div style={{
-          display: 'flex', gap: 4, padding: 4,
-          background: 'var(--surface-card)',
-          border: '1px solid var(--border)',
-          borderRadius: 12,
-          marginBottom: 26,
-          width: 'fit-content',
-          marginLeft: 'auto', marginRight: 'auto',
-        }}>
-          {[
-            { id: 'overview', label: 'Demo Accounts', icon: Users },
-            { id: 'tech',     label: 'Tech Stack',    icon: Code },
-            { id: 'timeline', label: 'Project Timeline', icon: Calendar },
-          ].map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setTab(id)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 7,
-                padding: '8px 16px', borderRadius: 9,
-                background: tab === id ? 'var(--teal)' : 'transparent',
-                color: tab === id ? '#fff' : 'var(--text-muted)',
-                fontWeight: 700, fontSize: '0.85rem',
-                transition: 'all 0.14s ease',
-              }}
-            >
-              <Icon size={14} strokeWidth={2.5} />
-              {label}
-            </button>
-          ))}
-        </div>
+      {/* ═══════════════════════════════════════
+          §3 PROBLEM / SOLUTION
+      ═══════════════════════════════════════ */}
+      <section id="features" style={{ padding: '100px 28px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <Reveal>
+            <div className="label-caps" style={{ color: 'var(--teal)', marginBottom: 18 }}>The problem</div>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+              letterSpacing: '-0.035em', lineHeight: 1.1, marginBottom: 24,
+              maxWidth: 720,
+            }}>
+              Marking the roll wastes hours. Schools need real-time visibility — not yesterday's spreadsheet.
+            </h2>
+          </Reveal>
 
-        {/* ─── TAB CONTENT ────────────────────── */}
-        {tab === 'overview' && (
-          <div style={{ animation: 'fadeIn 0.25s ease' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
-              {DEMO_ACCOUNTS.map(acc => {
-                const Icon = acc.icon;
-                return (
-                  <button
-                    key={acc.role}
-                    onClick={() => setOpenModal(acc)}
-                    style={{
-                      background: 'var(--surface-card)',
-                      border: '1.5px solid var(--border)',
-                      borderRadius: 16,
-                      padding: '20px 20px 16px',
-                      textAlign: 'left',
-                      transition: 'all 0.18s ease',
-                      display: 'flex', flexDirection: 'column', gap: 10,
-                      position: 'relative',
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.borderColor = acc.colour;
-                      e.currentTarget.style.boxShadow = `0 8px 28px ${acc.colour}25`;
-                      e.currentTarget.style.transform = 'translateY(-3px)';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.borderColor = 'var(--border)';
-                      e.currentTarget.style.boxShadow = 'none';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-                        <div style={{
-                          width: 38, height: 38, borderRadius: 11,
-                          background: `${acc.colour}18`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: acc.colour,
-                        }}>
-                          <Icon size={18} strokeWidth={2} />
-                        </div>
-                        <div>
-                          <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)' }}>
-                            {acc.role}
-                          </div>
-                          <div style={{ fontSize: '0.72rem', color: acc.colour, fontWeight: 700 }}>{acc.name}</div>
-                        </div>
-                      </div>
-                      <div style={{
-                        padding: '3px 9px', borderRadius: 99,
-                        background: `${acc.colour}12`,
-                        color: acc.colour,
-                        fontSize: '0.68rem', fontWeight: 800,
-                        letterSpacing: '0.04em',
-                      }}>
-                        VIEW
-                      </div>
-                    </div>
-
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
-                      {acc.description}
-                    </p>
-
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                      {acc.highlights.map(h => (
-                        <span key={h} style={{
-                          fontSize: '0.66rem', fontWeight: 700,
-                          padding: '2px 8px', borderRadius: 99,
-                          background: 'var(--surface-soft)',
-                          color: 'var(--text-muted)',
-                          border: '1px solid var(--border)',
-                        }}>
-                          {h}
-                        </span>
-                      ))}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            <p style={{ textAlign: 'center', fontSize: '0.78rem', color: 'var(--text-soft)', marginTop: 16 }}>
-              Click any role card to see its full feature breakdown
-            </p>
-          </div>
-        )}
-
-        {tab === 'tech' && (
-          <div style={{ animation: 'fadeIn 0.25s ease' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {SYSTEM_SPECS.map(group => (
-                <div key={group.category} style={{
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 80 }} className="problem-grid">
+            {PROBLEMS.map((p, i) => (
+              <Reveal key={p.title} delay={i * 70}>
+                <div style={{
                   background: 'var(--surface-card)',
                   border: '1px solid var(--border)',
-                  borderRadius: 16,
-                  padding: '20px 22px',
+                  borderRadius: 14, padding: '22px 24px',
                   boxShadow: 'var(--shadow-sm)',
+                  display: 'flex', gap: 14,
+                  height: '100%',
+                }}>
+                  <div style={{ fontSize: '1.6rem', lineHeight: 1, flexShrink: 0 }}>{p.icon}</div>
+                  <div>
+                    <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 800, fontSize: '1.05rem', marginBottom: 6, letterSpacing: '-0.02em' }}>
+                      {p.title}
+                    </div>
+                    <div style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                      {p.detail}
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal>
+            <div className="label-caps" style={{ color: 'var(--teal)', marginBottom: 18 }}>The solution</div>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+              letterSpacing: '-0.035em', lineHeight: 1.1, marginBottom: 32,
+              maxWidth: 720,
+            }}>
+              One tap. One source of truth. Live for everyone.
+            </h2>
+          </Reveal>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }} className="problem-grid">
+            {SOLUTIONS.map((s, i) => (
+              <Reveal key={s.title} delay={i * 70}>
+                <div style={{
+                  background: 'var(--surface-card)',
+                  border: '1px solid var(--teal-border)',
+                  borderRadius: 14, padding: '22px 24px',
+                  boxShadow: 'var(--shadow-sm)',
+                  display: 'flex', gap: 14,
+                  height: '100%',
+                }}>
+                  <div style={{
+                    width: 38, height: 38, borderRadius: 10,
+                    background: 'var(--teal-glow)',
+                    color: 'var(--teal)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    {s.icon}
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 800, fontSize: '1.05rem', marginBottom: 6, letterSpacing: '-0.02em' }}>
+                      {s.title}
+                    </div>
+                    <div style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                      {s.detail}
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          §4 HOW IT WORKS — pipeline
+      ═══════════════════════════════════════ */}
+      <section style={{
+        padding: '100px 28px',
+        background: 'var(--surface-card)',
+        borderTop: '1px solid var(--border)',
+        borderBottom: '1px solid var(--border)',
+      }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <Reveal>
+            <div className="label-caps" style={{ color: 'var(--teal)', marginBottom: 18 }}>How it works</div>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+              letterSpacing: '-0.035em', lineHeight: 1.1, marginBottom: 40,
+              maxWidth: 760,
+            }}>
+              From a card tap to a live dashboard — in under 100 milliseconds.
+            </h2>
+          </Reveal>
+
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16,
+          }} className="pipeline-grid">
+            {[
+              { n: '01', icon: CreditCard, title: 'NFC tap',         d: 'Student taps their MIFARE card on the ACR122U USB reader connected to the Raspberry Pi.' },
+              { n: '02', icon: Cpu,        title: 'Pi identifies',   d: 'Python + pyscard reads the UID and queries SQLite for the matching student record.' },
+              { n: '03', icon: Wifi,       title: 'WebSocket emit',  d: 'Flask-SocketIO broadcasts a card_tap event with the student data over WebSocket.' },
+              { n: '04', icon: Activity,   title: 'UI updates live', d: 'React clients receive the event via socket.io-client and update every dashboard in real-time.' },
+            ].map((step, i) => (
+              <Reveal key={step.n} delay={i * 100}>
+                <div style={{
+                  background: 'var(--surface-soft)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 14, padding: '22px 22px',
+                  height: '100%', position: 'relative',
                 }}>
                   <div style={{
                     fontFamily: 'Bricolage Grotesque, sans-serif',
-                    fontSize: '0.95rem', fontWeight: 800,
-                    color: 'var(--teal)', marginBottom: 14,
-                    letterSpacing: '-0.01em',
+                    fontSize: '2.2rem', fontWeight: 800,
+                    color: 'var(--teal)', opacity: 0.4,
+                    letterSpacing: '-0.04em', lineHeight: 1,
+                    marginBottom: 16,
                   }}>
-                    {group.category}
+                    {step.n}
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 8 }}>
-                    {group.items.map(({ label, icon: Icon }) => (
-                      <div key={label} style={{
-                        display: 'flex', alignItems: 'center', gap: 9,
-                        padding: '10px 12px', borderRadius: 10,
-                        background: 'var(--surface-soft)',
+                  <div style={{
+                    width: 38, height: 38, borderRadius: 10,
+                    background: 'var(--teal-glow)',
+                    color: 'var(--teal)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: 14,
+                  }}>
+                    <step.icon size={18} strokeWidth={2} />
+                  </div>
+                  <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 800, fontSize: '1.05rem', marginBottom: 6, letterSpacing: '-0.02em' }}>
+                    {step.title}
+                  </div>
+                  <div style={{ fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: 1.55 }}>
+                    {step.d}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          §5 DEMO ACCOUNTS — interactive cards
+      ═══════════════════════════════════════ */}
+      <section style={{ padding: '100px 28px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <Reveal>
+            <div className="label-caps" style={{ color: 'var(--teal)', marginBottom: 18 }}>Demo accounts</div>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+              letterSpacing: '-0.035em', lineHeight: 1.1, marginBottom: 16,
+              maxWidth: 720,
+            }}>
+              Four roles. One platform. Click any card.
+            </h2>
+            <p style={{ fontSize: '1rem', color: 'var(--text-muted)', marginBottom: 40, maxWidth: 600 }}>
+              Each role has its own dashboard tailored to its needs. Click a card to see every feature, or hit "Open" to dive straight in.
+            </p>
+          </Reveal>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }} className="problem-grid">
+            {DEMO_ACCOUNTS.map((acc, i) => (
+              <Reveal key={acc.role} delay={i * 80}>
+                <button
+                  onClick={() => setOpenModal(acc)}
+                  style={{
+                    background: 'var(--surface-card)',
+                    border: '1.5px solid var(--border)',
+                    borderRadius: 16, padding: '24px 24px',
+                    textAlign: 'left',
+                    width: '100%',
+                    transition: 'all 0.22s cubic-bezier(0.32, 0.72, 0, 1)',
+                    display: 'flex', flexDirection: 'column', gap: 14,
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = acc.colour;
+                    e.currentTarget.style.boxShadow = `0 12px 36px ${acc.colour}25`;
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{
+                      width: 48, height: 48, borderRadius: 13,
+                      background: `${acc.colour}18`, color: acc.colour,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <acc.icon size={22} strokeWidth={2} />
+                    </div>
+                    <ArrowRight size={18} style={{ color: acc.colour }} />
+                  </div>
+                  <div>
+                    <div style={{
+                      fontFamily: 'Bricolage Grotesque, sans-serif',
+                      fontWeight: 800, fontSize: '1.6rem',
+                      color: 'var(--text-primary)', letterSpacing: '-0.03em',
+                      marginBottom: 4,
+                    }}>
+                      {acc.role}
+                    </div>
+                    <div style={{ fontSize: '0.85rem', color: acc.colour, fontWeight: 700, marginBottom: 12 }}>
+                      {acc.label}
+                    </div>
+                    <div style={{ fontSize: '0.93rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                      {acc.description}
+                    </div>
+                  </div>
+                  <div style={{
+                    fontSize: '0.74rem', fontWeight: 700,
+                    color: acc.colour, letterSpacing: '0.04em',
+                  }}>
+                    {acc.features.length} features →
+                  </div>
+                </button>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          §6 TECH STACK
+      ═══════════════════════════════════════ */}
+      <section style={{
+        padding: '100px 28px',
+        background: 'var(--surface-card)',
+        borderTop: '1px solid var(--border)',
+        borderBottom: '1px solid var(--border)',
+      }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <Reveal>
+            <div className="label-caps" style={{ color: 'var(--teal)', marginBottom: 18 }}>Tech stack</div>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+              letterSpacing: '-0.035em', lineHeight: 1.1, marginBottom: 40,
+              maxWidth: 720,
+            }}>
+              Built with modern, production-grade tooling.
+            </h2>
+          </Reveal>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }} className="tech-grid">
+            {TECH_GROUPS.map((g, i) => (
+              <Reveal key={g.title} delay={i * 80}>
+                <div style={{
+                  background: 'var(--surface-soft)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 14, padding: '24px',
+                  height: '100%',
+                }}>
+                  <div style={{
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                    fontWeight: 800, fontSize: '1.15rem',
+                    color: g.colour, marginBottom: 18,
+                    letterSpacing: '-0.02em',
+                  }}>
+                    {g.title}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+                    {g.items.map(t => (
+                      <div key={t.name} style={{
+                        padding: '11px 13px',
+                        background: 'var(--surface-card)',
                         border: '1px solid var(--border)',
+                        borderRadius: 10,
                       }}>
-                        <Icon size={14} strokeWidth={2} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
-                        <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-primary)' }}>{label}</span>
+                        <div style={{ fontWeight: 700, fontSize: '0.86rem', color: 'var(--text-primary)', marginBottom: 2 }}>
+                          {t.name}
+                        </div>
+                        <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+                          {t.note}
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {/* How it works */}
-            <div style={{
-              background: 'var(--surface-card)',
-              border: '1px solid var(--border)',
-              borderRadius: 16,
-              padding: '24px 26px',
-              marginTop: 20,
-              boxShadow: 'var(--shadow-sm)',
-            }}>
-              <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '0.95rem', fontWeight: 800, color: 'var(--teal)', marginBottom: 18 }}>
-                Card-tap pipeline
-              </div>
-              {[
-                { step: '01', title: 'NFC card tapped', detail: 'ACR122U USB reader (connected to Pi) detects the card UID' },
-                { step: '02', title: 'Pi identifies student', detail: 'Python + pyscard queries SQLite for the matching student record' },
-                { step: '03', title: 'WebSocket broadcast', detail: 'Flask-SocketIO emits a card_tap event over WebSocket' },
-                { step: '04', title: 'UI updates live', detail: 'React receives event via socket.io-client, all dashboards update' },
-              ].map(({ step, title, detail }, i, arr) => (
-                <div key={step} style={{ display: 'flex', gap: 14 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
-                    <div style={{
-                      width: 32, height: 32, borderRadius: '50%',
-                      background: 'var(--teal-glow)',
-                      border: '2px solid var(--teal-border)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 800, fontSize: '0.7rem',
-                      color: 'var(--teal)',
-                    }}>{step}</div>
-                    {i < arr.length - 1 && <div style={{ width: 2, flex: 1, background: 'var(--border)', minHeight: 20, margin: '4px 0' }} />}
-                  </div>
-                  <div style={{ paddingBottom: i < arr.length - 1 ? 16 : 0, paddingTop: 5 }}>
-                    <div style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--text-primary)', marginBottom: 2 }}>{title}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>{detail}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+              </Reveal>
+            ))}
           </div>
-        )}
+        </div>
+      </section>
 
-        {tab === 'timeline' && (
-          <div style={{ animation: 'fadeIn 0.25s ease' }}>
-            <div style={{
-              background: 'var(--surface-card)',
-              border: '1px solid var(--border)',
-              borderRadius: 16,
-              padding: '28px',
-              boxShadow: 'var(--shadow-sm)',
+      {/* ═══════════════════════════════════════
+          §7 TIMELINE
+      ═══════════════════════════════════════ */}
+      <section style={{ padding: '100px 28px' }}>
+        <div style={{ maxWidth: 880, margin: '0 auto' }}>
+          <Reveal>
+            <div className="label-caps" style={{ color: 'var(--teal)', marginBottom: 18 }}>The journey</div>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+              letterSpacing: '-0.035em', lineHeight: 1.1, marginBottom: 16,
+              maxWidth: 720,
             }}>
-              {TIMELINE.map((item, i, arr) => (
-                <div key={item.date} style={{ display: 'flex', gap: 16 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+              Eight months of research, design and engineering.
+            </h2>
+            <p style={{ fontSize: '1rem', color: 'var(--text-muted)', marginBottom: 48, maxWidth: 580 }}>
+              From research to deployment. Every phase documented for the HSC SDD project brief.
+            </p>
+          </Reveal>
+
+          <div>
+            {TIMELINE.map((item, i) => (
+              <Reveal key={item.date} delay={i * 50}>
+                <div style={{ display: 'flex', gap: 22, marginBottom: i < TIMELINE.length - 1 ? 0 : 0 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, width: 28 }}>
                     <div style={{
-                      width: 12, height: 12, borderRadius: '50%',
+                      width: 14, height: 14, borderRadius: '50%',
                       background: 'var(--teal)',
                       border: '3px solid var(--teal-glow)',
-                      marginTop: 6,
+                      marginTop: 8,
+                      boxShadow: '0 0 0 4px var(--surface), 0 0 14px rgba(20,184,184,0.45)',
                     }} />
-                    {i < arr.length - 1 && (
-                      <div style={{ width: 2, flex: 1, background: 'var(--border)', minHeight: 40, margin: '4px 0' }} />
+                    {i < TIMELINE.length - 1 && (
+                      <div style={{
+                        width: 2, flex: 1,
+                        background: 'linear-gradient(to bottom, var(--teal-border) 0%, var(--border) 100%)',
+                        minHeight: 36, margin: '6px 0 0',
+                      }} />
                     )}
                   </div>
-                  <div style={{ paddingBottom: i < arr.length - 1 ? 22 : 0 }}>
+                  <div style={{ paddingBottom: i < TIMELINE.length - 1 ? 30 : 0, flex: 1 }}>
                     <div style={{
-                      fontSize: '0.7rem', fontWeight: 800,
-                      color: 'var(--teal)', textTransform: 'uppercase', letterSpacing: '0.08em',
-                      marginBottom: 4,
-                    }}>{item.date}</div>
-                    <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)', marginBottom: 4 }}>{item.title}</div>
-                    <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.55 }}>{item.detail}</div>
+                      fontSize: '0.72rem', fontWeight: 800,
+                      color: 'var(--teal)', textTransform: 'uppercase',
+                      letterSpacing: '0.1em', marginBottom: 6,
+                    }}>
+                      {item.date}
+                    </div>
+                    <div style={{
+                      fontFamily: 'Bricolage Grotesque, sans-serif',
+                      fontWeight: 800, fontSize: '1.2rem',
+                      color: 'var(--text-primary)', marginBottom: 6,
+                      letterSpacing: '-0.025em',
+                    }}>
+                      {item.title}
+                    </div>
+                    <div style={{ fontSize: '0.92rem', color: 'var(--text-muted)', lineHeight: 1.65, maxWidth: 640 }}>
+                      {item.detail}
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              </Reveal>
+            ))}
           </div>
-        )}
+        </div>
+      </section>
 
-        {/* ─── SHARE BAR ──────────────────────── */}
-        <div style={{
-          marginTop: 32,
-          background: 'var(--surface-card)',
-          border: '1px solid var(--border)',
-          borderRadius: 16,
-          padding: '16px 22px',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap',
-          boxShadow: 'var(--shadow-sm)',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      {/* ═══════════════════════════════════════
+          §8 BUILT BY + SHARE
+      ═══════════════════════════════════════ */}
+      <section style={{
+        padding: '80px 28px',
+        background: 'linear-gradient(180deg, transparent 0%, rgba(20,184,184,0.06) 100%)',
+        borderTop: '1px solid var(--border)',
+      }}>
+        <div style={{ maxWidth: 880, margin: '0 auto' }}>
+          <Reveal>
             <div style={{
-              width: 38, height: 38, borderRadius: 10,
-              background: 'var(--teal-glow)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'var(--teal)',
+              background: 'var(--surface-card)',
+              border: '1px solid var(--border)',
+              borderRadius: 18, padding: '32px',
+              boxShadow: 'var(--shadow-md)',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 22, flexWrap: 'wrap',
             }}>
-              <ExternalLink size={16} strokeWidth={2} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+                <div style={{
+                  width: 60, height: 60, borderRadius: 14,
+                  background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)',
+                  color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  fontWeight: 800, fontSize: '1.4rem',
+                  boxShadow: '0 8px 24px rgba(20,184,184,0.4)',
+                }}>
+                  TC
+                </div>
+                <div>
+                  <div style={{
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                    fontWeight: 800, fontSize: '1.2rem',
+                    color: 'var(--text-primary)', marginBottom: 3, letterSpacing: '-0.02em',
+                  }}>
+                    Toby Crowther
+                  </div>
+                  <div style={{ fontSize: '0.86rem', color: 'var(--text-muted)' }}>
+                    Shore School · HSC SDD 2026
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={copyURL}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '11px 18px', borderRadius: 11,
+                  background: copied ? 'var(--green)' : 'var(--surface)',
+                  color: copied ? '#fff' : 'var(--text-primary)',
+                  border: `1.5px solid ${copied ? 'var(--green)' : 'var(--border)'}`,
+                  fontSize: '0.86rem', fontWeight: 700,
+                  transition: 'all 0.18s ease',
+                }}
+              >
+                {copied
+                  ? <><CheckCircle size={14} strokeWidth={2.8} /> Link copied</>
+                  : <><Copy size={14} strokeWidth={2.5} /> Copy demo URL</>}
+              </button>
             </div>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--text-primary)' }}>Share this demo</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: 2 }}>
-                {typeof window !== 'undefined' ? window.location.origin : 'localhost:3000'}
+          </Reveal>
+
+          {/* Tagline mark at the very end */}
+          <Reveal delay={150}>
+            <div style={{ textAlign: 'center', marginTop: 56, opacity: 0.6 }}>
+              <div style={{ display: 'inline-flex', justifyContent: 'center' }}>
+                <Tagline size="md" inline muted />
               </div>
             </div>
-          </div>
-          <button
-            onClick={copyURL}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 7,
-              padding: '8px 16px', borderRadius: 10,
-              background: copied ? 'var(--green)' : 'var(--teal)',
-              color: '#fff', fontWeight: 700, fontSize: '0.85rem',
-              transition: 'all 0.15s',
-            }}
-          >
-            {copied
-              ? <><CheckCircle size={14} strokeWidth={2.8} /> Copied!</>
-              : <><Copy size={14} strokeWidth={2.5} /> Copy link</>
-            }
-          </button>
+          </Reveal>
         </div>
+      </section>
 
-        {/* ─── FOOTER ─────────────────────────── */}
-        <div style={{ textAlign: 'center', marginTop: 40 }}>
-          <img
-            src="/vero-wordmark.png"
-            alt="VERO."
-            style={{ height: 22, objectFit: 'contain', display: 'block', margin: '0 auto 8px', opacity: 0.5 }}
-          />
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-soft)' }}>
-            Built by <strong style={{ color: 'var(--text-muted)' }}>Toby Crowther</strong> · Shore School · HSC SDD 2026
-          </p>
-        </div>
-
-      </div>
+      <style>{`
+        @media (max-width: 900px) {
+          .numbers-grid  { grid-template-columns: repeat(2, 1fr) !important; gap: 22px !important; }
+          .problem-grid  { grid-template-columns: 1fr !important; }
+          .pipeline-grid { grid-template-columns: 1fr !important; }
+          .tech-grid     { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }

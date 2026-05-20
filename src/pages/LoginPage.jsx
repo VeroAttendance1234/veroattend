@@ -65,8 +65,8 @@ export default function LoginPage({ onLogin }) {
         background: 'var(--surface-card)',
       }}>
         <div>
-          <img src="/vero-wordmark.png" alt="VERO." style={{ height: 34, marginBottom: 8, display: 'block' }} />
-          <Tagline size="sm" center={false} />
+          <img src="/vero-wordmark.png" alt="VERO." style={{ height: 34, marginBottom: 10, display: 'block' }} />
+          <Tagline size="md" />
         </div>
 
         <div>
@@ -132,9 +132,9 @@ export default function LoginPage({ onLogin }) {
         <div style={{ width: '100%', maxWidth: 420 }}>
 
           {/* Mobile-only logo */}
-          <div className="login-mobile-logo" style={{ display: 'none', textAlign: 'center', marginBottom: 28 }}>
-            <img src="/vero-wordmark.png" alt="VERO." style={{ height: 30, marginBottom: 8, display: 'block', margin: '0 auto 8px' }} />
-            <Tagline size="sm" />
+          <div className="login-mobile-logo" style={{ display: 'none', textAlign: 'center', marginBottom: 28, alignItems: 'center' }}>
+            <img src="/vero-wordmark.png" alt="VERO." style={{ height: 32, display: 'block', margin: '0 auto 10px' }} />
+            <div style={{ display: 'flex', justifyContent: 'center' }}><Tagline size="sm" inline /></div>
           </div>
 
           <h2 style={{ fontSize: '1.6rem', marginBottom: 8 }}>Welcome back</h2>
