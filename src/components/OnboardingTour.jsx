@@ -24,16 +24,13 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
   const [vh, setVh] = useState(typeof window !== 'undefined' ? window.innerHeight : 800);
   const tooltipRef = useRef(null);
 
-  /* Open on fresh visit (or when forced). sessionStorage means it shows
-     again on a new tab/refresh, but not when toggling roles. */
+  /* Open on every mount — the user explicitly wants it to always show,
+     even after a refresh or role-switch. Skip just dismisses it for now;
+     next mount = fresh tour. */
   useEffect(() => {
-    if (forceOpen) { setOpen(true); setIdx(0); return; }
-    const skipped = sessionStorage.getItem(storageKey);
-    if (!skipped) {
-      const t = setTimeout(() => setOpen(true), 700);
-      return () => clearTimeout(t);
-    }
-  }, [storageKey, forceOpen]);
+    const t = setTimeout(() => { setOpen(true); setIdx(0); }, 600);
+    return () => clearTimeout(t);
+  }, [forceOpen]);
 
   /* Track viewport size — strips depend on it */
   useEffect(() => {
@@ -126,7 +123,7 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
   }
   function prev() { if (idx > 0) setIdx(idx - 1); }
   function finish() {
-    sessionStorage.setItem(storageKey, '1');
+    // Just close — no persistence. Next mount/refresh shows the tour again.
     setOpen(false);
     setIdx(0);
     onClose?.();
