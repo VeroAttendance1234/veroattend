@@ -16,24 +16,24 @@ import CountUp from '../components/CountUp';
 const DEMO_ACCOUNTS = [
   {
     role: 'Admin', label: 'Administrator', colour: '#14B8B8', icon: Monitor,
-    description: 'Full school overview — 1,050 students, live analytics, system control.',
+    description: 'Full school overview · 1,050 students, live analytics, system control.',
     features: [
       { t: 'Live attendance hero',  d: 'Pulsing real-time rate of every active scan across the school' },
-      { t: 'Six-up stat grid',      d: 'Total students, present, absent, late, staff, classes — all animated count-ups' },
+      { t: 'Six-up stat grid',      d: 'Total students, present, absent, late, staff, classes · all animated count-ups' },
       { t: 'Trend analytics',       d: 'Recharts area chart of monthly attendance over 5 years with timeframe toggles' },
       { t: 'Year-group breakdown',  d: 'Bar chart comparing Year 7-12 attendance rates side-by-side' },
       { t: 'Calendar heatmap',      d: 'Month-grid heatmap with daily rate, today indicator, hover/tap details' },
       { t: 'Absence inbox',         d: 'Pending requests with one-click approve/reject + expandable parent reasons' },
       { t: 'Class leaderboard',     d: 'Top 12 classes with medals + animated progress bars' },
       { t: 'Student leaderboard',   d: 'Top students by attendance % with streak tracking' },
-      { t: 'System status',         d: 'Live device monitoring — Pi, ACR122U, WebSocket, Database' },
+      { t: 'System status',         d: 'Live device monitoring · Pi, ACR122U, WebSocket, Database' },
       { t: 'Searchable roll',       d: '1,050 students paginated 30/page with year, class, name filters' },
-      { t: 'Notifications feed',    d: '9 colour-coded notification types — absence, alert, message, system, milestone' },
+      { t: 'Notifications feed',    d: '9 colour-coded notification types · absence, alert, message, system, milestone' },
     ],
   },
   {
     role: 'Teacher', label: 'Mr David Chen', colour: '#2563EB', icon: BookOpen,
-    description: 'Maths teacher with 6 classes — class management & live attendance.',
+    description: 'Maths teacher with 6 classes · class management & live attendance.',
     features: [
       { t: 'Teacher switcher',      d: 'Search through 30 staff members by name or subject' },
       { t: 'Class selector',        d: '6 class buttons with per-class present/total counts at a glance' },
@@ -45,11 +45,11 @@ const DEMO_ACCOUNTS = [
   },
   {
     role: 'Student', label: 'Aisha Patel', colour: '#16A34A', icon: Heart,
-    description: 'Year 11A student — wellbeing, goals, journal, timetable.',
+    description: 'Year 11A student · wellbeing, goals, journal, timetable.',
     features: [
       { t: 'Welcome banner',        d: 'Personalised greeting with today\'s status and current mood' },
       { t: 'Live timetable',        d: 'Today\'s periods with NOW indicator on the current lesson' },
-      { t: 'Wellbeing check-in',    d: '5-emoji mood scale with optional note — feeds into the journal' },
+      { t: 'Wellbeing check-in',    d: '5-emoji mood scale with optional note · feeds into the journal' },
       { t: 'Searchable journal',    d: 'Full mood journal history with search and emoji-tagged entries' },
       { t: 'Goal tracker',          d: 'Filterable goals by category with priority + due dates' },
       { t: 'Family messaging',      d: 'Chat threads with parents and teachers' },
@@ -57,7 +57,7 @@ const DEMO_ACCOUNTS = [
   },
   {
     role: 'Parent', label: 'J. Patel', colour: '#7C3AED', icon: Users,
-    description: 'Parent of Aisha — attendance, wellbeing, absence requests.',
+    description: 'Parent of Aisha · attendance, wellbeing, absence requests.',
     features: [
       { t: 'Child status card',     d: 'Border colour shows whether child is present today' },
       { t: 'Week attendance',       d: 'Mon-Fri breakdown with progress bar and weekly rate' },
@@ -116,7 +116,7 @@ const TIMELINE = [
 ];
 
 const PROBLEMS = [
-  { icon: '⏱️', title: 'Manual roll wastes time', detail: 'Teachers spend 5–8 minutes per period marking rolls. That\'s ~30 minutes/day of lost teaching.' },
+  { icon: '⏱️', title: 'Manual roll wastes time', detail: 'Teachers spend 5-8 minutes per period marking rolls. That\'s ~30 minutes/day of lost teaching.' },
   { icon: '❌', title: 'Errors and friction',     detail: 'Paper or basic forms get lost, parents are confused, admins chase up missing data.' },
   { icon: '🔍', title: 'No real-time visibility', detail: 'Schools don\'t know who\'s on campus until rolls are entered hours later.' },
   { icon: '💬', title: 'Disconnected workflows',  detail: 'Absence requests, messaging, and attendance live in 3+ different systems.' },
@@ -124,7 +124,7 @@ const PROBLEMS = [
 
 const SOLUTIONS = [
   { icon: <Zap size={18} />,           title: 'Sub-second card tap',  detail: 'Students tap an NFC card on the reader. Their dashboard updates in real-time everywhere.' },
-  { icon: <Shield size={18} />,        title: 'One source of truth',  detail: 'Attendance, absences, messaging — all in one app, all in sync.' },
+  { icon: <Shield size={18} />,        title: 'One source of truth',  detail: 'Attendance, absences, messaging · all in one app, all in sync.' },
   { icon: <Activity size={18} />,      title: 'Live analytics',       detail: 'Admins see school-wide attendance rates updating live. Spot drops the moment they happen.' },
   { icon: <MessageSquare size={18} />, title: 'Frictionless workflow', detail: 'Parents submit absences from their phone. Admins approve with one click. Everyone is notified.' },
 ];
@@ -246,7 +246,7 @@ export default function MarkerPage({ onClose, setRole }) {
       )}
 
       {/* ═══════════════════════════════════════
-          §1 HERO — full-bleed, massive
+          §1 HERO · full-bleed, massive
       ═══════════════════════════════════════ */}
       <section style={{
         minHeight: '85vh',
@@ -351,7 +351,7 @@ export default function MarkerPage({ onClose, setRole }) {
       </section>
 
       {/* ═══════════════════════════════════════
-          §2 NUMBERS — big stats with count-up
+          §2 NUMBERS · big stats with count-up
       ═══════════════════════════════════════ */}
       <section style={{
         padding: '80px 28px',
@@ -407,7 +407,7 @@ export default function MarkerPage({ onClose, setRole }) {
               letterSpacing: '-0.035em', lineHeight: 1.1, marginBottom: 24,
               maxWidth: 720,
             }}>
-              Marking the roll wastes hours. Schools need real-time visibility — not yesterday's spreadsheet.
+              Marking the roll wastes hours. Schools need real-time visibility · not yesterday's spreadsheet.
             </h2>
           </Reveal>
 
@@ -483,7 +483,7 @@ export default function MarkerPage({ onClose, setRole }) {
       </section>
 
       {/* ═══════════════════════════════════════
-          §4 HOW IT WORKS — pipeline
+          §4 HOW IT WORKS · pipeline
       ═══════════════════════════════════════ */}
       <section style={{
         padding: '100px 28px',
@@ -499,7 +499,7 @@ export default function MarkerPage({ onClose, setRole }) {
               letterSpacing: '-0.035em', lineHeight: 1.1, marginBottom: 40,
               maxWidth: 760,
             }}>
-              From a card tap to a live dashboard — in under 100 milliseconds.
+              From a card tap to a live dashboard · in under 100 milliseconds.
             </h2>
           </Reveal>
 
@@ -551,7 +551,7 @@ export default function MarkerPage({ onClose, setRole }) {
       </section>
 
       {/* ═══════════════════════════════════════
-          §5 DEMO ACCOUNTS — interactive cards
+          §5 DEMO ACCOUNTS · interactive cards
       ═══════════════════════════════════════ */}
       <section style={{ padding: '100px 28px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
@@ -630,6 +630,64 @@ export default function MarkerPage({ onClose, setRole }) {
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          §5b QUIET CTA · bridge between demo + tech
+      ═══════════════════════════════════════ */}
+      <section style={{ padding: '40px 28px 80px' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
+          <Reveal>
+            <p style={{
+              fontFamily: 'Bricolage Grotesque, sans-serif',
+              fontSize: 'clamp(1.3rem, 3vw, 1.9rem)',
+              fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.25,
+              color: 'var(--text-primary)',
+              marginBottom: 14,
+            }}>
+              Best experienced first-hand.
+            </p>
+            <p style={{
+              fontSize: '1rem', color: 'var(--text-muted)',
+              lineHeight: 1.65, marginBottom: 26,
+            }}>
+              Reading about it only gets you so far. The platform's strength is in the live interactions, the animations, the way the dashboards respond to a real card tap. Pick any role to step inside.
+            </p>
+
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+              {DEMO_ACCOUNTS.map(acc => (
+                <button
+                  key={acc.role}
+                  onClick={() => openRole(acc.role)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    padding: '10px 18px', borderRadius: 11,
+                    background: 'var(--surface-card)',
+                    border: `1.5px solid ${acc.colour}50`,
+                    color: acc.colour,
+                    fontSize: '0.86rem', fontWeight: 800,
+                    transition: 'all 0.18s cubic-bezier(0.32, 0.72, 0, 1)',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = `${acc.colour}10`;
+                    e.currentTarget.style.borderColor = acc.colour;
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = `0 6px 18px ${acc.colour}30`;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'var(--surface-card)';
+                    e.currentTarget.style.borderColor = `${acc.colour}50`;
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  <acc.icon size={14} strokeWidth={2.4} />
+                  Try {acc.role}
+                </button>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -827,7 +885,7 @@ export default function MarkerPage({ onClose, setRole }) {
           <Reveal delay={150}>
             <div style={{ textAlign: 'center', marginTop: 56, opacity: 0.6 }}>
               <div style={{ display: 'inline-flex', justifyContent: 'center' }}>
-                <Tagline size="md" inline muted />
+                <Tagline size="sm" muted />
               </div>
             </div>
           </Reveal>

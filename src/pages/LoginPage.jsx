@@ -24,17 +24,14 @@ export default function LoginPage({ onLogin }) {
   function pickRole(r) {
     setSelectedRole(r.role);
     setEmail(r.email);
-    setPassword('');
+    // Password persists across role picks (demo convenience)
     setError('');
   }
 
   function handleLogin(e) {
     e?.preventDefault();
     setError('');
-    if (loginMethod === 'password' && password.length < 4) {
-      setError('Password must be at least 4 characters');
-      return;
-    }
+    // No validation in demo mode · Sign in always works
     onLogin(selectedRole);
   }
 
@@ -90,7 +87,7 @@ export default function LoginPage({ onLogin }) {
             Sign in to your<br/>school dashboard.
           </h1>
           <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: 380 }}>
-            Real-time attendance, wellbeing and analytics —
+            Real-time attendance, wellbeing and analytics ·
             powered by NFC card taps and your Raspberry Pi.
           </p>
 
@@ -134,7 +131,7 @@ export default function LoginPage({ onLogin }) {
           {/* Mobile-only logo */}
           <div className="login-mobile-logo" style={{ display: 'none', textAlign: 'center', marginBottom: 28, alignItems: 'center' }}>
             <img src="/vero-wordmark.png" alt="VERO." style={{ height: 32, display: 'block', margin: '0 auto 10px' }} />
-            <div style={{ display: 'flex', justifyContent: 'center' }}><Tagline size="sm" inline /></div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}><Tagline size="sm" /></div>
           </div>
 
           <h2 style={{ fontSize: '1.6rem', marginBottom: 8 }}>Welcome back</h2>
@@ -142,7 +139,7 @@ export default function LoginPage({ onLogin }) {
             Choose your role to continue.
           </p>
 
-          {/* Demo helper banner — makes it obvious what to do */}
+          {/* Demo helper banner · makes it obvious what to do */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
             background: 'var(--teal-glow)',
@@ -160,7 +157,7 @@ export default function LoginPage({ onLogin }) {
             <div style={{ flex: 1, fontSize: '0.82rem', lineHeight: 1.5 }}>
               <strong style={{ color: 'var(--teal-dark)' }}>Demo ready.</strong>{' '}
               <span style={{ color: 'var(--text-secondary)' }}>
-                Password is pre-filled — just click <strong>Sign in</strong> below.
+                Password is pre-filled · just click <strong>Sign in</strong> below.
               </span>
             </div>
           </div>
@@ -315,12 +312,13 @@ export default function LoginPage({ onLogin }) {
                   <Lock size={15} style={{ color: 'var(--text-soft)' }} />
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={e => { setPassword(e.target.value); setError(''); }}
-                    placeholder="Ready to sign in — demo unlocked"
+                    value="demo1234"
+                    readOnly
+                    aria-label="Demo password (pre-filled)"
                     style={{
                       border: 'none', background: 'transparent', padding: '11px 0',
                       width: '100%', fontSize: '0.875rem',
+                      cursor: 'not-allowed',
                     }}
                   />
                   <button

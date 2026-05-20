@@ -163,7 +163,7 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
                     autoFocus
                     value={teacherSearch}
                     onChange={e => setTeacherSearch(e.target.value)}
-                    placeholder="Switch teacher — search by name or subject"
+                    placeholder="Switch teacher · search by name or subject"
                     style={{
                       border: 'none', background: 'transparent', padding: '8px 0',
                       flex: 1, fontSize: '0.85rem',
@@ -303,7 +303,7 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
       <Card style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <div>
-            <p className="section-title" style={{ marginBottom: 2 }}>Live Scan Feed — {selectedClass}</p>
+            <p className="section-title" style={{ marginBottom: 2 }}>Live Scan Feed · {selectedClass}</p>
             <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Real-time card taps</span>
           </div>
           {classTaps.length > 0 && (
@@ -321,7 +321,7 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
       <Reveal>
       <div className="grid-2">
         <Card>
-          <p className="section-title">Class Roll — {selectedClass}</p>
+          <p className="section-title">Class Roll · {selectedClass}</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 420, overflowY: 'auto' }}>
             {classStudents.map(s => (
               <div
@@ -357,7 +357,7 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
         </Card>
 
         <Card>
-          <p className="section-title">My Timetable — {today}</p>
+          <p className="section-title">My Timetable · {today}</p>
           <div className="table-scroll">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
               <thead>
@@ -384,8 +384,8 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
                       <div style={{ fontSize: '0.68rem', color: 'var(--text-soft)' }}>{p.time}</div>
                     </td>
                     {DAYS.map(d => {
-                      const cell = teacherTimetable[d]?.[p.label] || '—';
-                      const isFree = cell === '—' || cell === 'Preparation';
+                      const cell = teacherTimetable[d]?.[p.label] || '·';
+                      const isFree = cell === '·' || cell === 'Preparation';
                       const isToday = d === today;
                       return (
                         <td key={d} style={{

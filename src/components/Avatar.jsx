@@ -1,15 +1,15 @@
 /**
- * Avatar — DiceBear-powered, consistent avatars from any name.
+ * Avatar · DiceBear-powered, consistent avatars from any name.
  *
  * Uses the `notionists-neutral` collection which renders friendly,
  * portrait-style illustrations that work well alongside school photos.
  * The seed is derived deterministically from the name, so the same
  * student always gets the same avatar.
  *
- * @param {string}  name    – display name (used as the seed)
- * @param {number}  size    – px square size (default 40)
- * @param {string}  ring    – optional border colour (defaults to var(--border))
- * @param {string}  status  – 'present' | 'absent' | null — coloured dot
+ * @param {string}  name    - display name (used as the seed)
+ * @param {number}  size    - px square size (default 40)
+ * @param {string}  ring    - optional border colour (defaults to var(--border))
+ * @param {string}  status  - 'present' | 'absent' | null · coloured dot
  */
 export default function Avatar({ name = '', size = 40, ring, status }) {
   const seed = encodeURIComponent(name.trim().toLowerCase() || 'vero');

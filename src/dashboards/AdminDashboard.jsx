@@ -156,7 +156,7 @@ export default function AdminDashboard({
   return (
     <div className="page">
 
-      {/* Modal — opens when a student row is clicked */}
+      {/* Modal · opens when a student row is clicked */}
       <StudentDetailModal
         student={selectedStudent}
         open={!!selectedStudent}

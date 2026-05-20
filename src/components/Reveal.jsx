@@ -1,11 +1,11 @@
 import { useReveal } from '../hooks/useReveal';
 
 /**
- * Reveal — wraps children in a div that fades + slides up when scrolled into view.
+ * Reveal · wraps children in a div that fades + slides up when scrolled into view.
  *
- * @param {string|number} delay  – ms to stagger (e.g. 100 → fires 100ms after revealing)
- * @param {string}        as     – HTML tag (default 'div')
- * @param {string}        from   – animation origin: 'up' (default) | 'left' | 'right' | 'scale'
+ * @param {string|number} delay  - ms to stagger (e.g. 100 → fires 100ms after revealing)
+ * @param {string}        as     - HTML tag (default 'div')
+ * @param {string}        from   - animation origin: 'up' (default) | 'left' | 'right' | 'scale'
  */
 export default function Reveal({
   children,

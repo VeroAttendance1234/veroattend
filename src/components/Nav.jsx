@@ -118,7 +118,7 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
               </span>
             )}
 
-            {/* Pi status pill — desktop only */}
+            {/* Pi status pill · desktop only */}
             {!isMobile && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 5,
@@ -138,7 +138,7 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
             )}
           </div>
 
-          {/* ── Page title (desktop) — fixed-width column so right cluster stays put ─ */}
+          {/* ── Page title (desktop) · fixed-width column so right cluster stays put ─ */}
           {!isMobile && (
             <div style={{
               flex: 1,
@@ -223,21 +223,45 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
               </button>
             )}
 
-            {/* Marker (desktop only) */}
+            {/* Marker (desktop only) · animated to draw attention */}
             {!isMobile && (
               <button
                 onClick={onMarker}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  padding: '6px 12px', borderRadius: 9,
-                  background: 'var(--teal-glow)',
-                  border: '1px solid var(--teal-border)',
-                  color: 'var(--teal)',
-                  fontSize: '0.78rem', fontWeight: 700,
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '7px 14px', borderRadius: 10,
+                  background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: '0.8rem', fontWeight: 800,
+                  letterSpacing: '0.02em',
+                  boxShadow: '0 4px 14px rgba(20, 184, 184, 0.32)',
+                  animation: 'markerPulse 2.4s ease-in-out infinite',
+                  transition: 'transform 0.14s ease',
                 }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; }}
               >
-                <BookOpen size={13} strokeWidth={2.5} />
-                Marker
+                <BookOpen size={14} strokeWidth={2.6} />
+                <span>For the marker</span>
+                <span style={{
+                  fontSize: '0.95rem', lineHeight: 1,
+                  animation: 'markerWave 1.6s ease-in-out infinite',
+                }}>
+                  👋
+                </span>
+                <style>{`
+                  @keyframes markerPulse {
+                    0%, 100% { box-shadow: 0 4px 14px rgba(20,184,184,0.32), 0 0 0 0 rgba(20,184,184,0.45); }
+                    50%      { box-shadow: 0 4px 14px rgba(20,184,184,0.32), 0 0 0 8px rgba(20,184,184,0); }
+                  }
+                  @keyframes markerWave {
+                    0%, 100% { transform: rotate(0deg); }
+                    25%      { transform: rotate(15deg); }
+                    50%      { transform: rotate(-8deg); }
+                    75%      { transform: rotate(12deg); }
+                  }
+                `}</style>
               </button>
             )}
 
@@ -271,7 +295,7 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
               </div>
             )}
 
-            {/* Avatar chip — fixed-width so it doesn't jump per role */}
+            {/* Avatar chip · fixed-width so it doesn't jump per role */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: 7,
               padding: isMobile ? '4px' : '4px 10px 4px 6px',
@@ -310,7 +334,7 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
               )}
             </div>
 
-            {/* Logout (desktop only — drawer handles it on mobile) */}
+            {/* Logout (desktop only · drawer handles it on mobile) */}
             {!isMobile && onLogout && (
               <button
                 onClick={onLogout}
@@ -370,8 +394,8 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
             <div style={{ maxHeight: 360, overflowY: 'auto' }}>
               {[
                 { icon: '🎉', title: 'Attendance milestone', text: 'School hit 91% attendance today', time: '2 min ago', colour: 'var(--green)' },
-                { icon: '⚠️', title: 'Low attendance alert', text: 'Year 12 below 88% — second day running', time: '24 min ago', colour: 'var(--amber)' },
-                { icon: '📅', title: 'Parent–teacher night', text: 'Reminders sent to 1,050 families', time: '1 hr ago', colour: 'var(--blue)' },
+                { icon: '⚠️', title: 'Low attendance alert', text: 'Year 12 below 88% · second day running', time: '24 min ago', colour: 'var(--amber)' },
+                { icon: '📅', title: 'Parent-teacher night', text: 'Reminders sent to 1,050 families', time: '1 hr ago', colour: 'var(--blue)' },
                 { icon: '🏆', title: 'Class 7A leads', text: 'Highest rate in school: 97.2%', time: '3 hrs ago', colour: 'var(--teal)' },
                 { icon: '🔔', title: 'System update', text: 'ACR122U firmware: stable', time: 'Yesterday', colour: 'var(--text-muted)' },
               ].map((n, i) => (

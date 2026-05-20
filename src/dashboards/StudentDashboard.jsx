@@ -90,7 +90,7 @@ export default function StudentDashboard({ students, threads = [], onSendMessage
     if (!newGoalText.trim()) return;
     setGoals(prev => [...prev, {
       id: Date.now(), text: newGoalText.trim(),
-      due: newGoalDue || '—', done: false,
+      due: newGoalDue || '·', done: false,
       category: newGoalCat, priority: newGoalPri,
     }]);
     setNewGoalText(''); setNewGoalDue('');
@@ -387,7 +387,7 @@ export default function StudentDashboard({ students, threads = [], onSendMessage
                   <span style={{ fontSize: '0.7rem', fontWeight: 700, color: PRIORITY_COLOURS[g.priority] }}>
                     {PRIORITY_ICONS[g.priority]}
                   </span>
-                  {g.due !== '—' && (
+                  {g.due !== '·' && (
                     <span style={{ fontSize: '0.7rem', color: 'var(--text-soft)' }}>Due {g.due}</span>
                   )}
                 </div>

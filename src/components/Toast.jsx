@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect } from 'rea
 import { CheckCircle, AlertCircle, Info, X, AlertTriangle } from 'lucide-react';
 
 /**
- * Toast system — global, context-driven, queueable.
+ * Toast system · global, context-driven, queueable.
  *
  * Usage:
  *   const toast = useToast();

@@ -28,7 +28,7 @@ export default function AbsenceRequestForm({ student, parent, onSubmit, requests
   const [submitted, setSubmitted] = useState(false);
   const [error,    setError]    = useState('');
 
-  // History filter — most recent first
+  // History filter · most recent first
   const ownRequests = requests
     .filter(r => r.studentId === student?.id)
     .sort((a, b) => b.submitted.localeCompare(a.submitted))
@@ -154,7 +154,7 @@ export default function AbsenceRequestForm({ student, parent, onSubmit, requests
               value={reason}
               onChange={e => { setReason(e.target.value); setError(''); }}
               rows={4}
-              placeholder="Please provide context — symptoms, appointment details, expected return time, etc."
+              placeholder="Please provide context · symptoms, appointment details, expected return time, etc."
               style={{
                 width: '100%', border: '1px solid var(--border)', borderRadius: 9,
                 padding: '11px 13px', background: 'var(--surface)', resize: 'vertical',
@@ -192,7 +192,7 @@ export default function AbsenceRequestForm({ student, parent, onSubmit, requests
               display: 'flex', alignItems: 'center', gap: 8,
             }}>
               <CheckCircle size={14} strokeWidth={2.5} />
-              Request submitted — admin will review shortly.
+              Request submitted · admin will review shortly.
             </div>
           )}
 

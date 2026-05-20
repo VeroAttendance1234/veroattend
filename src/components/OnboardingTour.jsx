@@ -2,13 +2,13 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { ChevronRight, ChevronLeft, X, Sparkles } from 'lucide-react';
 
 /**
- * OnboardingTour — Apple-style guided walkthrough.
+ * OnboardingTour · Apple-style guided walkthrough.
  *
  * Selective-blur architecture:
  *   The classic "single backdrop + blur" approach blurs EVERYTHING, including
  *   the focus point. To keep the spotlighted element crisp, we render the
  *   dim+blur as FOUR STRIPS around the spotlight rect (top, bottom, left, right).
- *   The cutout area itself has nothing covering it — so the highlighted element
+ *   The cutout area itself has nothing covering it · so the highlighted element
  *   is rendered at full clarity, while the rest of the page is softly blurred.
  *
  *   All strip dimensions animate with the same cubic-bezier, so when stepping
@@ -24,7 +24,7 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
   const [vh, setVh] = useState(typeof window !== 'undefined' ? window.innerHeight : 800);
   const tooltipRef = useRef(null);
 
-  /* Open on every mount — the user explicitly wants it to always show,
+  /* Open on every mount · the user explicitly wants it to always show,
      even after a refresh or role-switch. Skip just dismisses it for now;
      next mount = fresh tour. */
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
     return () => clearTimeout(t);
   }, [forceOpen]);
 
-  /* Track viewport size — strips depend on it */
+  /* Track viewport size · strips depend on it */
   useEffect(() => {
     function onResize() { setVw(window.innerWidth); setVh(window.innerHeight); }
     window.addEventListener('resize', onResize);
@@ -67,7 +67,7 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
     /* 3. After the scroll completes, the element will be at this viewport-Y */
     const futureTop = elemAbsY - targetScrollY;
 
-    /* 4. Apply the FUTURE position now — spotlight + strips smoothly tween */
+    /* 4. Apply the FUTURE position now · spotlight + strips smoothly tween */
     const futureRect = {
       top:    futureTop,
       left:   elRect.left,
@@ -92,7 +92,7 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
     top  = Math.max(16, Math.min(top,  window.innerHeight - tooltipH - 16));
     setTooltipPos({ top, left });
 
-    /* 6. Start the page scroll at the SAME instant — runs in parallel */
+    /* 6. Start the page scroll at the SAME instant · runs in parallel */
     window.scrollTo({ top: targetScrollY, behavior: 'smooth' });
   }, [open, idx, steps]);
 
@@ -123,7 +123,7 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
   }
   function prev() { if (idx > 0) setIdx(idx - 1); }
   function finish() {
-    // Just close — no persistence. Next mount/refresh shows the tour again.
+    // Just close · no persistence. Next mount/refresh shows the tour again.
     setOpen(false);
     setIdx(0);
     onClose?.();
@@ -137,7 +137,7 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
   const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
   const D    = '0.7s';
 
-  /* Strip styles — share transition for synchronised motion */
+  /* Strip styles · share transition for synchronised motion */
   const stripBase = {
     position: 'fixed',
     background: 'rgba(8, 18, 28, 0.45)',
@@ -169,7 +169,7 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
 
       {/* ── Selective-blur strips ──
             When rect is null (center step), we render ONE full overlay.
-            Otherwise four strips frame the cutout — leaving the focus crisp. */}
+            Otherwise four strips frame the cutout · leaving the focus crisp. */}
       {isCenter ? (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 2,

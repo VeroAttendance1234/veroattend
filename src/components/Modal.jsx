@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 
 /**
- * Modal — reusable bottom-up / fade-in popup used across VERO.
+ * Modal · reusable bottom-up / fade-in popup used across VERO.
  *
  * Performance-aware:
  *  - Conditionally mounts (returns null when closed) so we never animate offscreen DOM.
@@ -11,15 +11,15 @@ import { X } from 'lucide-react';
  *  - Click backdrop or press Escape to close.
  *  - Focus is parked on the dialog so keyboard nav lands there.
  *
- * @param {bool}     open     – whether to render
+ * @param {bool}     open     - whether to render
  * @param {Function} onClose
- * @param {string}   accent   – brand colour for the header rail (defaults to teal)
- * @param {ReactNode} icon    – optional icon element shown in the header
+ * @param {string}   accent   - brand colour for the header rail (defaults to teal)
+ * @param {ReactNode} icon    - optional icon element shown in the header
  * @param {string}   title
  * @param {string}   subtitle
- * @param {ReactNode} children – body content
- * @param {ReactNode} footer   – optional sticky footer (e.g. action buttons)
- * @param {string}   width    – max width: 'sm' | 'md' | 'lg'
+ * @param {ReactNode} children - body content
+ * @param {ReactNode} footer   - optional sticky footer (e.g. action buttons)
+ * @param {string}   width    - max width: 'sm' | 'md' | 'lg'
  */
 export default function Modal({
   open,
@@ -157,7 +157,7 @@ export default function Modal({
           </div>
         )}
 
-        {/* Body — scrolls if content is tall */}
+        {/* Body · scrolls if content is tall */}
         <div style={{
           padding: '20px 22px',
           overflowY: 'auto',

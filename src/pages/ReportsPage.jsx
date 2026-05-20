@@ -63,7 +63,7 @@ function downloadCSV(filename, rows) {
 function buildRollRows(students, yearFilter) {
   const filtered = yearFilter === 'all' ? students : students.filter(s => s.year === yearFilter);
   const header = ['ID', 'Name', 'Year', 'Class', 'Status', 'UID'];
-  const body = filtered.map(s => [s.id, s.name, s.year, s.class, s.present ? 'Present' : 'Absent', s.uid || '—']);
+  const body = filtered.map(s => [s.id, s.name, s.year, s.class, s.present ? 'Present' : 'Absent', s.uid || '·']);
   return [header, ...body];
 }
 function buildYearRows() {
@@ -120,7 +120,7 @@ export default function ReportsPage({ onClose, students }) {
   function handleExportCSV() {
     const fname = `vero-${activeId}-${new Date().toISOString().slice(0,10)}.csv`;
     downloadCSV(fname, filteredRows);
-    toast.success('CSV exported', `${totalRows} rows downloaded — ${fname}`);
+    toast.success('CSV exported', `${totalRows} rows downloaded · ${fname}`);
   }
   function handlePrint() {
     window.print();
@@ -158,7 +158,7 @@ export default function ReportsPage({ onClose, students }) {
             Reports & Exports
           </div>
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            Generate attendance reports — CSV, print, or email
+            Generate attendance reports · CSV, print, or email
           </div>
         </div>
         <button

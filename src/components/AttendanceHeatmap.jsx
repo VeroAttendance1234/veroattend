@@ -5,7 +5,7 @@ const DAYS  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 /**
- * AttendanceHeatmap — month-grid heatmap of school attendance %.
+ * AttendanceHeatmap · month-grid heatmap of school attendance %.
  * Each cell is tap/hoverable to see the date + rate.
  * Deterministic seed → same date always shows same rate (no flicker).
  */
@@ -27,7 +27,7 @@ export default function AttendanceHeatmap() {
       const dow = date.getDay();
       const isWeekend = dow === 0 || dow === 6;
       const seed = (y * 1000 + (m + 1) * 31 + day) % 23;
-      let rate = isWeekend ? null : 78 + ((seed * 7) % 20); // 78–98%
+      let rate = isWeekend ? null : 78 + ((seed * 7) % 20); // 78-98%
       if (date > now) rate = null;
       cells.push({
         day, date, rate, isWeekend,
@@ -233,7 +233,7 @@ export default function AttendanceHeatmap() {
                 color: cellColour(info.rate)?.bg ?? 'var(--text-soft)',
                 fontSize: '0.95rem',
               }}>
-                {info.rate ?? '—'}%
+                {info.rate ?? '·'}%
               </strong>
               {info.rate >= 95 && ' 🎉 excellent'}
               {info.rate >= 90 && info.rate < 95 && ' 👍 great'}

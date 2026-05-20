@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import CountUp from './CountUp';
 
 /**
- * StatCard — number + label tile.
+ * StatCard · number + label tile.
  *
  * If `value` is a plain number (or numeric string), it animates from 0 → value
  * with a smooth count-up when scrolled into view. Strings with non-numeric
@@ -18,7 +18,7 @@ export default function StatCard({ label, value, sub, accent, icon: Icon, trend 
     if (typeof value === 'number') return { num: value, prefix: '', suffix: '' };
     const s = String(value ?? '');
     const m = s.match(/^([^\d-]*)(-?\d+(?:\.\d+)?)([^\d]*)$/);
-    if (!m) return null; // not animatable — render verbatim
+    if (!m) return null; // not animatable · render verbatim
     return { prefix: m[1], num: Number(m[2]), suffix: m[3] };
   }, [value]);
 

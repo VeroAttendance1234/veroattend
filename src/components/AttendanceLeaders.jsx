@@ -3,7 +3,7 @@ import { Trophy, Crown, Award, TrendingUp } from 'lucide-react';
 import Avatar from './Avatar';
 
 /**
- * AttendanceLeaders — compact student leaderboard.
+ * AttendanceLeaders · compact student leaderboard.
  * Generates a deterministic top-10 from the student list with simulated rates.
  */
 export default function AttendanceLeaders({ students, onSelectStudent }) {

@@ -10,15 +10,15 @@ const ROLE_COLOURS = {
 };
 
 /**
- * MessagingPanel — Schoolbox-style two-pane messaging.
+ * MessagingPanel · Schoolbox-style two-pane messaging.
  *
  * - Mobile: shows the thread list, then opens the thread when tapped.
  * - Desktop: classic two-pane (list left, conversation right).
  *
- * @param {string} role        – Logged-in role ('parent' | 'teacher' | 'student' | 'admin')
- * @param {string} userName    – Name of the logged-in user (for "from" attribution)
- * @param {Array}  threads     – Conversation threads from shared state
- * @param {Func}   onSend      – Called when user sends a message (threadId, text)
+ * @param {string} role        - Logged-in role ('parent' | 'teacher' | 'student' | 'admin')
+ * @param {string} userName    - Name of the logged-in user (for "from" attribution)
+ * @param {Array}  threads     - Conversation threads from shared state
+ * @param {Func}   onSend      - Called when user sends a message (threadId, text)
  */
 export default function MessagingPanel({ role, userName, threads, onSend }) {
   const [activeId, setActiveId] = useState(threads[0]?.id);

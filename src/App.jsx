@@ -29,12 +29,12 @@ const ADMIN_TOUR_STEPS = [
   {
     target: null,
     title:  'Welcome to VERO',
-    body:   'A real-time school attendance platform. This quick tour will show you what you can do as an Administrator — about 30 seconds.',
+    body:   'A real-time school attendance platform. This quick tour will show you what you can do as an Administrator · about 30 seconds.',
   },
   {
     target: 'leader-strip',
     title:  'Current Leaders',
-    body:   'See who\'s leading at-a-glance — top student, top class, top year, and biggest weekly gain. Updates live.',
+    body:   'See who\'s leading at-a-glance · top student, top class, top year, and biggest weekly gain. Updates live.',
   },
   {
     target: 'hero-status',
@@ -54,7 +54,7 @@ const ADMIN_TOUR_STEPS = [
   {
     target: 'absence-requests',
     title:  'Absence requests',
-    body:   'Parents submit requests with reasons. You can approve or decline in one click — they\'ll be notified automatically.',
+    body:   'Parents submit requests with reasons. You can approve or decline in one click · they\'ll be notified automatically.',
   },
   {
     target: 'live-feed',
@@ -102,7 +102,7 @@ function AppInner() {
   const [showReports, setShowReports] = useState(false);
   const [forceTour, setForceTour]     = useState(false);
 
-  /* Live Pi connection state — only true when the WebSocket
+  /* Live Pi connection state · only true when the WebSocket
      handshake has actually succeeded with the Pi. */
   const [piConnected, setPiConnected] = useState(false);
 
@@ -127,12 +127,12 @@ function AppInner() {
   function approveAbsenceRequest(id) {
     const r = absenceRequests.find(x => x.id === id);
     setAbsenceRequests(prev => prev.map(x => x.id === id ? { ...x, status: 'approved' } : x));
-    if (r) toast.success('Request approved', `${r.student} (${r.class}) — ${r.fromDate}`);
+    if (r) toast.success('Request approved', `${r.student} (${r.class}) · ${r.fromDate}`);
   }
   function rejectAbsenceRequest(id) {
     const r = absenceRequests.find(x => x.id === id);
     setAbsenceRequests(prev => prev.map(x => x.id === id ? { ...x, status: 'rejected' } : x));
-    if (r) toast.warn('Request declined', `${r.student} (${r.class}) — parent will be notified`);
+    if (r) toast.warn('Request declined', `${r.student} (${r.class}) · parent will be notified`);
   }
 
   /* Messaging actions */
@@ -229,7 +229,7 @@ function AppInner() {
         onLogout={() => setAuthedRole(null)}
       />
 
-      {/* First-visit guided tour — only shows for Admin role */}
+      {/* First-visit guided tour · only shows for Admin role */}
       {role === 'Admin' && (
         <OnboardingTour
           storageKey="vero.tour.admin.v1"

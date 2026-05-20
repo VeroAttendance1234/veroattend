@@ -31,7 +31,7 @@ function sentimentLabel(moods) {
   const avg = moods.reduce((a, b) => a + b, 0) / moods.length;
   if (avg >= 3.5) return { text: 'Positive week 😊', color: 'var(--green)', bg: 'var(--green-light)', border: 'var(--green-border)' };
   if (avg >= 2.5) return { text: 'Mixed week 🙂', color: 'var(--teal)', bg: 'var(--teal-glow)', border: 'var(--teal-border)' };
-  return { text: 'Tough week — worth checking in', color: 'var(--amber)', bg: 'var(--amber-light)', border: 'var(--amber-border)' };
+  return { text: 'Tough week · worth checking in', color: 'var(--amber)', bg: 'var(--amber-light)', border: 'var(--amber-border)' };
 }
 
 export default function ParentDashboard({
@@ -248,7 +248,7 @@ export default function ParentDashboard({
                 }}>
                   {g.text}
                 </div>
-                {g.due !== '—' && (
+                {g.due !== '·' && (
                   <span style={{ fontSize: '0.7rem', color: 'var(--text-soft)', flexShrink: 0 }}>
                     Due {g.due}
                   </span>

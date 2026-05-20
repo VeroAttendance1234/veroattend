@@ -87,16 +87,16 @@ export const teachers = [
   { id:'T030', name:'Mr Gabriel Santos',  subject:'Geography',            classes:['7E','8B','9C','10D','11E','12E'],      avatar:'GS' },
 ];
 
-export const DEMO_TEACHER_ID = 'T002'; // Mr David Chen — Maths
+export const DEMO_TEACHER_ID = 'T002'; // Mr David Chen · Maths
 
 // ─── Teacher timetable (per class, per day) ───────────────────
 // Shows what Mr David Chen (T002) teaches each day
 export const teacherTimetable = {
-  Mon: { 'Period 1':'7B Maths', 'Period 2':'8A Maths', 'Recess':'—',    'Period 3':'10D Maths', 'Period 4':'Preparation'  },
-  Tue: { 'Period 1':'9C Maths', 'Period 2':'Preparation','Recess':'—',  'Period 3':'12B Maths', 'Period 4':'11A Maths'    },
-  Wed: { 'Period 1':'11A Maths','Period 2':'7B Maths',  'Recess':'—',   'Period 3':'Preparation','Period 4':'9C Maths'    },
-  Thu: { 'Period 1':'10D Maths','Period 2':'12B Maths', 'Recess':'—',   'Period 3':'8A Maths',  'Period 4':'Preparation'  },
-  Fri: { 'Period 1':'Preparation','Period 2':'9C Maths','Recess':'—',   'Period 3':'11A Maths', 'Period 4':'10D Maths'    },
+  Mon: { 'Period 1':'7B Maths', 'Period 2':'8A Maths', 'Recess':'·',    'Period 3':'10D Maths', 'Period 4':'Preparation'  },
+  Tue: { 'Period 1':'9C Maths', 'Period 2':'Preparation','Recess':'·',  'Period 3':'12B Maths', 'Period 4':'11A Maths'    },
+  Wed: { 'Period 1':'11A Maths','Period 2':'7B Maths',  'Recess':'·',   'Period 3':'Preparation','Period 4':'9C Maths'    },
+  Thu: { 'Period 1':'10D Maths','Period 2':'12B Maths', 'Recess':'·',   'Period 3':'8A Maths',  'Period 4':'Preparation'  },
+  Fri: { 'Period 1':'Preparation','Period 2':'9C Maths','Recess':'·',   'Period 3':'11A Maths', 'Period 4':'10D Maths'    },
 };
 
 // ─── Student timetable (Aisha Patel, 11A) ─────────────────────
@@ -109,11 +109,11 @@ export const timetable = {
 };
 
 export const periods = [
-  { label:'Period 1', time:'9:00–10:00'  },
-  { label:'Period 2', time:'10:00–11:00' },
-  { label:'Recess',   time:'11:00–11:30' },
-  { label:'Period 3', time:'11:30–12:30' },
-  { label:'Period 4', time:'12:30–1:30'  },
+  { label:'Period 1', time:'9:00-10:00'  },
+  { label:'Period 2', time:'10:00-11:00' },
+  { label:'Recess',   time:'11:00-11:30' },
+  { label:'Period 3', time:'11:30-12:30' },
+  { label:'Period 4', time:'12:30-1:30'  },
 ];
 
 // ─── Wellbeing & student data ─────────────────────────────────
@@ -128,7 +128,7 @@ export const goals = [
 
 export const journalEntries = [
   { id:1, date:'Mon 6 May',  mood:3, text:'Had a good maths lesson today. Feeling more confident about the exam.' },
-  { id:2, date:'Tue 7 May',  mood:4, text:'English was fun — we started a new novel study. Really enjoying it.' },
+  { id:2, date:'Tue 7 May',  mood:4, text:'English was fun · we started a new novel study. Really enjoying it.' },
   { id:3, date:'Wed 8 May',  mood:1, text:'Tough day. Science test didn\'t go as well as I hoped. Need to study more.' },
   { id:4, date:'Thu 9 May',  mood:3, text:'Better today. Talked to Ms Richards about my essay and feel clearer now.' },
   { id:5, date:'Fri 10 May', mood:4, text:'Great week overall. Looking forward to the weekend and catching up with friends.' },
@@ -136,10 +136,10 @@ export const journalEntries = [
 
 export const notifications = [
   { id:1, text:'Aisha Patel marked absent Period 2',    time:'10:05 AM', type:'warn' },
-  { id:2, text:'12B — 3 students absent today',         time:'9:30 AM',  type:'warn' },
-  { id:3, text:'Wellbeing check submitted — Aisha',     time:'9:02 AM',  type:'info' },
+  { id:2, text:'12B · 3 students absent today',         time:'9:30 AM',  type:'warn' },
+  { id:3, text:'Wellbeing check submitted · Aisha',     time:'9:02 AM',  type:'info' },
   { id:4, text:'New journal entry added',               time:'8:45 AM',  type:'info' },
-  { id:5, text:'7C — 100% attendance today 🎉',         time:'9:10 AM',  type:'info' },
+  { id:5, text:'7C · 100% attendance today 🎉',         time:'9:10 AM',  type:'info' },
 ];
 
 export const attendanceHistory = [
@@ -150,7 +150,7 @@ export const attendanceHistory = [
   { date:'Fri 10 May', status:'present' },
 ];
 
-// ─── Historical attendance (monthly, 2021–2026) ───────────────
+// ─── Historical attendance (monthly, 2021-2026) ───────────────
 export const monthlyAttendance = [
   { period:'Feb 21', rate:91.2, enrolled:987  }, { period:'Mar 21', rate:89.5, enrolled:995  },
   { period:'Apr 21', rate:88.9, enrolled:995  }, { period:'May 21', rate:87.2, enrolled:998  },
@@ -208,19 +208,19 @@ export const classLeaderboard = Object.entries(CLASS_RATES)
 
 // ─── Assessments ──────────────────────────────────────────────
 export const assessments = [
-  { id:'A001', subject:'English Advanced',  task:'Module A — Textual Analysis Essay',    type:'Essay',      due:'15 Mar', weight:'15%', score:82, grade:'A',  status:'submitted', feedback:'Excellent analysis. Work on thesis clarity.' },
+  { id:'A001', subject:'English Advanced',  task:'Module A · Textual Analysis Essay',    type:'Essay',      due:'15 Mar', weight:'15%', score:82, grade:'A',  status:'submitted', feedback:'Excellent analysis. Work on thesis clarity.' },
   { id:'A002', subject:'Mathematics Adv',   task:'Functions & Calculus Assignment',        type:'Assignment', due:'22 Mar', weight:'10%', score:78, grade:'B+', status:'submitted', feedback:'Strong calculus section.' },
   { id:'A003', subject:'Modern History',    task:'WWI Depth Study',                        type:'Project',    due:'5 Apr',  weight:'20%', score:85, grade:'A-', status:'submitted', feedback:'Impressive primary source analysis.' },
   { id:'A004', subject:'PDHPE',             task:'Fitness Component Testing',              type:'Practical',  due:'20 May', weight:'10%', score:null, grade:null, status:'upcoming', feedback:null },
   { id:'A005', subject:'Mathematics Adv',   task:'Calculus & Series In-Class Test',        type:'Test',       due:'25 May', weight:'15%', score:null, grade:null, status:'upcoming', feedback:null },
-  { id:'A006', subject:'English Advanced',  task:'Module B — Creative Writing Piece',      type:'Creative',   due:'30 May', weight:'20%', score:null, grade:null, status:'upcoming', feedback:null },
+  { id:'A006', subject:'English Advanced',  task:'Module B · Creative Writing Piece',      type:'Creative',   due:'30 May', weight:'20%', score:null, grade:null, status:'upcoming', feedback:null },
   { id:'A007', subject:'Modern History',    task:'WWII Causes Research Essay',             type:'Essay',      due:'6 Jun',  weight:'25%', score:null, grade:null, status:'upcoming', feedback:null },
 ];
 
 // ─── Homework ─────────────────────────────────────────────────
 export const homework = [
-  { id:'H001', subject:'Mathematics', task:'Exercise 5.3 — Integration by Parts', due:'Tomorrow', done:false, urgent:true  },
-  { id:'H002', subject:'English',     task:'Read Chapters 6–8 of set text',        due:'Thu',      done:false, urgent:false },
+  { id:'H001', subject:'Mathematics', task:'Exercise 5.3 · Integration by Parts', due:'Tomorrow', done:false, urgent:true  },
+  { id:'H002', subject:'English',     task:'Read Chapters 6-8 of set text',        due:'Thu',      done:false, urgent:false },
   { id:'H003', subject:'History',     task:'Research notes on WWII causes',         due:'Fri',      done:true,  urgent:false },
   { id:'H004', subject:'Science',     task:'Lab report write-up (titration)',        due:'Mon',      done:false, urgent:false },
   { id:'H005', subject:'PDHPE',       task:'Weekly training log entry',             due:'Fri',      done:true,  urgent:false },
@@ -230,14 +230,14 @@ export const homework = [
 export const extracurriculars = [
   { id:'E001', name:'Debating Club',     role:'Member',       next:'Tue lunch · Room 14',    icon:'🎙️', season:'Year-round' },
   { id:'E002', name:'Environmental Club',role:'Vice Captain', next:'Thu lunch · Oval',       icon:'🌱', season:'Year-round' },
-  { id:'E003', name:'Girls Soccer',      role:'Midfielder',   next:'Wed 3:30pm · Main Oval', icon:'⚽', season:'Term 1–2'  },
+  { id:'E003', name:'Girls Soccer',      role:'Midfielder',   next:'Wed 3:30pm · Main Oval', icon:'⚽', season:'Term 1-2'  },
 ];
 
 export const sportsFixtures = [
-  { sport:'Girls Soccer', opponent:'Westfield HS',     date:'Sat 24 May', time:'2:00 PM', venue:'Home – Main Oval', result:null     },
-  { sport:'Girls Soccer', opponent:'Shore Grammar',    date:'Sat 10 May', time:'10:00 AM',venue:'Away',             result:'W 3–1'  },
-  { sport:'Girls Soccer', opponent:'Northern Beaches', date:'Sat 3 May',  time:'11:00 AM',venue:'Home',             result:'D 1–1'  },
-  { sport:'Girls Soccer', opponent:'Manly Selective',  date:'Sat 26 Apr', time:'9:00 AM', venue:'Away',             result:'W 2–0'  },
+  { sport:'Girls Soccer', opponent:'Westfield HS',     date:'Sat 24 May', time:'2:00 PM', venue:'Home - Main Oval', result:null     },
+  { sport:'Girls Soccer', opponent:'Shore Grammar',    date:'Sat 10 May', time:'10:00 AM',venue:'Away',             result:'W 3-1'  },
+  { sport:'Girls Soccer', opponent:'Northern Beaches', date:'Sat 3 May',  time:'11:00 AM',venue:'Home',             result:'D 1-1'  },
+  { sport:'Girls Soccer', opponent:'Manly Selective',  date:'Sat 26 Apr', time:'9:00 AM', venue:'Away',             result:'W 2-0'  },
 ];
 
 // ─── School fun facts ─────────────────────────────────────────
