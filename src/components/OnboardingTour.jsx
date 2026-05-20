@@ -22,11 +22,16 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
   const [transitioning, setTransitioning] = useState(false);
   const tooltipRef = useRef(null);
 
-  /* Open on first visit (or when forced) */
+  /* Open on every fresh page load, unless skipped in this session.
+     Uses sessionStorage (not localStorage) so:
+       - Tour ALWAYS shows on a fresh visit / refresh
+       - Skipping it doesn't make it re-pop when switching roles
+       - Closing the tab and reopening triggers it again
+  */
   useEffect(() => {
     if (forceOpen) { setOpen(true); setIdx(0); return; }
-    const seen = localStorage.getItem(storageKey);
-    if (!seen) {
+    const skippedThisSession = sessionStorage.getItem(storageKey);
+    if (!skippedThisSession) {
       const t = setTimeout(() => setOpen(true), 800);
       return () => clearTimeout(t);
     }
@@ -111,7 +116,8 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
   }
   function prev() { if (idx > 0) setIdx(idx - 1); }
   function finish() {
-    localStorage.setItem(storageKey, '1');
+    // Only remember within this session — tour will show again on next visit
+    sessionStorage.setItem(storageKey, '1');
     setOpen(false);
     setIdx(0);
     onClose?.();
