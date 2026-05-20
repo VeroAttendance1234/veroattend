@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'; // useEffect for scroll listener
 import {
   Wifi, WifiOff, ChevronDown, BookOpen, LogOut,
   Menu, X, Bell, Monitor, Heart, Users, FileSpreadsheet,
@@ -25,9 +25,20 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
   const [imgErr, setImgErr]     = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const isMobile = useIsMobile();
   const meta = ROLE_META[role];
   const page = PAGE_TITLES[role];
+
+  /* Shrink + heighten shadow once the user scrolls past 8px */
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 8);
+    }
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   /* Lock body scroll while drawer is open */
   useEffect(() => {
@@ -44,23 +55,27 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
           TOP NAV
       ═══════════════════════════════════════════ */}
       <nav style={{
-        background: 'rgba(255,255,255,0.96)',
+        background: scrolled ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.96)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         borderBottom: '1px solid var(--border)',
         position: 'sticky',
         top: 0,
         zIndex: 200,
-        boxShadow: 'var(--shadow-sm)',
+        boxShadow: scrolled
+          ? '0 4px 18px rgba(15, 30, 40, 0.08)'
+          : 'var(--shadow-sm)',
+        transition: 'background 0.25s ease, box-shadow 0.25s ease, height 0.25s cubic-bezier(0.32, 0.72, 0, 1)',
       }}>
         <div style={{
           maxWidth: 1200,
           margin: '0 auto',
           padding: isMobile ? '0 14px' : '0 24px',
-          height: isMobile ? 54 : 60,
+          height: isMobile ? (scrolled ? 48 : 54) : (scrolled ? 52 : 60),
           display: 'flex',
           alignItems: 'center',
           gap: isMobile ? 10 : 20,
+          transition: 'height 0.25s cubic-bezier(0.32, 0.72, 0, 1)',
         }}>
 
           {/* ── Hamburger (mobile) ────────────── */}

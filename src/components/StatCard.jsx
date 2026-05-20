@@ -1,4 +1,27 @@
+import { useMemo } from 'react';
+import CountUp from './CountUp';
+
+/**
+ * StatCard — number + label tile.
+ *
+ * If `value` is a plain number (or numeric string), it animates from 0 → value
+ * with a smooth count-up when scrolled into view. Strings with non-numeric
+ * characters are rendered as-is.
+ *
+ * Format hints supported in string values:
+ *   "91%"   → animates 91, appends %
+ *   "1050"  → animates 1050 with thousands separator
+ */
 export default function StatCard({ label, value, sub, accent, icon: Icon, trend }) {
+  /* Parse `value` once: detect numeric portion + suffix (%, etc.) */
+  const parsed = useMemo(() => {
+    if (typeof value === 'number') return { num: value, prefix: '', suffix: '' };
+    const s = String(value ?? '');
+    const m = s.match(/^([^\d-]*)(-?\d+(?:\.\d+)?)([^\d]*)$/);
+    if (!m) return null; // not animatable — render verbatim
+    return { prefix: m[1], num: Number(m[2]), suffix: m[3] };
+  }, [value]);
+
   return (
     <div style={{
       background: 'var(--surface-card)',
@@ -12,7 +35,17 @@ export default function StatCard({ label, value, sub, accent, icon: Icon, trend 
       gap: 4,
       position: 'relative',
       overflow: 'hidden',
-    }}>
+      transition: 'transform 0.18s cubic-bezier(0.32,0.72,0,1), box-shadow 0.18s cubic-bezier(0.32,0.72,0,1)',
+    }}
+      onMouseEnter={e => {
+        e.currentTarget.style.transform = 'translateY(-3px)';
+        e.currentTarget.style.boxShadow = `0 8px 28px ${accent ? `${accent}22` : 'rgba(20,184,184,0.18)'}, 0 2px 6px rgba(47,62,70,0.06)`;
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+      }}
+    >
       {/* Background icon watermark */}
       {Icon && (
         <div style={{
@@ -24,9 +57,7 @@ export default function StatCard({ label, value, sub, accent, icon: Icon, trend 
         </div>
       )}
 
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4,
-      }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
         {Icon && (
           <div style={{
             width: 28, height: 28, borderRadius: 8,
@@ -57,14 +88,16 @@ export default function StatCard({ label, value, sub, accent, icon: Icon, trend 
         lineHeight: 1,
         letterSpacing: '-0.03em',
       }}>
-        {value}
+        {parsed
+          ? <CountUp value={parsed.num} prefix={parsed.prefix} suffix={parsed.suffix} />
+          : value}
       </div>
 
       {sub && (
         <div style={{
           fontSize: '0.8rem',
-          fontWeight: 600,
           color: accent || 'var(--teal)',
+          fontWeight: 600,
           marginTop: 2,
         }}>
           {sub}

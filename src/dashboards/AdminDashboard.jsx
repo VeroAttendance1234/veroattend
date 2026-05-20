@@ -18,6 +18,7 @@ import AbsenceRequestsAdmin from '../components/AbsenceRequestsAdmin';
 import AttendanceLeaders, { CurrentLeaderStrip } from '../components/AttendanceLeaders';
 import AttendanceHeatmap from '../components/AttendanceHeatmap';
 import StudentDetailModal from '../components/StudentDetailModal';
+import Reveal from '../components/Reveal';
 import { extraNotifications } from '../data/initialState';
 import {
   notifications, teachers, monthlyAttendance,
@@ -384,25 +385,32 @@ export default function AdminDashboard({
       </div>
 
       {/* ── Calendar heatmap ───────────────────── */}
-      <Card data-tour="attendance-heatmap" style={{ marginBottom: 20 }}>
-        <AttendanceHeatmap />
-      </Card>
+      <Reveal>
+        <Card data-tour="attendance-heatmap" style={{ marginBottom: 20 }}>
+          <AttendanceHeatmap />
+        </Card>
+      </Reveal>
 
       {/* ── Absence requests + Leaderboard ────── */}
       <div className="grid-2" style={{ marginBottom: 20 }}>
-        <Card data-tour="absence-requests">
-          <AbsenceRequestsAdmin
-            requests={absenceRequests}
-            onApprove={onApproveAbsence}
-            onReject={onRejectAbsence}
-          />
-        </Card>
-        <Card>
-          <AttendanceLeaders students={students} onSelectStudent={setSelectedStudent} />
-        </Card>
+        <Reveal delay={0}>
+          <Card data-tour="absence-requests">
+            <AbsenceRequestsAdmin
+              requests={absenceRequests}
+              onApprove={onApproveAbsence}
+              onReject={onRejectAbsence}
+            />
+          </Card>
+        </Reveal>
+        <Reveal delay={120}>
+          <Card>
+            <AttendanceLeaders students={students} onSelectStudent={setSelectedStudent} />
+          </Card>
+        </Reveal>
       </div>
 
       {/* ── Live feed ──────────────────────────── */}
+      <Reveal>
       <Card data-tour="live-feed" style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <div>
@@ -420,8 +428,10 @@ export default function AdminDashboard({
           <RFIDSimulator students={students} onTap={onTap} />
         </div>
       </Card>
+      </Reveal>
 
       {/* ── Student roll ───────────────────────── */}
+      <Reveal>
       <Card data-tour="student-roll" style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 12 }}>
           <p className="section-title" style={{ marginBottom: 0 }}>Student Roll</p>
@@ -549,8 +559,10 @@ export default function AdminDashboard({
           </div>
         )}
       </Card>
+      </Reveal>
 
       {/* ── Notifications ──────────────────────── */}
+      <Reveal>
       <Card>
         <p className="section-title" style={{ marginBottom: 14 }}>Notifications</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -584,6 +596,7 @@ export default function AdminDashboard({
           })}
         </div>
       </Card>
+      </Reveal>
 
     </div>
   );
