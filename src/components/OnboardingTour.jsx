@@ -4,104 +4,97 @@ import { ChevronRight, ChevronLeft, X, Sparkles } from 'lucide-react';
 /**
  * OnboardingTour — Apple-style guided walkthrough.
  *
- * Design notes:
- *  - Backdrop darkens to 0.78 so spotlighted elements POP visually.
- *  - Spotlight uses a triple-layer effect: inner glow + bright border + pulsing aura.
- *  - All timings use Apple's signature curve cubic-bezier(0.32, 0.72, 0, 1)
- *    — same one used across macOS / iOS.
- *  - Tooltip re-mounts per step (keyed by index) so each entrance is fresh,
- *    not a morphing position transition. Feels intentional, never janky.
- *  - Spotlight cutout transitions smoothly via box-shadow + width/height tweens.
- *  - We wait for the smooth-scroll to complete before drawing the spotlight.
+ * Selective-blur architecture:
+ *   The classic "single backdrop + blur" approach blurs EVERYTHING, including
+ *   the focus point. To keep the spotlighted element crisp, we render the
+ *   dim+blur as FOUR STRIPS around the spotlight rect (top, bottom, left, right).
+ *   The cutout area itself has nothing covering it — so the highlighted element
+ *   is rendered at full clarity, while the rest of the page is softly blurred.
+ *
+ *   All strip dimensions animate with the same cubic-bezier, so when stepping
+ *   between targets the cutout smoothly expands/contracts/translates as a
+ *   single coherent motion (no flash, no two-stage fade).
  */
 export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }) {
   const [open, setOpen] = useState(false);
   const [idx,  setIdx]  = useState(0);
   const [rect, setRect] = useState(null);
-  const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0, placement: 'bottom' });
-  const [transitioning, setTransitioning] = useState(false);
+  const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
+  const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth  : 1200);
+  const [vh, setVh] = useState(typeof window !== 'undefined' ? window.innerHeight : 800);
   const tooltipRef = useRef(null);
 
-  /* Open on every fresh page load, unless skipped in this session.
-     Uses sessionStorage (not localStorage) so:
-       - Tour ALWAYS shows on a fresh visit / refresh
-       - Skipping it doesn't make it re-pop when switching roles
-       - Closing the tab and reopening triggers it again
-  */
+  /* Open on fresh visit (or when forced). sessionStorage means it shows
+     again on a new tab/refresh, but not when toggling roles. */
   useEffect(() => {
     if (forceOpen) { setOpen(true); setIdx(0); return; }
-    const skippedThisSession = sessionStorage.getItem(storageKey);
-    if (!skippedThisSession) {
-      const t = setTimeout(() => setOpen(true), 800);
+    const skipped = sessionStorage.getItem(storageKey);
+    if (!skipped) {
+      const t = setTimeout(() => setOpen(true), 700);
       return () => clearTimeout(t);
     }
   }, [storageKey, forceOpen]);
 
-  /* Compute target rectangle + tooltip position whenever step changes */
+  /* Track viewport size — strips depend on it */
+  useEffect(() => {
+    function onResize() { setVw(window.innerWidth); setVh(window.innerHeight); }
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  /* When step changes: scroll target into view, then read rect.
+     Spotlight + strips smoothly tween via CSS transition. */
   useLayoutEffect(() => {
     if (!open) return;
     const step = steps[idx];
     if (!step?.target) {
       setRect(null);
-      setTransitioning(false);
       return;
     }
-
-    setTransitioning(true);
 
     const el = document.querySelector(`[data-tour="${step.target}"]`);
-    if (!el) {
-      setRect(null);
-      setTransitioning(false);
-      return;
-    }
+    if (!el) { setRect(null); return; }
 
-    // Calculate where we need to scroll so the element ends up in view
-    // with some breathing room. We use programmatic scroll for predictable timing.
     const elRect = el.getBoundingClientRect();
-    const scrollY = window.scrollY + elRect.top - (window.innerHeight / 2 - elRect.height / 2);
-    window.scrollTo({ top: Math.max(0, scrollY), behavior: 'smooth' });
+    const targetY = window.scrollY + elRect.top - (window.innerHeight / 2 - elRect.height / 2);
+    window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
 
-    // After scroll completes (~450ms), measure and reveal
+    // Re-measure after scroll lands, then commit. Single setState
+    // means the spotlight smoothly slides via the CSS transitions.
     const t = setTimeout(() => {
       const r = el.getBoundingClientRect();
       setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
 
-      // Tooltip placement
       const tt = tooltipRef.current?.getBoundingClientRect();
       const tooltipH = tt?.height ?? 220;
       const tooltipW = tt?.width  ?? 360;
       const spaceBelow = window.innerHeight - r.bottom;
       const spaceAbove = r.top;
-      const placement = step.placement
-        ?? (spaceBelow > tooltipH + 30 ? 'bottom' : spaceAbove > tooltipH + 30 ? 'top' : 'bottom');
+      const placeBottom = spaceBelow > tooltipH + 30 || spaceAbove < tooltipH + 30;
 
-      let top  = placement === 'bottom' ? r.bottom + 20 : r.top - tooltipH - 20;
+      let top  = placeBottom ? r.bottom + 22 : r.top - tooltipH - 22;
       let left = r.left + r.width / 2 - tooltipW / 2;
-
-      // Keep on-screen
-      left = Math.max(16, Math.min(left, window.innerWidth - tooltipW - 16));
-      top  = Math.max(16, Math.min(top, window.innerHeight - tooltipH - 16));
-      setTooltipPos({ top, left, placement });
-      setTransitioning(false);
-    }, 480);
+      left = Math.max(16, Math.min(left, window.innerWidth  - tooltipW - 16));
+      top  = Math.max(16, Math.min(top,  window.innerHeight - tooltipH - 16));
+      setTooltipPos({ top, left });
+    }, 500);
 
     return () => clearTimeout(t);
   }, [open, idx, steps]);
 
-  /* Keyboard nav */
+  /* Keyboard */
   useEffect(() => {
     if (!open) return;
     function onKey(e) {
       if (e.key === 'Escape') finish();
-      if (e.key === 'ArrowRight' || e.key === 'Enter') next();
-      if (e.key === 'ArrowLeft') prev();
+      else if (e.key === 'ArrowRight' || e.key === 'Enter') next();
+      else if (e.key === 'ArrowLeft') prev();
     }
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [open, idx]);
 
-  /* Lock body scroll while open (but allow programmatic scroll) */
+  /* Lock body scroll */
   useEffect(() => {
     if (open) {
       const prev = document.body.style.overflow;
@@ -116,7 +109,6 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
   }
   function prev() { if (idx > 0) setIdx(idx - 1); }
   function finish() {
-    // Only remember within this session — tour will show again on next visit
     sessionStorage.setItem(storageKey, '1');
     setOpen(false);
     setIdx(0);
@@ -127,105 +119,122 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
   const step = steps[idx];
   const isCenter = !step.target || !rect;
 
-  /* Apple's signature easing curve */
-  const APPLE_EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
-  const SCROLL_DURATION = '0.55s';
+  /* Apple's signature easing */
+  const EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
+  const D    = '0.7s';
+
+  /* Strip styles — share transition for synchronised motion */
+  const stripBase = {
+    position: 'fixed',
+    background: 'rgba(8, 18, 28, 0.45)',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    transition: `top ${D} ${EASE}, left ${D} ${EASE}, width ${D} ${EASE}, height ${D} ${EASE}, opacity 0.35s ${EASE}`,
+    pointerEvents: 'auto',
+  };
+
+  /* Spotlight dimensions with breathing room */
+  const padding = 10;
+  const spotTop    = rect ? rect.top    - padding : 0;
+  const spotLeft   = rect ? rect.left   - padding : 0;
+  const spotWidth  = rect ? rect.width  + padding * 2 : 0;
+  const spotHeight = rect ? rect.height + padding * 2 : 0;
+  const spotBottom = spotTop + spotHeight;
+  const spotRight  = spotLeft + spotWidth;
 
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 8000,
       animation: 'tourFadeIn 0.32s cubic-bezier(0.32, 0.72, 0, 1)',
     }}>
-
-      {/* ── Backdrop ─── */}
+      {/* ── Click-anywhere-to-close hit area ─── */}
       <div
         onClick={finish}
-        style={{
-          position: 'absolute', inset: 0,
-          background: 'rgba(8, 18, 28, 0.78)',
-          backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)',
-          transition: `background ${SCROLL_DURATION} ${APPLE_EASE}`,
-        }}
+        style={{ position: 'fixed', inset: 0, zIndex: 1 }}
       />
 
-      {/* ── Spotlight cutout (Apple-style glow) ─── */}
+      {/* ── Selective-blur strips ──
+            When rect is null (center step), we render ONE full overlay.
+            Otherwise four strips frame the cutout — leaving the focus crisp. */}
+      {isCenter ? (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 2,
+          background: 'rgba(8, 18, 28, 0.55)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          transition: `opacity 0.4s ${EASE}`,
+        }} />
+      ) : (
+        <>
+          {/* TOP */}
+          <div style={{ ...stripBase, zIndex: 2,
+            top: 0, left: 0, width: '100vw', height: Math.max(0, spotTop) }} />
+          {/* BOTTOM */}
+          <div style={{ ...stripBase, zIndex: 2,
+            top: spotBottom, left: 0, width: '100vw', height: Math.max(0, vh - spotBottom) }} />
+          {/* LEFT */}
+          <div style={{ ...stripBase, zIndex: 2,
+            top: spotTop, left: 0, width: Math.max(0, spotLeft), height: Math.max(0, spotHeight) }} />
+          {/* RIGHT */}
+          <div style={{ ...stripBase, zIndex: 2,
+            top: spotTop, left: spotRight, width: Math.max(0, vw - spotRight), height: Math.max(0, spotHeight) }} />
+        </>
+      )}
+
+      {/* ── Spotlight border + glow (sits on top of the cutout) ─── */}
       {rect && (
         <>
-          {/* Layer 1: bright spotlight border */}
+          {/* Animated glow halo */}
           <div
             style={{
-              position: 'absolute',
-              top:    rect.top - 10,
-              left:   rect.left - 10,
-              width:  rect.width  + 20,
-              height: rect.height + 20,
+              position: 'fixed', zIndex: 3,
+              top: spotTop, left: spotLeft, width: spotWidth, height: spotHeight,
               borderRadius: 18,
               boxShadow: `
-                0 0 0 9999px rgba(8, 18, 28, 0.72),
                 0 0 0 2px rgba(255, 255, 255, 0.95),
                 0 0 0 5px var(--teal),
-                0 0 40px 6px rgba(20, 184, 184, 0.6),
-                0 0 80px 12px rgba(20, 184, 184, 0.25)
+                0 0 36px 6px rgba(20, 184, 184, 0.5),
+                0 0 72px 12px rgba(20, 184, 184, 0.22)
               `,
               pointerEvents: 'none',
-              opacity: transitioning ? 0 : 1,
-              transition: `
-                top ${SCROLL_DURATION} ${APPLE_EASE},
-                left ${SCROLL_DURATION} ${APPLE_EASE},
-                width ${SCROLL_DURATION} ${APPLE_EASE},
-                height ${SCROLL_DURATION} ${APPLE_EASE},
-                border-radius ${SCROLL_DURATION} ${APPLE_EASE},
-                opacity 0.4s ${APPLE_EASE}
-              `,
-              animation: !transitioning ? 'spotlightPulse 2.4s ease-in-out infinite' : 'none',
+              transition: `top ${D} ${EASE}, left ${D} ${EASE}, width ${D} ${EASE}, height ${D} ${EASE}`,
+              animation: 'spotPulse 2.6s ease-in-out infinite',
             }}
           />
-
-          {/* Layer 2: subtle pulsing ring extending beyond */}
+          {/* Outer pulsing ring */}
           <div
             style={{
-              position: 'absolute',
-              top:    rect.top - 18,
-              left:   rect.left - 18,
-              width:  rect.width  + 36,
-              height: rect.height + 36,
+              position: 'fixed', zIndex: 3,
+              top:  spotTop  - 8,
+              left: spotLeft - 8,
+              width:  spotWidth  + 16,
+              height: spotHeight + 16,
               borderRadius: 22,
-              border: '1.5px solid rgba(20, 184, 184, 0.35)',
+              border: '1.5px solid rgba(20, 184, 184, 0.4)',
               pointerEvents: 'none',
               transformOrigin: 'center center',
-              opacity: transitioning ? 0 : 1,
-              transition: `
-                top ${SCROLL_DURATION} ${APPLE_EASE},
-                left ${SCROLL_DURATION} ${APPLE_EASE},
-                width ${SCROLL_DURATION} ${APPLE_EASE},
-                height ${SCROLL_DURATION} ${APPLE_EASE},
-                opacity 0.5s ${APPLE_EASE}
-              `,
-              animation: !transitioning ? 'spotlightRing 2.4s ease-in-out infinite' : 'none',
+              transition: `top ${D} ${EASE}, left ${D} ${EASE}, width ${D} ${EASE}, height ${D} ${EASE}`,
+              animation: 'spotRing 2.6s ease-in-out infinite',
             }}
           />
         </>
       )}
 
-      {/* ── Tooltip (re-mounts per step for smooth entrance) ─── */}
+      {/* ── Tooltip card ── */}
       <div
-        key={idx /* re-mount per step → fresh animation, no morph */}
+        key={idx /* re-mount per step → fresh entrance, no morph */}
         ref={tooltipRef}
         style={isCenter ? {
-          position: 'absolute',
+          position: 'fixed', zIndex: 4,
           top: '50%', left: '50%',
           transform: 'translate(-50%, -50%)',
           width: 'min(92vw, 460px)',
-          opacity: transitioning ? 0 : 1,
-          transition: `opacity 0.35s ${APPLE_EASE}`,
         } : {
-          position: 'absolute',
+          position: 'fixed', zIndex: 4,
           top: tooltipPos.top,
           left: tooltipPos.left,
           width: 'min(92vw, 360px)',
-          opacity: transitioning ? 0 : 1,
-          transition: `opacity 0.35s ${APPLE_EASE}`,
+          transition: `top ${D} ${EASE}, left ${D} ${EASE}`,
         }}
       >
         <div
@@ -235,7 +244,7 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
             padding: '22px 24px',
             boxShadow: '0 24px 64px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 0, 0, 0.2)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
-            animation: !transitioning ? `tooltipEntrance 0.6s ${APPLE_EASE}` : 'none',
+            animation: `tooltipEntrance 0.55s ${EASE}`,
           }}
         >
           {/* Header */}
@@ -274,8 +283,8 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
             </button>
           </div>
 
-          {/* Body — staggered fade-in */}
-          <div style={{ animation: !transitioning ? `tooltipContent 0.7s ${APPLE_EASE} 0.08s both` : 'none' }}>
+          {/* Body */}
+          <div style={{ animation: `tooltipContent 0.6s ${EASE} 0.08s both` }}>
             <h3 style={{
               fontFamily: 'Bricolage Grotesque, sans-serif',
               fontSize: '1.18rem', fontWeight: 800,
@@ -302,7 +311,7 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
                 width: i === idx ? 22 : 6,
                 height: 6, borderRadius: 99,
                 background: i === idx ? 'var(--teal)' : i < idx ? 'var(--teal-border)' : 'var(--border)',
-                transition: `width 0.45s ${APPLE_EASE}, background 0.3s ease`,
+                transition: `width 0.5s ${EASE}, background 0.3s ease`,
               }} />
             ))}
           </div>
@@ -355,40 +364,32 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
           to   { opacity: 1; }
         }
         @keyframes tooltipEntrance {
-          0%   { opacity: 0; transform: translateY(12px) scale(0.96); }
-          100% { opacity: 1; transform: translateY(0) scale(1); }
+          0%   { opacity: 0; transform: translateY(14px) scale(0.96); }
+          100% { opacity: 1; transform: translateY(0)    scale(1);    }
         }
         @keyframes tooltipContent {
           0%   { opacity: 0; transform: translateY(6px); }
-          100% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 1; transform: translateY(0);   }
         }
-        @keyframes spotlightPulse {
+        @keyframes spotPulse {
           0%, 100% {
             box-shadow:
-              0 0 0 9999px rgba(8, 18, 28, 0.72),
               0 0 0 2px rgba(255, 255, 255, 0.95),
               0 0 0 5px var(--teal),
-              0 0 40px 6px rgba(20, 184, 184, 0.6),
-              0 0 80px 12px rgba(20, 184, 184, 0.25);
+              0 0 36px 6px rgba(20, 184, 184, 0.5),
+              0 0 72px 12px rgba(20, 184, 184, 0.22);
           }
           50% {
             box-shadow:
-              0 0 0 9999px rgba(8, 18, 28, 0.72),
               0 0 0 2px rgba(255, 255, 255, 1),
               0 0 0 5px var(--teal),
-              0 0 56px 10px rgba(20, 184, 184, 0.85),
-              0 0 100px 20px rgba(20, 184, 184, 0.4);
+              0 0 52px 9px rgba(20, 184, 184, 0.8),
+              0 0 96px 18px rgba(20, 184, 184, 0.36);
           }
         }
-        @keyframes spotlightRing {
-          0%, 100% {
-            transform: scale(1);
-            opacity: 0.35;
-          }
-          50% {
-            transform: scale(1.04);
-            opacity: 0.65;
-          }
+        @keyframes spotRing {
+          0%, 100% { transform: scale(1);    opacity: 0.4; }
+          50%      { transform: scale(1.04); opacity: 0.7; }
         }
       `}</style>
     </div>
