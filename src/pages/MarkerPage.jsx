@@ -5,6 +5,7 @@ import {
   CheckCircle, Clock, ArrowRight, Sparkles, ExternalLink, Copy,
 } from 'lucide-react';
 import Modal from '../components/Modal';
+import Tagline from '../components/Tagline';
 
 /* ─────────────────────────────────────────────────────────────
    DEMO ACCOUNT DATA
@@ -236,13 +237,11 @@ export default function MarkerPage({ onClose, setRole }) {
           <img
             src="/vero-logo.png"
             alt="VERO."
-            style={{ height: 110, objectFit: 'contain', display: 'block', margin: '0 auto 14px' }}
+            style={{ height: 110, objectFit: 'contain', display: 'block', margin: '0 auto 20px' }}
           />
-          <img
-            src="/vero-tagline.png"
-            alt="Attendance. Made Real"
-            style={{ height: 34, objectFit: 'contain', display: 'block', margin: '0 auto 28px', opacity: 0.85 }}
-          />
+          <div style={{ marginBottom: 30 }}>
+            <Tagline size="lg" />
+          </div>
 
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 10,

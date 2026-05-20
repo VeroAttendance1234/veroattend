@@ -3,6 +3,7 @@ import {
   Monitor, BookOpen, Heart, Users, CreditCard, Lock,
   Mail, Eye, EyeOff, ChevronRight, Wifi, Shield,
 } from 'lucide-react';
+import Tagline from '../components/Tagline';
 
 const ROLE_OPTIONS = [
   { role: 'Admin',   label: 'Administrator',   email: 'admin@shore.nsw.edu.au',     colour: '#14B8B8', icon: Monitor },
@@ -64,8 +65,8 @@ export default function LoginPage({ onLogin }) {
         background: 'var(--surface-card)',
       }}>
         <div>
-          <img src="/vero-wordmark.png" alt="VERO." style={{ height: 32, marginBottom: 4 }} />
-          <img src="/vero-tagline.png" alt="Attendance. Made Real." style={{ height: 18, opacity: 0.6 }} />
+          <img src="/vero-wordmark.png" alt="VERO." style={{ height: 34, marginBottom: 8, display: 'block' }} />
+          <Tagline size="sm" center={false} />
         </div>
 
         <div>
@@ -132,8 +133,8 @@ export default function LoginPage({ onLogin }) {
 
           {/* Mobile-only logo */}
           <div className="login-mobile-logo" style={{ display: 'none', textAlign: 'center', marginBottom: 28 }}>
-            <img src="/vero-wordmark.png" alt="VERO." style={{ height: 28, marginBottom: 4 }} />
-            <img src="/vero-tagline.png" alt="Attendance. Made Real." style={{ height: 16, opacity: 0.6, display: 'block', margin: '0 auto' }} />
+            <img src="/vero-wordmark.png" alt="VERO." style={{ height: 30, marginBottom: 8, display: 'block', margin: '0 auto 8px' }} />
+            <Tagline size="sm" />
           </div>
 
           <h2 style={{ fontSize: '1.6rem', marginBottom: 8 }}>Welcome back</h2>

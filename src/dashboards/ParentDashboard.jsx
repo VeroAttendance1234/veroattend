@@ -6,6 +6,7 @@ import Badge from '../components/Badge';
 import Avatar from '../components/Avatar';
 import AbsenceRequestForm from '../components/AbsenceRequestForm';
 import MessagingPanel from '../components/MessagingPanel';
+import Reveal from '../components/Reveal';
 import { MessageSquare } from 'lucide-react';
 import {
   attendanceHistory, notifications, goals, journalEntries,
@@ -161,6 +162,7 @@ export default function ParentDashboard({
       </div>
 
       {/* ── Absence request ───────────────────── */}
+      <Reveal>
       <div style={{ marginBottom: 20 }}>
         <AbsenceRequestForm
           student={child}
@@ -169,8 +171,10 @@ export default function ParentDashboard({
           onSubmit={onSubmitAbsence}
         />
       </div>
+      </Reveal>
 
       {/* ── Messaging ─────────────────────────── */}
+      <Reveal>
       <Card style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
           <MessageSquare size={16} style={{ color: 'var(--purple)' }} />
@@ -178,6 +182,7 @@ export default function ParentDashboard({
         </div>
         <MessagingPanel role="parent" userName="J. Patel" threads={threads} onSend={onSendMessage} />
       </Card>
+      </Reveal>
 
       {/* ── Recent journal entries ─────────────── */}
       <Card style={{ marginBottom: 20 }}>

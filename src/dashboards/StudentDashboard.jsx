@@ -7,6 +7,7 @@ import Card from '../components/Card';
 import Badge from '../components/Badge';
 import Avatar from '../components/Avatar';
 import MessagingPanel from '../components/MessagingPanel';
+import Reveal from '../components/Reveal';
 import { MessageSquare } from 'lucide-react';
 import { timetable, periods, goals as initialGoals, journalEntries as initialJournal } from '../data/sampleData';
 
@@ -255,6 +256,7 @@ export default function StudentDashboard({ students, threads = [], onSendMessage
       </div>
 
       {/* ── Wellbeing Journal ──────────────────── */}
+      <Reveal>
       <Card style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -306,8 +308,10 @@ export default function StudentDashboard({ students, threads = [], onSendMessage
           </div>
         )}
       </Card>
+      </Reveal>
 
       {/* ── Goal Tracker ───────────────────────── */}
+      <Reveal>
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, flexWrap: 'wrap', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -439,8 +443,10 @@ export default function StudentDashboard({ students, threads = [], onSendMessage
           </div>
         </div>
       </Card>
+      </Reveal>
 
       {/* ── Messaging ─────────────────────────── */}
+      <Reveal>
       <Card style={{ marginTop: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
           <MessageSquare size={16} style={{ color: 'var(--purple)' }} />
@@ -448,6 +454,7 @@ export default function StudentDashboard({ students, threads = [], onSendMessage
         </div>
         <MessagingPanel role="student" userName="Aisha Patel" threads={threads} onSend={onSendMessage} />
       </Card>
+      </Reveal>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Caveat:wght@600;700&display=swap');
 
 /* ═══════════════════════════════════════════════
    VERO DESIGN TOKENS
@@ -449,6 +449,21 @@ img[src*="vero-"] {
 /* Hide scrollbars on horizontal scrollers but keep scroll behaviour */
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Page (role) transition — applied to .page wrapper */
+.page {
+  animation: pageEnter 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; transform: translate3d(0, 12px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* Magnetic CTA helper — slight pull on hover via JS magnetic transform */
+.magnetic {
+  transition: transform 0.15s cubic-bezier(0.32, 0.72, 0, 1) !important;
+}
 
 /* Skeleton loading placeholder */
 .skeleton {

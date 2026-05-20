@@ -10,6 +10,7 @@ import Avatar from '../components/Avatar';
 import LiveFeed from '../components/LiveFeed';
 import MessagingPanel from '../components/MessagingPanel';
 import StudentDetailModal from '../components/StudentDetailModal';
+import Reveal from '../components/Reveal';
 import { MessageSquare } from 'lucide-react';
 import RFIDSimulator from '../components/RFIDSimulator';
 import { teachers, DEMO_TEACHER_ID, teacherTimetable, periods } from '../data/sampleData';
@@ -298,6 +299,7 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
       </div>
 
       {/* ── Live feed ──────────────────────────── */}
+      <Reveal>
       <Card style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <div>
@@ -313,8 +315,10 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
           <RFIDSimulator students={classStudents} onTap={onTap} />
         </div>
       </Card>
+      </Reveal>
 
       {/* ── Roll + Timetable ───────────────────── */}
+      <Reveal>
       <div className="grid-2">
         <Card>
           <p className="section-title">Class Roll — {selectedClass}</p>
@@ -403,8 +407,10 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
           </div>
         </Card>
       </div>
+      </Reveal>
 
       {/* ── Messaging with parents ─────────────── */}
+      <Reveal>
       <Card style={{ marginTop: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
           <MessageSquare size={16} style={{ color: 'var(--purple)' }} />
@@ -412,6 +418,7 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
         </div>
         <MessagingPanel role="teacher" userName="Mr David Chen" threads={threads} onSend={onSendMessage} />
       </Card>
+      </Reveal>
     </div>
   );
 }
