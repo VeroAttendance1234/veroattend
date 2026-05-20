@@ -42,8 +42,10 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  /* When step changes: scroll target into view, then read rect.
-     Spotlight + strips smoothly tween via CSS transition. */
+  /* When step changes: compute the FUTURE position of the target (where it
+     will land after we scroll) and apply it immediately. The spotlight + tooltip
+     start sliding at t=0 in parallel with the page's smooth scroll, so they
+     all land in sync ~500-700ms later. No 500ms lag-then-jump. */
   useLayoutEffect(() => {
     if (!open) return;
     const step = steps[idx];
@@ -55,31 +57,46 @@ export default function OnboardingTour({ steps, storageKey, forceOpen, onClose }
     const el = document.querySelector(`[data-tour="${step.target}"]`);
     if (!el) { setRect(null); return; }
 
+    /* 1. Measure where the element CURRENTLY is */
     const elRect = el.getBoundingClientRect();
-    const targetY = window.scrollY + elRect.top - (window.innerHeight / 2 - elRect.height / 2);
-    window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+    const currentScrollY = window.scrollY;
+    const elemAbsY       = elRect.top + currentScrollY;
+    const maxScroll      = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
 
-    // Re-measure after scroll lands, then commit. Single setState
-    // means the spotlight smoothly slides via the CSS transitions.
-    const t = setTimeout(() => {
-      const r = el.getBoundingClientRect();
-      setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+    /* 2. Where do we want to scroll to so the element is centred? */
+    const desiredScrollY = elemAbsY - (window.innerHeight / 2) + (elRect.height / 2);
+    const targetScrollY  = Math.max(0, Math.min(maxScroll, desiredScrollY));
 
-      const tt = tooltipRef.current?.getBoundingClientRect();
-      const tooltipH = tt?.height ?? 220;
-      const tooltipW = tt?.width  ?? 360;
-      const spaceBelow = window.innerHeight - r.bottom;
-      const spaceAbove = r.top;
-      const placeBottom = spaceBelow > tooltipH + 30 || spaceAbove < tooltipH + 30;
+    /* 3. After the scroll completes, the element will be at this viewport-Y */
+    const futureTop = elemAbsY - targetScrollY;
 
-      let top  = placeBottom ? r.bottom + 22 : r.top - tooltipH - 22;
-      let left = r.left + r.width / 2 - tooltipW / 2;
-      left = Math.max(16, Math.min(left, window.innerWidth  - tooltipW - 16));
-      top  = Math.max(16, Math.min(top,  window.innerHeight - tooltipH - 16));
-      setTooltipPos({ top, left });
-    }, 500);
+    /* 4. Apply the FUTURE position now — spotlight + strips smoothly tween */
+    const futureRect = {
+      top:    futureTop,
+      left:   elRect.left,
+      width:  elRect.width,
+      height: elRect.height,
+    };
+    setRect(futureRect);
 
-    return () => clearTimeout(t);
+    /* 5. Position the tooltip based on the FUTURE rect */
+    const tt = tooltipRef.current?.getBoundingClientRect();
+    const tooltipH = tt?.height ?? 220;
+    const tooltipW = tt?.width  ?? 360;
+    const spaceBelow = window.innerHeight - (futureRect.top + futureRect.height);
+    const spaceAbove = futureRect.top;
+    const placeBottom = spaceBelow > tooltipH + 30 || spaceAbove < tooltipH + 30;
+
+    let top  = placeBottom
+      ? futureRect.top + futureRect.height + 22
+      : futureRect.top - tooltipH - 22;
+    let left = futureRect.left + futureRect.width / 2 - tooltipW / 2;
+    left = Math.max(16, Math.min(left, window.innerWidth  - tooltipW - 16));
+    top  = Math.max(16, Math.min(top,  window.innerHeight - tooltipH - 16));
+    setTooltipPos({ top, left });
+
+    /* 6. Start the page scroll at the SAME instant — runs in parallel */
+    window.scrollTo({ top: targetScrollY, behavior: 'smooth' });
   }, [open, idx, steps]);
 
   /* Keyboard */
