@@ -165,7 +165,7 @@ export function CurrentLeaderStrip({ students }) {
   ];
 
   return (
-    <div style={{
+    <div data-tour="leader-strip" style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(4, 1fr)',
       gap: 12,

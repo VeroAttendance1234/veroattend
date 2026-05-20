@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Wifi, WifiOff, ChevronDown, BookOpen, LogOut,
-  Menu, X, Bell, Monitor, Heart, Users,
+  Menu, X, Bell, Monitor, Heart, Users, FileSpreadsheet,
 } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
 
@@ -21,7 +21,7 @@ const PAGE_TITLES = {
   Parent:  { title: 'Parent View',        sub: "Your child's attendance & progress" },
 };
 
-export default function Nav({ role, setRole, piConnected, onMarker, onLogout }) {
+export default function Nav({ role, setRole, piConnected, onMarker, onReports, onLogout }) {
   const [imgErr, setImgErr]     = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
@@ -176,6 +176,27 @@ export default function Nav({ role, setRole, piConnected, onMarker, onLogout }) 
                 border: '2px solid var(--surface-card)',
               }} />
             </button>
+
+            {/* Reports (desktop only) */}
+            {!isMobile && onReports && (
+              <button
+                onClick={onReports}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  padding: '6px 12px', borderRadius: 9,
+                  background: 'var(--surface-card)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-muted)',
+                  fontSize: '0.78rem', fontWeight: 700,
+                  transition: 'all 0.12s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--teal)'; e.currentTarget.style.borderColor = 'var(--teal)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
+              >
+                <FileSpreadsheet size={13} strokeWidth={2.5} />
+                Reports
+              </button>
+            )}
 
             {/* Marker (desktop only) */}
             {!isMobile && (
@@ -461,6 +482,23 @@ export default function Nav({ role, setRole, piConnected, onMarker, onLogout }) 
 
             {/* Quick actions */}
             <div style={{ padding: '8px 16px', borderTop: '1px solid var(--border)', marginTop: 8 }}>
+              <button
+                onClick={() => { setMenuOpen(false); onReports?.(); }}
+                style={{
+                  width: '100%',
+                  display: 'flex', alignItems: 'center', gap: 11,
+                  padding: '12px',
+                  background: 'var(--surface-soft)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 10,
+                  color: 'var(--text-primary)',
+                  fontWeight: 700, fontSize: '0.88rem',
+                  marginTop: 8,
+                }}
+              >
+                <FileSpreadsheet size={15} strokeWidth={2.2} style={{ color: 'var(--teal)' }} />
+                Reports & exports
+              </button>
               <button
                 onClick={() => { setMenuOpen(false); onMarker?.(); }}
                 style={{

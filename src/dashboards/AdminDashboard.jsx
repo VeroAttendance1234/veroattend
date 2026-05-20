@@ -16,6 +16,7 @@ import LiveFeed from '../components/LiveFeed';
 import RFIDSimulator from '../components/RFIDSimulator';
 import AbsenceRequestsAdmin from '../components/AbsenceRequestsAdmin';
 import AttendanceLeaders, { CurrentLeaderStrip } from '../components/AttendanceLeaders';
+import AttendanceHeatmap from '../components/AttendanceHeatmap';
 import StudentDetailModal from '../components/StudentDetailModal';
 import { extraNotifications } from '../data/initialState';
 import {
@@ -165,7 +166,7 @@ export default function AdminDashboard({
       <CurrentLeaderStrip students={students} />
 
       {/* ── Hero status widget ──────────────────── */}
-      <div style={{
+      <div data-tour="hero-status" style={{
         background: 'var(--surface-card)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--radius-xl)',
@@ -251,7 +252,7 @@ export default function AdminDashboard({
       </div>
 
       {/* ── Stat cards ─────────────────────────── */}
-      <div className="stats-row-6" style={{ marginBottom: 20 }}>
+      <div data-tour="stats-row" className="stats-row-6" style={{ marginBottom: 20 }}>
         <StatCard label="Total Students" value={students.length}         icon={Users}     accent="var(--teal)"  />
         <StatCard label="Present Today"  value={schoolPresent}           icon={UserCheck} accent="var(--green)" sub={`${schoolRate}% rate`} />
         <StatCard label="Absent Today"   value={students.length - schoolPresent} icon={UserX} accent="var(--red)"   />
@@ -382,9 +383,14 @@ export default function AdminDashboard({
         </div>
       </div>
 
+      {/* ── Calendar heatmap ───────────────────── */}
+      <Card data-tour="attendance-heatmap" style={{ marginBottom: 20 }}>
+        <AttendanceHeatmap />
+      </Card>
+
       {/* ── Absence requests + Leaderboard ────── */}
       <div className="grid-2" style={{ marginBottom: 20 }}>
-        <Card>
+        <Card data-tour="absence-requests">
           <AbsenceRequestsAdmin
             requests={absenceRequests}
             onApprove={onApproveAbsence}
@@ -397,7 +403,7 @@ export default function AdminDashboard({
       </div>
 
       {/* ── Live feed ──────────────────────────── */}
-      <Card style={{ marginBottom: 20 }}>
+      <Card data-tour="live-feed" style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <div>
             <p className="section-title" style={{ marginBottom: 2 }}>Live Scan Feed</p>
@@ -416,7 +422,7 @@ export default function AdminDashboard({
       </Card>
 
       {/* ── Student roll ───────────────────────── */}
-      <Card style={{ marginBottom: 20 }}>
+      <Card data-tour="student-roll" style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 12 }}>
           <p className="section-title" style={{ marginBottom: 0 }}>Student Roll</p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.82rem' }}>
