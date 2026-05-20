@@ -137,9 +137,49 @@ export default function LoginPage({ onLogin }) {
           </div>
 
           <h2 style={{ fontSize: '1.6rem', marginBottom: 8 }}>Welcome back</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: 26 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: 18 }}>
             Choose your role to continue.
           </p>
+
+          {/* Demo helper banner — makes it obvious what to do */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            background: 'var(--teal-glow)',
+            border: '1.5px solid var(--teal-border)',
+            borderRadius: 11,
+            padding: '11px 14px',
+            marginBottom: 22,
+          }}>
+            <span style={{
+              fontSize: '1rem', lineHeight: 1,
+              animation: 'pointHand 1.5s ease-in-out infinite',
+            }}>
+              👉
+            </span>
+            <div style={{ flex: 1, fontSize: '0.82rem', lineHeight: 1.5 }}>
+              <strong style={{ color: 'var(--teal-dark)' }}>Demo ready.</strong>{' '}
+              <span style={{ color: 'var(--text-secondary)' }}>
+                Password is pre-filled — just click <strong>Sign in</strong> below.
+              </span>
+            </div>
+          </div>
+
+          <style>{`
+            @keyframes pointHand {
+              0%, 100% { transform: translateX(0); }
+              50%      { transform: translateX(3px); }
+            }
+            @keyframes signInPulse {
+              0%, 100% {
+                box-shadow: 0 4px 16px rgba(20, 184, 184, 0.3),
+                            0 0 0 0 rgba(20, 184, 184, 0.45);
+              }
+              50% {
+                box-shadow: 0 4px 16px rgba(20, 184, 184, 0.3),
+                            0 0 0 8px rgba(20, 184, 184, 0);
+              }
+            }
+          `}</style>
 
           {/* Role picker */}
           <div style={{
@@ -300,15 +340,22 @@ export default function LoginPage({ onLogin }) {
               <button
                 type="submit"
                 style={{
-                  background: 'var(--teal)', color: '#fff',
-                  padding: '12px 16px', borderRadius: 10,
-                  fontWeight: 700, fontSize: '0.9rem',
+                  background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)',
+                  color: '#fff',
+                  padding: '14px 20px',
+                  borderRadius: 12,
+                  fontWeight: 800, fontSize: '1rem',
+                  letterSpacing: '0.01em',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  marginTop: 4, boxShadow: '0 4px 16px rgba(20,184,184,0.3)',
+                  marginTop: 6,
+                  animation: 'signInPulse 2s ease-in-out infinite',
+                  transition: 'transform 0.12s ease',
                 }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
               >
-                Sign in
-                <ChevronRight size={15} strokeWidth={2.8} />
+                Sign in as {selectedRole}
+                <ChevronRight size={17} strokeWidth={3} />
               </button>
             </form>
           )}
