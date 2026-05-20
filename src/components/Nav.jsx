@@ -123,9 +123,16 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
             )}
           </div>
 
-          {/* ── Page title (desktop) ───────────── */}
+          {/* ── Page title (desktop) — fixed-width column so right cluster stays put ─ */}
           {!isMobile && (
-            <div style={{ flex: 1, display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0 }}>
+            <div style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 10,
+              minWidth: 0,
+              overflow: 'hidden',
+            }}>
               <span style={{
                 fontFamily: 'Bricolage Grotesque, sans-serif',
                 fontWeight: 800,
@@ -133,6 +140,7 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
                 color: 'var(--text-primary)',
                 letterSpacing: '-0.01em',
                 whiteSpace: 'nowrap',
+                flexShrink: 0,
               }}>
                 {page.title}
               </span>
@@ -142,6 +150,8 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
+                flex: 1,
+                minWidth: 0,
               }}>
                 {page.sub}
               </span>
@@ -246,13 +256,15 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
               </div>
             )}
 
-            {/* Avatar chip */}
+            {/* Avatar chip — fixed-width so it doesn't jump per role */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: 7,
               padding: isMobile ? '4px' : '4px 10px 4px 6px',
               borderRadius: 10,
               border: '1px solid var(--border)',
               background: 'var(--surface-card)',
+              width: isMobile ? 'auto' : 168,
+              flexShrink: 0,
             }}>
               <div style={{
                 width: 28, height: 28, borderRadius: 8,
@@ -260,20 +272,25 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontWeight: 700, fontSize: '0.68rem',
                 letterSpacing: '0.04em',
+                flexShrink: 0,
               }}>
                 {meta.initials}
               </div>
               {!isMobile && (
                 <>
-                  <div>
-                    <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontSize: '0.78rem', fontWeight: 700,
+                      color: 'var(--text-primary)', lineHeight: 1.2,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>
                       {meta.label}
                     </div>
                     <div style={{ fontSize: '0.65rem', color: 'var(--text-soft)', lineHeight: 1.2 }}>
                       {role}
                     </div>
                   </div>
-                  <ChevronDown size={13} strokeWidth={2.5} style={{ color: 'var(--text-soft)', marginLeft: 2 }} />
+                  <ChevronDown size={13} strokeWidth={2.5} style={{ color: 'var(--text-soft)', flexShrink: 0 }} />
                 </>
               )}
             </div>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   Users, UserCheck, UserX, TrendingUp,
-  BookOpen, Calendar,
+  BookOpen, Calendar, ChevronDown, Search,
 } from 'lucide-react';
 import Card from '../components/Card';
 import StatCard from '../components/StatCard';
@@ -22,10 +22,28 @@ function todayKey() {
 }
 
 export default function TeacherDashboard({ students, setStudents, taps, onTap, threads = [], onSendMessage }) {
-  const teacher = teachers.find(t => t.id === DEMO_TEACHER_ID);
+  const [selectedTeacherId, setSelectedTeacherId] = useState(DEMO_TEACHER_ID);
+  const [teacherPickerOpen, setTeacherPickerOpen] = useState(false);
+  const [teacherSearch, setTeacherSearch] = useState('');
+  const teacher = teachers.find(t => t.id === selectedTeacherId) || teachers[0];
   const [selectedClass, setSelectedClass] = useState(teacher.classes[0]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const today = todayKey();
+
+  /* When teacher changes, reset their selected class */
+  function pickTeacher(id) {
+    const t = teachers.find(x => x.id === id);
+    setSelectedTeacherId(id);
+    setSelectedClass(t?.classes?.[0] || '');
+    setTeacherPickerOpen(false);
+    setTeacherSearch('');
+  }
+
+  const filteredTeachers = teachers.filter(t =>
+    !teacherSearch.trim()
+    || t.name.toLowerCase().includes(teacherSearch.toLowerCase())
+    || t.subject.toLowerCase().includes(teacherSearch.toLowerCase())
+  );
 
   const classStudents = students.filter(s => s.class === selectedClass);
   const classTaps     = taps.filter(t => t.class === selectedClass);
@@ -42,7 +60,7 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
         onClose={() => setSelectedStudent(null)}
       />
 
-      {/* ── Teacher hero banner ─────────────────── */}
+      {/* ── Teacher hero banner with switcher ── */}
       <div style={{
         background: 'var(--surface-card)',
         border: '1px solid var(--border)',
@@ -51,27 +69,49 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
         marginBottom: 20,
         boxShadow: 'var(--shadow-md)',
         display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap',
+        position: 'relative',
       }}>
-        <div style={{
-          width: 54, height: 54, borderRadius: 16,
-          background: 'var(--blue-light)',
-          border: '2px solid var(--blue-border)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '1.4rem', flexShrink: 0,
-        }}>
-          {teacher.avatar}
-        </div>
-        <div style={{ flex: 1 }}>
-          <h2 style={{ fontSize: '1.25rem', marginBottom: 3 }}>{teacher.name}</h2>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-              {teacher.subject}
-            </span>
-            <span style={{ color: 'var(--border-strong)' }}>·</span>
-            <Badge status="info">{teacher.classes.length} classes</Badge>
-            <Badge status="teal">{today}</Badge>
+        {/* Avatar + name + picker trigger */}
+        <button
+          onClick={() => setTeacherPickerOpen(o => !o)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            background: 'transparent', padding: '6px',
+            borderRadius: 12, flex: 1, minWidth: 250,
+            transition: 'background 0.12s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-soft)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+        >
+          <div style={{
+            width: 54, height: 54, borderRadius: 16,
+            background: 'var(--blue-light)',
+            border: '2px solid var(--blue-border)',
+            color: 'var(--blue)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '0.95rem', fontWeight: 800,
+            fontFamily: 'Bricolage Grotesque, sans-serif',
+            flexShrink: 0,
+          }}>
+            {teacher.avatar}
           </div>
-        </div>
+          <div style={{ flex: 1, textAlign: 'left' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <h2 style={{ fontSize: '1.25rem', marginBottom: 3 }}>{teacher.name}</h2>
+              <ChevronDown size={15} style={{ color: 'var(--text-muted)', transform: teacherPickerOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.18s' }} />
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                {teacher.subject}
+              </span>
+              <span style={{ color: 'var(--border-strong)' }}>·</span>
+              <Badge status="info">{teacher.classes.length} classes</Badge>
+              <Badge status="teal">{today}</Badge>
+            </div>
+          </div>
+        </button>
+
+        {/* Class rate badge */}
         <div style={{
           textAlign: 'right',
           padding: '12px 18px',
@@ -88,6 +128,123 @@ export default function TeacherDashboard({ students, setStudents, taps, onTap, t
             Class rate
           </div>
         </div>
+
+        {/* ── Teacher picker dropdown ── */}
+        {teacherPickerOpen && (
+          <>
+            <div
+              onClick={() => setTeacherPickerOpen(false)}
+              style={{ position: 'fixed', inset: 0, zIndex: 100 }}
+            />
+            <div style={{
+              position: 'absolute', top: 'calc(100% + 8px)', left: 0,
+              width: 'min(420px, calc(100% - 0px))',
+              background: 'var(--surface-card)',
+              border: '1px solid var(--border)',
+              borderRadius: 14,
+              boxShadow: 'var(--shadow-lg)',
+              zIndex: 101,
+              animation: 'slideDown 0.18s ease',
+              overflow: 'hidden',
+            }}>
+              <div style={{
+                padding: '12px 14px',
+                borderBottom: '1px solid var(--border)',
+                background: 'var(--surface-soft)',
+              }}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  background: 'var(--surface-card)', border: '1px solid var(--border)',
+                  borderRadius: 9, padding: '0 11px',
+                }}>
+                  <Search size={13} style={{ color: 'var(--text-soft)' }} />
+                  <input
+                    autoFocus
+                    value={teacherSearch}
+                    onChange={e => setTeacherSearch(e.target.value)}
+                    placeholder="Switch teacher — search by name or subject"
+                    style={{
+                      border: 'none', background: 'transparent', padding: '8px 0',
+                      flex: 1, fontSize: '0.85rem',
+                    }}
+                  />
+                  <span style={{
+                    fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-soft)',
+                    background: 'var(--surface)', padding: '2px 7px', borderRadius: 99,
+                  }}>
+                    {filteredTeachers.length}
+                  </span>
+                </div>
+              </div>
+              <div style={{ maxHeight: 360, overflowY: 'auto' }}>
+                {filteredTeachers.map(t => {
+                  const isActive = t.id === selectedTeacherId;
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => pickTeacher(t.id)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 11,
+                        width: '100%', textAlign: 'left',
+                        padding: '10px 14px',
+                        background: isActive ? 'var(--teal-glow)' : 'transparent',
+                        borderBottom: '1px solid var(--border)',
+                        borderLeft: `3px solid ${isActive ? 'var(--teal)' : 'transparent'}`,
+                        transition: 'all 0.1s',
+                      }}
+                      onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--surface-soft)'; }}
+                      onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
+                    >
+                      <div style={{
+                        width: 36, height: 36, borderRadius: 10,
+                        background: isActive ? 'var(--teal)' : 'var(--blue-light)',
+                        color: isActive ? '#fff' : 'var(--blue)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontWeight: 800, fontSize: '0.72rem',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        flexShrink: 0,
+                      }}>
+                        {t.avatar}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          fontWeight: 700, fontSize: '0.85rem',
+                          color: 'var(--text-primary)',
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>
+                          {t.name}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          {t.subject} · {t.classes.length} classes
+                        </div>
+                      </div>
+                      {isActive && (
+                        <span style={{
+                          fontSize: '0.66rem', fontWeight: 800, color: 'var(--teal)',
+                          letterSpacing: '0.06em',
+                        }}>
+                          ● ACTIVE
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+                {filteredTeachers.length === 0 && (
+                  <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-soft)', fontSize: '0.82rem' }}>
+                    No teachers match "{teacherSearch}"
+                  </div>
+                )}
+              </div>
+              <div style={{
+                padding: '10px 14px', borderTop: '1px solid var(--border)',
+                background: 'var(--surface-soft)',
+                fontSize: '0.72rem', color: 'var(--text-soft)', textAlign: 'center',
+              }}>
+                {teachers.length} teaching staff total
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* ── Class selector ──────────────────────── */}
