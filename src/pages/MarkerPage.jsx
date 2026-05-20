@@ -9,6 +9,7 @@ import Modal from '../components/Modal';
 import Tagline from '../components/Tagline';
 import Reveal from '../components/Reveal';
 import CountUp from '../components/CountUp';
+import CardTapDemo from '../components/CardTapDemo';
 
 /* ─────────────────────────────────────────────
    DATA
@@ -269,83 +270,103 @@ export default function MarkerPage({ onClose, setRole }) {
           pointerEvents: 'none', filter: 'blur(40px)',
         }} />
 
-        <div style={{ maxWidth: 1100, margin: '0 auto', width: '100%', position: 'relative' }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 9,
-            background: 'var(--surface-card)',
-            border: '1px solid var(--teal-border)',
-            borderRadius: 99, padding: '7px 16px',
-            marginBottom: 28,
-            boxShadow: 'var(--shadow-sm)',
-            animation: 'taglineWordIn 0.5s cubic-bezier(0.32,0.72,0,1) both',
-          }}>
-            <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)', animation: 'pulse-dot 2s ease-in-out infinite' }} />
-            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--teal)', letterSpacing: '0.02em' }}>
-              Live · HSC Major Project · 2026
-            </span>
-          </div>
+        <div style={{
+          maxWidth: 1200, margin: '0 auto', width: '100%', position: 'relative',
+          display: 'grid', gridTemplateColumns: '1.05fr 1fr', gap: 40, alignItems: 'center',
+        }} className="hero-grid">
 
-          <img
-            src="/vero-logo.png"
-            alt="VERO."
-            style={{
-              height: 140, objectFit: 'contain', display: 'block', marginBottom: 28,
+          {/* ── Left: copy ── */}
+          <div>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 9,
+              background: 'var(--surface-card)',
+              border: '1px solid var(--teal-border)',
+              borderRadius: 99, padding: '7px 16px',
+              marginBottom: 28,
+              boxShadow: 'var(--shadow-sm)',
+              animation: 'taglineWordIn 0.5s cubic-bezier(0.32,0.72,0,1) both',
+            }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)', animation: 'pulse-dot 2s ease-in-out infinite' }} />
+              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--teal)', letterSpacing: '0.02em' }}>
+                Live · HSC Major Project · 2026
+              </span>
+            </div>
+
+            <div style={{
+              marginBottom: 28,
               animation: 'taglineWordIn 0.6s 0.1s cubic-bezier(0.32,0.72,0,1) both',
-            }}
-          />
+            }}>
+              <Tagline size="hero" stacked />
+            </div>
 
-          <div style={{ marginBottom: 32, animation: 'taglineWordIn 0.6s 0.2s cubic-bezier(0.32,0.72,0,1) both' }}>
-            <Tagline size="hero" />
+            <p style={{
+              fontSize: '1.15rem',
+              color: 'var(--text-muted)',
+              lineHeight: 1.6,
+              maxWidth: 540,
+              marginBottom: 32,
+              animation: 'taglineWordIn 0.6s 0.2s cubic-bezier(0.32,0.72,0,1) both',
+            }}>
+              A real-time school attendance platform. NFC card hardware on Raspberry Pi, Python backend, four role-based React dashboards · all wired into one living system.
+            </p>
+
+            <div style={{
+              display: 'flex', gap: 12, flexWrap: 'wrap',
+              animation: 'taglineWordIn 0.6s 0.3s cubic-bezier(0.32,0.72,0,1) both',
+            }}>
+              <button
+                onClick={onClose}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 10,
+                  padding: '14px 24px', borderRadius: 12,
+                  background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)',
+                  color: '#fff', fontSize: '1rem', fontWeight: 800,
+                  boxShadow: '0 8px 28px rgba(20,184,184,0.4)',
+                  transition: 'transform 0.14s ease',
+                }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                Explore the live demo
+                <ArrowRight size={17} strokeWidth={2.8} />
+              </button>
+              <a
+                href="#features"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '14px 22px', borderRadius: 12,
+                  background: 'var(--surface-card)',
+                  border: '1.5px solid var(--border)',
+                  color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 700,
+                  textDecoration: 'none',
+                  transition: 'all 0.14s ease',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--teal)'; e.currentTarget.style.color = 'var(--teal)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+              >
+                Read the case study
+                <ArrowDown size={15} strokeWidth={2.6} />
+              </a>
+            </div>
           </div>
 
-          <p style={{
-            fontSize: '1.2rem',
-            color: 'var(--text-muted)',
-            lineHeight: 1.6,
-            maxWidth: 640,
-            marginBottom: 36,
-            animation: 'taglineWordIn 0.6s 0.3s cubic-bezier(0.32,0.72,0,1) both',
-          }}>
-            A real-time school attendance platform unifying NFC card hardware, a Python backend on Raspberry Pi, and four role-based React dashboards into a single living system.
-          </p>
-
+          {/* ── Right: 3D card-tap demo ── */}
           <div style={{
-            display: 'flex', gap: 12, flexWrap: 'wrap',
-            animation: 'taglineWordIn 0.6s 0.4s cubic-bezier(0.32,0.72,0,1) both',
+            position: 'relative',
+            animation: 'taglineWordIn 0.7s 0.35s cubic-bezier(0.32,0.72,0,1) both',
           }}>
-            <button
-              onClick={onClose}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 10,
-                padding: '14px 24px', borderRadius: 12,
-                background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)',
-                color: '#fff', fontSize: '1rem', fontWeight: 800,
-                boxShadow: '0 8px 28px rgba(20,184,184,0.4)',
-                transition: 'transform 0.14s ease',
-              }}
-              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              Explore the live demo
-              <ArrowRight size={17} strokeWidth={2.8} />
-            </button>
-            <a
-              href="#features"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                padding: '14px 22px', borderRadius: 12,
-                background: 'var(--surface-card)',
-                border: '1.5px solid var(--border)',
-                color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 700,
-                textDecoration: 'none',
-                transition: 'all 0.14s ease',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--teal)'; e.currentTarget.style.color = 'var(--teal)'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
-            >
-              Read the case study
-              <ArrowDown size={15} strokeWidth={2.6} />
-            </a>
+            <CardTapDemo size="lg" />
+
+            {/* Caption underneath the scene */}
+            <div style={{
+              position: 'absolute', bottom: -8, left: 0, right: 0,
+              textAlign: 'center',
+              fontSize: '0.72rem', fontWeight: 700,
+              color: 'var(--text-soft)',
+              textTransform: 'uppercase', letterSpacing: '0.14em',
+            }}>
+              Card tap · live every 4 seconds
+            </div>
           </div>
         </div>
       </section>
@@ -893,6 +914,9 @@ export default function MarkerPage({ onClose, setRole }) {
       </section>
 
       <style>{`
+        @media (max-width: 980px) {
+          .hero-grid     { grid-template-columns: 1fr !important; gap: 24px !important; }
+        }
         @media (max-width: 900px) {
           .numbers-grid  { grid-template-columns: repeat(2, 1fr) !important; gap: 22px !important; }
           .problem-grid  { grid-template-columns: 1fr !important; }
