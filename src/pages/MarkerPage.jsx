@@ -250,9 +250,9 @@ export default function MarkerPage({ onClose, setRole }) {
           §1 HERO · full-bleed, massive
       ═══════════════════════════════════════ */}
       <section style={{
-        minHeight: '85vh',
+        minHeight: '100vh',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        padding: '60px 28px',
+        padding: '40px 24px 60px',
         position: 'relative',
         overflow: 'hidden',
       }}>
@@ -271,8 +271,8 @@ export default function MarkerPage({ onClose, setRole }) {
         }} />
 
         <div style={{
-          maxWidth: 1200, margin: '0 auto', width: '100%', position: 'relative',
-          display: 'grid', gridTemplateColumns: '1.05fr 1fr', gap: 40, alignItems: 'center',
+          maxWidth: 1320, margin: '0 auto', width: '100%', position: 'relative',
+          display: 'grid', gridTemplateColumns: '0.85fr 1.15fr', gap: 32, alignItems: 'center',
         }} className="hero-grid">
 
           {/* ── Left: copy ── */}
@@ -350,22 +350,29 @@ export default function MarkerPage({ onClose, setRole }) {
             </div>
           </div>
 
-          {/* ── Right: 3D card-tap demo ── */}
+          {/* ── Right: 3D card-tap demo (the focal point) ── */}
           <div style={{
             position: 'relative',
             animation: 'taglineWordIn 0.7s 0.35s cubic-bezier(0.32,0.72,0,1) both',
+            minHeight: 600,
           }}>
             <CardTapDemo size="lg" />
 
-            {/* Caption underneath the scene */}
             <div style={{
-              position: 'absolute', bottom: -8, left: 0, right: 0,
+              position: 'absolute', bottom: -2, left: 0, right: 0,
               textAlign: 'center',
-              fontSize: '0.72rem', fontWeight: 700,
+              fontSize: '0.7rem', fontWeight: 800,
               color: 'var(--text-soft)',
-              textTransform: 'uppercase', letterSpacing: '0.14em',
+              textTransform: 'uppercase', letterSpacing: '0.18em',
             }}>
-              Card tap · live every 4 seconds
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <span style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: 'var(--green)',
+                  animation: 'pulse-dot 2s ease-in-out infinite',
+                }} />
+                Live · NFC card tap stream
+              </span>
             </div>
           </div>
         </div>
