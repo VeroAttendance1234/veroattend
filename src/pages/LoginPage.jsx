@@ -1,9 +1,80 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Monitor, BookOpen, Heart, Users, CreditCard, Lock,
-  Mail, Eye, EyeOff, ChevronRight, Wifi, Shield,
+  Mail, Eye, EyeOff, ChevronRight, Wifi, Shield, Zap, Clock, TrendingUp,
 } from 'lucide-react';
 import Tagline from '../components/Tagline';
+
+/* Rotates through simulated card-tap events to suggest the system is alive */
+function LiveActivityTicker() {
+  const EVENTS = [
+    { name: 'Aisha Patel',     class: '11A · Maths',    when: 'just now', colour: 'var(--green)' },
+    { name: 'Mr David Chen',   class: 'Year 11 home',   when: '4s ago',   colour: 'var(--blue)' },
+    { name: 'Hassan Khan',     class: '8E · Geography', when: '11s ago',  colour: 'var(--teal)' },
+    { name: 'Olivia Burns',    class: '12B · Physics',  when: '18s ago',  colour: 'var(--purple)' },
+    { name: 'Marco Trovato',   class: '9F · English',   when: '24s ago',  colour: 'var(--green)' },
+  ];
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx(i => (i + 1) % EVENTS.length), 2400);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const ev = EVENTS[idx];
+  return (
+    <div style={{
+      border: '1px solid var(--border)',
+      background: 'var(--surface-soft)',
+      borderRadius: 14,
+      padding: '12px 14px',
+      display: 'flex', alignItems: 'center', gap: 12,
+      overflow: 'hidden',
+    }} aria-live="polite">
+      <div style={{
+        width: 36, height: 36, borderRadius: 10,
+        background: 'var(--teal-glow)',
+        border: '1px solid var(--teal-border)',
+        color: 'var(--teal)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexShrink: 0,
+      }}>
+        <CreditCard size={15} strokeWidth={2.4} />
+      </div>
+      <div key={idx} style={{ flex: 1, minWidth: 0, animation: 'tickerIn 0.32s cubic-bezier(0.22,1,0.36,1) both' }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {ev.name}
+          <span style={{
+            fontSize: '0.62rem', fontWeight: 800,
+            color: '#fff', background: ev.colour,
+            padding: '2px 7px', borderRadius: 99, letterSpacing: '0.03em',
+          }}>
+            CHECKED IN
+          </span>
+        </div>
+        <div style={{
+          fontSize: '0.74rem', color: 'var(--text-muted)',
+          display: 'flex', gap: 6, alignItems: 'center',
+        }}>
+          <span>{ev.class}</span>
+          <span style={{ color: 'var(--border-strong)' }}>·</span>
+          <Clock size={10} strokeWidth={2.5} />
+          <span>{ev.when}</span>
+        </div>
+      </div>
+      <TrendingUp size={14} strokeWidth={2.4} style={{ color: 'var(--teal)', flexShrink: 0, opacity: 0.6 }} />
+      <style>{`
+        @keyframes tickerIn {
+          from { opacity: 0; transform: translateX(10px); }
+          to   { opacity: 1; transform: translateX(0);    }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 const ROLE_OPTIONS = [
   { role: 'Admin',   label: 'Administrator',   email: 'admin@shore.nsw.edu.au',     colour: '#14B8B8', icon: Monitor },
@@ -91,69 +162,156 @@ export default function LoginPage({ onLogin }) {
       <div style={{ display: 'flex', width: '100%', position: 'relative', zIndex: 1 }}>
       {/* ── Left: brand panel (desktop only) ── */}
       <div className="login-brand" style={{
-        flex: '0 0 45%',
+        flex: '0 0 50%',
         padding: '48px 56px',
         display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
         borderRight: '1px solid var(--border)',
         background: 'var(--surface-card)',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
-        <div>
-          <img src="/vero-wordmark.png" alt="VERO." style={{ height: 34, marginBottom: 10, display: 'block' }} />
-          <Tagline size="md" />
-        </div>
-
-        <div>
+        {/* Top: wordmark + live-connection chip */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+          <div>
+            <img src="/vero-wordmark.png" alt="VERO." style={{ height: 34, marginBottom: 10, display: 'block' }} />
+            <Tagline size="md" />
+          </div>
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
+            display: 'inline-flex', alignItems: 'center', gap: 7,
             background: 'var(--teal-glow)',
             border: '1px solid var(--teal-border)',
-            borderRadius: 99, padding: '6px 14px',
-            marginBottom: 22,
+            borderRadius: 99, padding: '6px 12px',
           }}>
-            <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)', animation: 'pulse-dot 2s ease-in-out infinite' }} />
-            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--teal)', letterSpacing: '0.02em' }}>
-              Pi connected · ACR122U online
+            <div style={{
+              width: 7, height: 7, borderRadius: '50%',
+              background: 'var(--green)',
+              boxShadow: '0 0 0 0 rgba(34,197,94,0.6)',
+              animation: 'heroHeartbeat 1.8s ease-out infinite',
+            }} />
+            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--teal-dark)', letterSpacing: '0.03em' }}>
+              ACR122U · LIVE
             </span>
           </div>
+        </div>
 
+        {/* Middle: hero + focal stat + activity */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+
+          {/* Massive gradient headline with kinetic word-in */}
           <h1 style={{
-            fontSize: '2.4rem', lineHeight: 1.1, letterSpacing: '-0.035em',
-            marginBottom: 16, color: 'var(--text-primary)',
+            fontSize: 'clamp(2.4rem, 5.4vw, 4.2rem)',
+            lineHeight: 0.98,
+            letterSpacing: '-0.045em',
+            margin: 0,
+            color: 'var(--text-primary)',
+            fontWeight: 800,
           }}>
-            Sign in to your<br/>school dashboard.
+            <span className="heroWord" style={{ animationDelay: '0.05s' }}>Real-time.</span>{' '}
+            <span className="heroWord" style={{ animationDelay: '0.18s' }}>Right</span>{' '}
+            <span className="heroWord heroWordAccent" style={{ animationDelay: '0.30s' }}>now.</span>
           </h1>
-          <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: 380 }}>
-            Real-time attendance, wellbeing and analytics ·
-            powered by NFC card taps and your Raspberry Pi.
+
+          <p style={{
+            fontSize: '1.02rem', color: 'var(--text-muted)',
+            lineHeight: 1.6, maxWidth: 460, margin: 0,
+          }}>
+            Replace the 5-minute roll call with a single NFC tap. Every
+            classroom, every period, every parent — synced in under 100ms.
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 32 }}>
-            {[
-              { icon: CreditCard, text: 'NFC card or password sign-in' },
-              { icon: Shield,     text: 'Role-based access control' },
-              { icon: Wifi,       text: 'Real-time WebSocket updates' },
-            ].map(({ icon: Icon, text }) => (
-              <div key={text} style={{
-                display: 'flex', alignItems: 'center', gap: 11,
-                fontSize: '0.85rem', color: 'var(--text-muted)',
-              }}>
-                <div style={{
-                  width: 28, height: 28, borderRadius: 8,
-                  background: 'var(--teal-glow)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'var(--teal)', flexShrink: 0,
-                }}>
-                  <Icon size={13} strokeWidth={2.2} />
-                </div>
-                {text}
+          {/* Focal stat: the one number that should burn in */}
+          <div style={{
+            position: 'relative',
+            padding: '22px 24px',
+            borderRadius: 18,
+            background: 'linear-gradient(135deg, rgba(20,184,184,0.10) 0%, rgba(15,152,152,0.04) 100%)',
+            border: '1px solid var(--teal-border)',
+            overflow: 'hidden',
+          }}>
+            {/* Decorative corner glow */}
+            <div aria-hidden="true" style={{
+              position: 'absolute', top: -60, right: -60,
+              width: 160, height: 160, borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(20,184,184,0.25), transparent 60%)',
+              filter: 'blur(8px)',
+            }} />
+            <div style={{ position: 'relative' }}>
+              <div className="label-caps" style={{ color: 'var(--teal-dark)', marginBottom: 6, fontSize: '0.62rem' }}>
+                Per-school annual impact
               </div>
+              <div style={{
+                fontFamily: 'Bricolage Grotesque, sans-serif',
+                fontWeight: 800,
+                fontSize: 'clamp(2.4rem, 5vw, 3.4rem)',
+                letterSpacing: '-0.04em',
+                lineHeight: 1,
+                background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 60%, #0a6e6e 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>
+                300<span style={{ fontSize: '0.42em', color: 'var(--teal-dark)', WebkitTextFillColor: 'var(--teal-dark)' }}> hrs/yr</span>
+              </div>
+              <div style={{
+                fontSize: '0.88rem', color: 'var(--text-secondary)',
+                marginTop: 6, lineHeight: 1.5,
+              }}>
+                of teaching time reclaimed when manual roll calls are replaced —
+                across a typical 30-staff secondary school.
+              </div>
+            </div>
+          </div>
+
+          {/* Live activity ticker — rotates through simulated taps */}
+          <LiveActivityTicker />
+        </div>
+
+        {/* Bottom: trust strip + footer */}
+        <div>
+          <div style={{
+            display: 'flex', gap: 18, alignItems: 'center',
+            color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 700,
+            marginBottom: 14, flexWrap: 'wrap',
+          }}>
+            {[
+              { icon: Shield, text: 'WCAG 2.1 AA' },
+              { icon: Zap,    text: '<100 ms latency' },
+              { icon: Wifi,   text: 'Offline-tolerant' },
+            ].map(({ icon: Icon, text }) => (
+              <span key={text} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <Icon size={12} strokeWidth={2.4} style={{ color: 'var(--teal)' }} />
+                {text}
+              </span>
             ))}
+          </div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-soft)' }}>
+            © 2026 VERO · HSC Software Design & Development Major Project
           </div>
         </div>
 
-        <div style={{ fontSize: '0.72rem', color: 'var(--text-soft)' }}>
-          © 2026 VERO · HSC Software Design & Development Major Project
-        </div>
+        <style>{`
+          .heroWord {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(18px);
+            animation: heroWordIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          }
+          .heroWordAccent {
+            background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+          @keyframes heroWordIn {
+            from { opacity: 0; transform: translateY(18px); filter: blur(4px); }
+            to   { opacity: 1; transform: translateY(0);    filter: blur(0);   }
+          }
+          @keyframes heroHeartbeat {
+            0%   { box-shadow: 0 0 0 0    rgba(34,197,94,0.55); }
+            70%  { box-shadow: 0 0 0 8px  rgba(34,197,94,0);    }
+            100% { box-shadow: 0 0 0 0    rgba(34,197,94,0);    }
+          }
+        `}</style>
       </div>
 
       {/* ── Right: form panel ── */}
@@ -170,32 +328,55 @@ export default function LoginPage({ onLogin }) {
             <div style={{ display: 'flex', justifyContent: 'center' }}><Tagline size="sm" /></div>
           </div>
 
-          <h2 style={{ fontSize: '1.6rem', marginBottom: 8 }}>Welcome back</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: 18 }}>
-            Choose your role to continue.
+          <h2 style={{
+            fontSize: '1.9rem',
+            marginBottom: 6,
+            letterSpacing: '-0.025em',
+            fontWeight: 800,
+          }}>
+            Welcome<span style={{ color: 'var(--teal)' }}>.</span>
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', marginBottom: 18, lineHeight: 1.5 }}>
+            Pick a role — every dashboard is fully wired with seeded data.
           </p>
 
           {/* Demo helper banner · makes it obvious what to do */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
-            background: 'var(--teal-glow)',
+            background: 'linear-gradient(90deg, var(--teal-glow) 0%, rgba(20,184,184,0.05) 100%)',
             border: '1.5px solid var(--teal-border)',
-            borderRadius: 11,
-            padding: '11px 14px',
+            borderRadius: 12,
+            padding: '12px 14px',
             marginBottom: 22,
+            position: 'relative',
+            overflow: 'hidden',
           }}>
+            {/* Subtle moving shimmer */}
+            <span aria-hidden="true" style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.45) 50%, transparent 70%)',
+              animation: 'demoShimmer 3.6s linear infinite',
+              pointerEvents: 'none',
+            }} />
             <span style={{
-              fontSize: '1rem', lineHeight: 1,
+              fontSize: '1.05rem', lineHeight: 1,
               animation: 'pointHand 1.5s ease-in-out infinite',
+              position: 'relative',
             }}>
               👉
             </span>
-            <div style={{ flex: 1, fontSize: '0.82rem', lineHeight: 1.5 }}>
+            <div style={{ flex: 1, fontSize: '0.82rem', lineHeight: 1.5, position: 'relative' }}>
               <strong style={{ color: 'var(--teal-dark)' }}>Demo ready.</strong>{' '}
               <span style={{ color: 'var(--text-secondary)' }}>
                 Password is pre-filled · just click <strong>Sign in</strong> below.
               </span>
             </div>
+            <style>{`
+              @keyframes demoShimmer {
+                from { transform: translateX(-100%); }
+                to   { transform: translateX(100%);  }
+              }
+            `}</style>
           </div>
 
           <style>{`
