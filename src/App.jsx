@@ -10,6 +10,7 @@ import LoginPage        from './pages/LoginPage';
 import ReportsPage      from './pages/ReportsPage';
 import OnboardingTour   from './components/OnboardingTour';
 import CommandPalette, { useCommandPaletteHotkey } from './components/CommandPalette';
+import MilestoneConfetti from './components/MilestoneConfetti';
 import { students as initialStudents } from './data/sampleData';
 import { initialAbsenceRequests, initialThreads } from './data/initialState';
 import './styles/global.css';
@@ -288,10 +289,25 @@ function AppInner() {
         />
       )}
 
-      {role === 'Admin'   && <AdminDashboard   students={students} setStudents={setStudents} taps={taps} onTap={handleTap} {...sharedProps} />}
-      {role === 'Teacher' && <TeacherDashboard students={students} setStudents={setStudents} taps={taps} onTap={handleTap} {...sharedProps} />}
-      {role === 'Student' && <StudentDashboard students={students} {...sharedProps} />}
-      {role === 'Parent'  && <ParentDashboard  students={students} {...sharedProps} />}
+      {/* Page transition wrapper — key={role} forces a remount with the
+          roleSlideIn animation when the user switches dashboards. */}
+      <div key={role} style={{ animation: 'roleSlideIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both' }}>
+        {role === 'Admin'   && <AdminDashboard   students={students} setStudents={setStudents} taps={taps} onTap={handleTap} {...sharedProps} />}
+        {role === 'Teacher' && <TeacherDashboard students={students} setStudents={setStudents} taps={taps} onTap={handleTap} {...sharedProps} />}
+        {role === 'Student' && <StudentDashboard students={students} {...sharedProps} />}
+        {role === 'Parent'  && <ParentDashboard  students={students} {...sharedProps} />}
+      </div>
+
+      {/* Confetti when the school crosses 95% attendance (once per session per role) */}
+      <MilestoneConfetti
+        attendanceRate={
+          students.length ? Math.round((students.filter(s => s.present).length / students.length) * 100) : 0
+        }
+        threshold={95}
+        storageKey={`vero.milestone.95.${role}`}
+        message="🎯 School hit 95 % attendance!"
+        subtitle="Best day this term · keep it up"
+      />
     </>
   );
 }

@@ -403,6 +403,12 @@ img[src*="vero-"] {
   to   { opacity: 1; }
 }
 
+/* Fired on every role switch (keyed remount in App.jsx) */
+@keyframes roleSlideIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.992); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);     filter: blur(0);   }
+}
+
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%       { opacity: 0.7; transform: scale(1.4); }

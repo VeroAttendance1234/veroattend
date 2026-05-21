@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Badge from './Badge';
 import Avatar from './Avatar';
+import Sparkline, { seedHistory } from './Sparkline';
 import { CreditCard, Clock } from 'lucide-react';
 
 export default function LiveFeed({ taps }) {
@@ -42,6 +43,11 @@ export default function LiveFeed({ taps }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 7, maxHeight: 340, overflowY: 'auto', paddingRight: 2 }}>
+      <style>{`
+        @media (min-width: 540px) {
+          .livefeed-spark { display: flex !important; }
+        }
+      `}</style>
       {taps.map((tap, i) => (
         <div
           key={tap.id}
@@ -79,6 +85,18 @@ export default function LiveFeed({ taps }) {
                 </>
               )}
             </div>
+          </div>
+
+          {/* 7-day attendance sparkline — gives every row instant context */}
+          <div style={{
+            flexShrink: 0, display: 'none', alignItems: 'center',
+            paddingRight: 4,
+          }} className="livefeed-spark">
+            <Sparkline
+              data={seedHistory(tap.id || tap.name, 7)}
+              width={56} height={22}
+              ariaLabel={`${tap.name} 7-day attendance trend`}
+            />
           </div>
 
           <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5 }}>
