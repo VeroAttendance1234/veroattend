@@ -27,7 +27,20 @@ import {
   Environment, ContactShadows, OrbitControls,
 } from '@react-three/drei';
 import * as THREE from 'three';
-import { ThreeMFLoader } from 'three/examples/jsm/loaders/3MFLoader.js';
+import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
+
+/* Detect WebGL up-front so we can render a friendly fallback instead
+   of letting three.js throw inside a Suspense boundary. */
+function hasWebGL() {
+  if (typeof window === 'undefined') return true; // SSR-safe assume yes
+  try {
+    const c = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext &&
+      (c.getContext('webgl2') || c.getContext('webgl') || c.getContext('experimental-webgl')));
+  } catch {
+    return false;
+  }
+}
 
 /* ───── Config ─────────────────────────────────── */
 const MODEL_URL     = '/models/vero-cloud-base.3mf';
@@ -317,6 +330,32 @@ export default function VeroTapAnimation({
   height = 420,
 }) {
   const [ready, setReady] = useState(autoPlay);
+  const [webgl] = useState(hasWebGL);
+
+  if (!webgl) {
+    return (
+      <div className={className} style={{
+        width: '100%', height, borderRadius: 18,
+        background: 'linear-gradient(135deg, #f8fafa 0%, #eef3f3 100%)',
+        border: '1px dashed var(--border)',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        gap: 8, padding: 24, textAlign: 'center',
+      }}>
+        <div style={{
+          fontFamily: 'Bricolage Grotesque, sans-serif',
+          fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)',
+        }}>
+          3D preview unavailable
+        </div>
+        <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', maxWidth: 320 }}>
+          WebGL is disabled in this browser. Enable hardware acceleration in
+          settings, or open this page in Chrome / Safari with a normal graphics
+          driver to see the live CAD model.
+        </div>
+      </div>
+    );
+  }
 
   // Pause when offscreen to save GPU
   const wrapRef = useRef();

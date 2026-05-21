@@ -19,9 +19,18 @@ import { Suspense, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { Environment, ContactShadows, OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
-import { ThreeMFLoader } from 'three/examples/jsm/loaders/3MFLoader.js';
+import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
 
 const MODEL_URL = '/models/vero-cloud-base.3mf';
+
+function hasWebGL() {
+  if (typeof window === 'undefined') return true;
+  try {
+    const c = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext &&
+      (c.getContext('webgl2') || c.getContext('webgl') || c.getContext('experimental-webgl')));
+  } catch { return false; }
+}
 
 const TEAL      = '#00B3B8';
 const TEAL_DARK = '#00A9A5';
@@ -520,6 +529,30 @@ export default function VeroExplodedView({
   className,
   interactive = true,
 }) {
+  if (!hasWebGL()) {
+    return (
+      <div className={className} style={{
+        width: '100%', height, borderRadius: 18,
+        background: 'linear-gradient(135deg, #f8fafa 0%, #eef3f3 100%)',
+        border: '1px dashed var(--border)',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        gap: 8, padding: 24, textAlign: 'center',
+      }}>
+        <div style={{
+          fontFamily: 'Bricolage Grotesque, sans-serif',
+          fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)',
+        }}>
+          Exploded view unavailable
+        </div>
+        <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', maxWidth: 320 }}>
+          WebGL is disabled in this browser. Enable hardware acceleration in
+          settings, or try a different browser to see the live 3D breakdown.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={className}
