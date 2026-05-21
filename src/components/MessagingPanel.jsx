@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, MessageSquare, ChevronLeft, Search } from 'lucide-react';
+import {
+  Send, MessageSquare, Search, Check, CheckCheck, Smile, Paperclip, Sparkles,
+} from 'lucide-react';
 import Avatar from './Avatar';
 
 const ROLE_COLOURS = {
@@ -20,11 +22,21 @@ const ROLE_COLOURS = {
  * @param {Array}  threads     - Conversation threads from shared state
  * @param {Func}   onSend      - Called when user sends a message (threadId, text)
  */
-export default function MessagingPanel({ role, userName, threads, onSend }) {
+export default function MessagingPanel({
+  role,
+  userName,
+  threads,
+  onSend,
+  quickReplies = [],
+  typingFromId = null,   // when set, shows a "typing..." indicator in that thread
+  height = 480,
+}) {
   const [activeId, setActiveId] = useState(threads[0]?.id);
   const [draft, setDraft]       = useState('');
   const [search, setSearch]     = useState('');
+  const [justSent, setJustSent] = useState(false);
   const scrollRef = useRef(null);
+  const inputRef  = useRef(null);
 
   // Filter threads where the current role participates
   const visible = threads.filter(t =>
@@ -36,14 +48,21 @@ export default function MessagingPanel({ role, userName, threads, onSend }) {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
     }
-  }, [active?.messages.length, activeId]);
+  }, [active?.messages.length, activeId, typingFromId]);
 
-  function handleSend() {
-    if (!draft.trim() || !active) return;
-    onSend(active.id, draft.trim());
+  function handleSend(textOverride) {
+    const text = (textOverride ?? draft).trim();
+    if (!text || !active) return;
+    onSend(active.id, text);
     setDraft('');
+    setJustSent(true);
+    setTimeout(() => setJustSent(false), 320);
+    inputRef.current?.focus();
   }
 
   function otherParticipants(t) {
@@ -55,11 +74,12 @@ export default function MessagingPanel({ role, userName, threads, onSend }) {
       display: 'grid',
       gridTemplateColumns: 'minmax(220px, 280px) 1fr',
       gap: 0,
-      height: 480,
+      height,
       background: 'var(--surface-card)',
       border: '1px solid var(--border)',
       borderRadius: 14,
       overflow: 'hidden',
+      boxShadow: 'var(--shadow-sm)',
     }} className="messaging-grid">
 
       {/* ── Thread list ─────────────────────────── */}
@@ -179,85 +199,219 @@ export default function MessagingPanel({ role, userName, threads, onSend }) {
             background: 'var(--surface)',
             display: 'flex', flexDirection: 'column', gap: 8,
           }}>
-            {active.messages.map(m => {
+            {active.messages.map((m, i) => {
               const isMine = m.from === role;
               const author = active.participants.find(p => p.role === m.from);
-              const bg = isMine ? 'var(--teal)' : 'var(--surface-card)';
+              const bg = isMine
+                ? 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)'
+                : 'var(--surface-card)';
               const colour = isMine ? '#fff' : 'var(--text-primary)';
+              const isLastMine = isMine && i === active.messages.length - 1;
               return (
-                <div key={m.id} style={{
-                  display: 'flex',
-                  justifyContent: isMine ? 'flex-end' : 'flex-start',
-                  gap: 8,
-                  alignItems: 'flex-end',
-                }}>
+                <div
+                  key={m.id}
+                  style={{
+                    display: 'flex',
+                    justifyContent: isMine ? 'flex-end' : 'flex-start',
+                    gap: 8,
+                    alignItems: 'flex-end',
+                    animation: 'msgIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both',
+                  }}
+                >
                   {!isMine && <Avatar name={author?.name || 'User'} size={26} />}
                   <div style={{ maxWidth: '72%' }}>
                     <div style={{
                       padding: '8px 12px',
-                      borderRadius: 12,
+                      borderRadius: 14,
                       background: bg,
                       color: colour,
                       border: isMine ? 'none' : '1px solid var(--border)',
                       fontSize: '0.86rem',
                       lineHeight: 1.5,
-                      borderBottomLeftRadius: isMine ? 12 : 3,
-                      borderBottomRightRadius: isMine ? 3 : 12,
+                      borderBottomLeftRadius: isMine ? 14 : 4,
+                      borderBottomRightRadius: isMine ? 4 : 14,
                       whiteSpace: 'pre-wrap',
+                      boxShadow: isMine
+                        ? '0 2px 10px rgba(20,184,184,0.22)'
+                        : 'var(--shadow-sm)',
                     }}>
                       {m.text}
                     </div>
                     <div style={{
                       fontSize: '0.65rem', color: 'var(--text-soft)',
-                      marginTop: 3, textAlign: isMine ? 'right' : 'left',
+                      marginTop: 3,
+                      display: 'flex',
+                      justifyContent: isMine ? 'flex-end' : 'flex-start',
+                      alignItems: 'center', gap: 4,
                       paddingLeft: 4, paddingRight: 4,
                     }}>
                       {!isMine && author && (
-                        <span style={{ color: ROLE_COLOURS[author.role], fontWeight: 700, marginRight: 5 }}>
+                        <span style={{ color: ROLE_COLOURS[author.role], fontWeight: 700 }}>
                           {author.name}
                         </span>
                       )}
-                      {m.time}
+                      <span>{m.time}</span>
+                      {isMine && (
+                        isLastMine
+                          ? <Check     size={11} strokeWidth={3} style={{ color: 'var(--text-soft)' }} aria-label="Sent" />
+                          : <CheckCheck size={11} strokeWidth={3} style={{ color: 'var(--teal)'   }} aria-label="Read" />
+                      )}
                     </div>
                   </div>
                 </div>
               );
             })}
+
+            {/* Typing indicator for the other party */}
+            {typingFromId && active.id === typingFromId && (
+              <div style={{
+                display: 'flex', alignItems: 'flex-end', gap: 8,
+                animation: 'msgIn 0.22s ease both',
+              }}>
+                <Avatar name={otherParticipants(active)[0]?.name || 'User'} size={26} />
+                <div style={{
+                  padding: '10px 14px',
+                  borderRadius: 14,
+                  borderBottomLeftRadius: 4,
+                  background: 'var(--surface-card)',
+                  border: '1px solid var(--border)',
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                }}>
+                  {[0, 1, 2].map(i => (
+                    <span key={i} style={{
+                      width: 6, height: 6, borderRadius: '50%',
+                      background: 'var(--text-muted)',
+                      animation: `typingDot 1.2s ${i * 0.18}s ease-in-out infinite`,
+                    }} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
+
+          {/* Quick reply suggestions */}
+          {quickReplies.length > 0 && (
+            <div style={{
+              padding: '8px 14px 0',
+              display: 'flex', gap: 6, flexWrap: 'wrap',
+              background: 'var(--surface-card)',
+              borderTop: '1px solid var(--border)',
+            }}>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                fontSize: '0.62rem', fontWeight: 800,
+                color: 'var(--text-soft)', letterSpacing: '0.06em',
+                textTransform: 'uppercase', alignSelf: 'center',
+              }}>
+                <Sparkles size={10} strokeWidth={2.5} style={{ color: 'var(--teal)' }} />
+                Quick reply
+              </span>
+              {quickReplies.map((q) => (
+                <button
+                  key={q}
+                  type="button"
+                  onClick={() => handleSend(q)}
+                  style={{
+                    padding: '5px 11px', borderRadius: 99,
+                    background: 'var(--teal-glow)',
+                    border: '1px solid var(--teal-border)',
+                    color: 'var(--teal-dark)',
+                    fontSize: '0.75rem', fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--teal)'; e.currentTarget.style.color = '#fff'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--teal-glow)'; e.currentTarget.style.color = 'var(--teal-dark)'; }}
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Composer */}
           <div style={{
             padding: '11px 14px',
-            borderTop: '1px solid var(--border)',
+            borderTop: quickReplies.length ? '1px solid var(--border)' : '1px solid var(--border)',
             background: 'var(--surface-card)',
-            display: 'flex', alignItems: 'center', gap: 10,
+            display: 'flex', alignItems: 'center', gap: 8,
           }}>
+            <button
+              type="button"
+              aria-label="Emoji (demo only)"
+              title="Emoji picker — demo only"
+              style={{
+                width: 34, height: 34, borderRadius: 9,
+                background: 'transparent',
+                color: 'var(--text-soft)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0, cursor: 'pointer',
+                transition: 'all 0.12s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.color = 'var(--teal)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent';     e.currentTarget.style.color = 'var(--text-soft)'; }}
+              onClick={() => setDraft(d => d + ' 👍')}
+            >
+              <Smile size={15} strokeWidth={2.2} />
+            </button>
+            <button
+              type="button"
+              aria-label="Attach (demo only)"
+              title="Attachment — demo only"
+              style={{
+                width: 34, height: 34, borderRadius: 9,
+                background: 'transparent',
+                color: 'var(--text-soft)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0, cursor: 'pointer',
+                transition: 'all 0.12s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.color = 'var(--teal)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent';     e.currentTarget.style.color = 'var(--text-soft)'; }}
+            >
+              <Paperclip size={14} strokeWidth={2.2} />
+            </button>
             <input
+              ref={inputRef}
               value={draft}
               onChange={e => setDraft(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-              placeholder="Type a message..."
+              placeholder="Type a message…"
+              aria-label="Message"
               style={{
                 flex: 1,
                 border: '1px solid var(--border)', borderRadius: 99,
-                padding: '9px 16px',
+                padding: '10px 16px',
                 fontSize: '0.875rem',
                 background: 'var(--surface)',
+                transition: 'border-color 0.18s ease, box-shadow 0.18s ease',
+                outline: 'none',
               }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--teal)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20,184,184,0.16)'; }}
+              onBlur={(e)  => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
             />
             <button
-              onClick={handleSend}
+              onClick={() => handleSend()}
               disabled={!draft.trim()}
+              aria-label="Send message"
               style={{
                 width: 38, height: 38, borderRadius: '50%',
-                background: draft.trim() ? 'var(--teal)' : 'var(--surface)',
+                background: draft.trim()
+                  ? 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)'
+                  : 'var(--surface)',
                 color: draft.trim() ? '#fff' : 'var(--text-soft)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transition: 'all 0.12s',
+                transition: 'all 0.15s cubic-bezier(0.32, 0.72, 0, 1)',
                 flexShrink: 0,
+                boxShadow: draft.trim() ? '0 4px 14px rgba(20,184,184,0.35)' : 'none',
+                transform: justSent ? 'scale(0.86)' : 'scale(1)',
+                cursor: draft.trim() ? 'pointer' : 'not-allowed',
               }}
             >
-              <Send size={15} strokeWidth={2.4} />
+              <Send size={15} strokeWidth={2.4} style={{
+                transform: 'translateX(-1px)',
+                transition: 'transform 0.2s ease',
+              }} />
             </button>
           </div>
         </div>
@@ -273,6 +427,14 @@ export default function MessagingPanel({ role, userName, threads, onSend }) {
       )}
 
       <style>{`
+        @keyframes msgIn {
+          from { opacity: 0; transform: translateY(8px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0)   scale(1);    }
+        }
+        @keyframes typingDot {
+          0%, 60%, 100% { transform: translateY(0);    opacity: 0.4; }
+          30%           { transform: translateY(-4px); opacity: 1;   }
+        }
         @media (max-width: 700px) {
           .messaging-grid {
             grid-template-columns: 1fr !important;

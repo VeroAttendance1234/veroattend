@@ -11,6 +11,7 @@ import Reveal from '../components/Reveal';
 import CountUp from '../components/CountUp';
 import MarkerWelcomeDemo from '../components/MarkerWelcomeDemo';
 import RollImpactCalculator from '../components/RollImpactCalculator';
+import MessagingDemo from '../components/MessagingDemo';
 
 // Heavy three.js bundle — lazy-load so the marker page paints fast
 const VeroTapAnimation = lazy(() => import('../components/VeroTapAnimation'));
@@ -860,6 +861,44 @@ export default function MarkerPage({ onClose, setRole }) {
                 <VeroExplodedView height={520} />
               </Suspense>
             </HeroBoundary>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          §4c MESSAGING TRIAL · interactive parent/teacher chat
+      ═══════════════════════════════════════ */}
+      <section style={{
+        padding: '90px 28px',
+        background: 'linear-gradient(180deg, transparent 0%, rgba(20,184,184,0.04) 100%)',
+        borderTop: '1px solid var(--border)',
+        borderBottom: '1px solid var(--border)',
+      }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <Reveal>
+            <div className="label-caps" style={{ color: 'var(--teal)', marginBottom: 18 }}>
+              Try it yourself
+            </div>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+              letterSpacing: '-0.035em', lineHeight: 1.1, marginBottom: 16,
+              maxWidth: 720,
+            }}>
+              Message a parent. Right here.
+            </h2>
+            <p style={{
+              fontSize: '1.05rem', color: 'var(--text-muted)',
+              lineHeight: 1.65, maxWidth: 680, marginBottom: 32,
+            }}>
+              The integrated messaging system replaces the email + SMS scramble
+              between parents and teachers. You're logged in as Mr Chen (teacher) —
+              send a message, watch the parent type back in real time. Try keywords
+              like <em>"absent"</em>, <em>"meeting"</em>, <em>"homework"</em>, or
+              just say thanks.
+            </p>
+          </Reveal>
+          <Reveal>
+            <MessagingDemo />
           </Reveal>
         </div>
       </section>
