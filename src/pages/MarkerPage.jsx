@@ -17,12 +17,84 @@ import MessagingDemo from '../components/MessagingDemo';
 const VeroTapAnimation = lazy(() => import('../components/VeroTapAnimation'));
 const VeroExplodedView = lazy(() => import('../components/VeroExplodedView'));
 
-// Boundary so a 3D failure can't take down the page
+// Shimmering placeholder so the marker can see when 3D is downloading
+function HeroSkeleton({ height = 520, label = 'Loading…' }) {
+  return (
+    <div style={{
+      position: 'relative',
+      width: '100%', height,
+      borderRadius: 18, overflow: 'hidden',
+      border: '1px solid var(--border)',
+      background: 'linear-gradient(135deg, #f8fafa 0%, #eef3f3 100%)',
+    }}>
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(110deg, transparent 30%, rgba(20,184,184,0.10) 50%, transparent 70%)',
+        animation: 'shimmer 1.6s linear infinite',
+      }} />
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 18,
+        textAlign: 'center',
+        fontFamily: 'Bricolage Grotesque, sans-serif',
+        fontWeight: 800, fontSize: '0.78rem',
+        color: 'var(--teal-dark)', letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+      }}>
+        {label}
+      </div>
+      <style>{`
+        @keyframes shimmer {
+          from { transform: translateX(-100%); }
+          to   { transform: translateX(100%);  }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// Boundary so a 3D failure can't take down the page — shows a visible
+// fallback so the marker can tell loading from broken.
 class HeroBoundary extends Component {
-  state = { failed: false };
-  static getDerivedStateFromError() { return { failed: true }; }
-  componentDidCatch(err) { console.error('[VeroTapAnimation]', err); }
-  render() { return this.state.failed ? null : this.props.children; }
+  state = { failed: false, err: null };
+  static getDerivedStateFromError(err) { return { failed: true, err }; }
+  componentDidCatch(err, info) { console.error('[3D]', err, info); }
+  render() {
+    if (this.state.failed) {
+      return (
+        <div style={{
+          width: '100%',
+          minHeight: 360,
+          borderRadius: 18,
+          background: 'linear-gradient(135deg, #f8fafa 0%, #eef3f3 100%)',
+          border: '1px dashed var(--border)',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          gap: 10, padding: 32, textAlign: 'center',
+        }}>
+          <div style={{
+            fontFamily: 'Bricolage Grotesque, sans-serif',
+            fontWeight: 800, fontSize: '1rem',
+            color: 'var(--text-primary)', letterSpacing: '-0.01em',
+          }}>
+            3D scene couldn't load
+          </div>
+          <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', maxWidth: 360 }}>
+            Likely WebGL is disabled or the device GPU blocked the canvas. Try a
+            different browser, or open dev tools → console for the exact error.
+          </div>
+          <code style={{
+            fontSize: '0.7rem', color: 'var(--red)',
+            background: 'var(--surface-card)', border: '1px solid var(--border)',
+            padding: '4px 10px', borderRadius: 6, marginTop: 4,
+            maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis',
+          }}>
+            {String(this.state.err?.message || this.state.err || 'unknown error')}
+          </code>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 /* ─────────────────────────────────────────────
@@ -556,12 +628,7 @@ export default function MarkerPage({ onClose, setRole }) {
             minHeight: 600,
           }}>
             <HeroBoundary>
-              <Suspense fallback={
-                <div style={{
-                  width: '100%', height: 560, borderRadius: 18,
-                  background: 'linear-gradient(135deg, #f8fafa 0%, #eef3f3 100%)',
-                }} />
-              }>
+              <Suspense fallback={<HeroSkeleton height={560} label="Loading 3D model…" />}>
                 <VeroTapAnimation height={560} interactive />
               </Suspense>
             </HeroBoundary>
@@ -851,13 +918,7 @@ export default function MarkerPage({ onClose, setRole }) {
 
           <Reveal>
             <HeroBoundary>
-              <Suspense fallback={
-                <div style={{
-                  width: '100%', height: 520, borderRadius: 18,
-                  background: 'linear-gradient(135deg, #f8fafa 0%, #eef3f3 100%)',
-                  border: '1px solid var(--border)',
-                }} />
-              }>
+              <Suspense fallback={<HeroSkeleton height={520} label="Loading exploded view…" />}>
                 <VeroExplodedView height={520} />
               </Suspense>
             </HeroBoundary>
