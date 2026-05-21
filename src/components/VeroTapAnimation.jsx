@@ -24,7 +24,7 @@ import {
 } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import {
-  Environment, ContactShadows, OrbitControls,
+  ContactShadows, OrbitControls,
 } from '@react-three/drei';
 import * as THREE from 'three';
 import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
@@ -389,20 +389,24 @@ export default function VeroTapAnimation({
           camera={{ position: [0.8, 1.2, 2.6], fov: 42 }}
           gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
         >
-          {/* Studio lighting */}
-          <ambientLight intensity={0.55} />
+          {/* Pure-local studio lighting — no remote HDRI fetch.
+              Hemisphere gives sky/ground tint, two directionals plus
+              a fill/back keep the white plastic looking lit from all
+              sides without needing an environment map. */}
+          <hemisphereLight args={['#ffffff', '#cdd6dd', 0.65]} />
+          <ambientLight intensity={0.35} />
           <directionalLight
             position={[3, 5, 2]}
-            intensity={1.1}
+            intensity={1.15}
             castShadow
             shadow-mapSize-width={1024}
             shadow-mapSize-height={1024}
             shadow-bias={-0.0005}
           />
-          <directionalLight position={[-3, 2, -2]} intensity={0.35} />
+          <directionalLight position={[-3, 2, -2]} intensity={0.45} />
+          <directionalLight position={[0, 2, -4]}  intensity={0.30} color="#dceeee" />
 
           <Suspense fallback={null}>
-            <Environment preset="studio" />
             <Scene
               loop={loop}
               autoPlay={autoPlay}

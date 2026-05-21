@@ -17,7 +17,7 @@
  */
 import { Suspense, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
-import { Environment, ContactShadows, OrbitControls, Html } from '@react-three/drei';
+import { ContactShadows, OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
 
@@ -572,19 +572,21 @@ export default function VeroExplodedView({
         camera={{ position: [4.5, 2.5, 5], fov: 36 }}
         gl={{ antialias: true, alpha: true }}
       >
-        <ambientLight intensity={0.5} />
+        {/* Pure-local lighting — no remote HDRI fetch */}
+        <hemisphereLight args={['#ffffff', '#d6dee4', 0.6]} />
+        <ambientLight intensity={0.32} />
         <directionalLight
           position={[4, 6, 3]}
-          intensity={1.0}
+          intensity={1.05}
           castShadow
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
           shadow-bias={-0.0005}
         />
-        <directionalLight position={[-4, 2, -3]} intensity={0.3} />
+        <directionalLight position={[-4, 2, -3]} intensity={0.4}  />
+        <directionalLight position={[0, 3, -5]}  intensity={0.25} color="#dceeee" />
 
         <Suspense fallback={null}>
-          <Environment preset="studio" />
           <Stack />
           <ContactShadows
             position={[0, -2.8, 0]}
