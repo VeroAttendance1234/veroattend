@@ -26,9 +26,19 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
   const [menuOpen, setMenuOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [now, setNow]           = useState(() => new Date());
   const isMobile = useIsMobile();
   const meta = ROLE_META[role];
   const page = PAGE_TITLES[role];
+
+  /* Live wall clock — re-renders every 30 s so seconds aren't burnt
+     into the layout but the minute always reads current. */
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+  const timeStr = now.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true });
+  const dateStr = now.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
 
   /* Shrink + heighten shadow once the user scrolls past 8px */
   useEffect(() => {
@@ -201,6 +211,47 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
                 border: '2px solid var(--surface-card)',
               }} />
             </button>
+
+            {/* Live clock (desktop only) — gives the dashboard a real-time feel */}
+            {!isMobile && (
+              <div
+                aria-label={`Current time ${timeStr}, ${dateStr}`}
+                style={{
+                  display: 'flex', flexDirection: 'column',
+                  alignItems: 'flex-end', justifyContent: 'center',
+                  padding: '0 4px 0 0',
+                  lineHeight: 1.1,
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  borderRight: '1px solid var(--border)',
+                  marginRight: 4, paddingRight: 12,
+                }}
+              >
+                <div style={{
+                  fontSize: '0.92rem', fontWeight: 800,
+                  color: 'var(--text-primary)',
+                  letterSpacing: '-0.01em',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}>
+                  <span style={{
+                    width: 6, height: 6, borderRadius: '50%',
+                    background: piConnected ? 'var(--green)' : 'var(--text-soft)',
+                    boxShadow: piConnected ? '0 0 0 0 rgba(34,197,94,0.55)' : 'none',
+                    animation: piConnected ? 'navHeartbeat 1.8s ease-out infinite' : 'none',
+                  }} />
+                  {timeStr}
+                </div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-soft)', fontWeight: 600, letterSpacing: '0.04em' }}>
+                  {dateStr}
+                </div>
+                <style>{`
+                  @keyframes navHeartbeat {
+                    0%   { box-shadow: 0 0 0 0    rgba(34,197,94,0.55); }
+                    70%  { box-shadow: 0 0 0 7px  rgba(34,197,94,0);    }
+                    100% { box-shadow: 0 0 0 0    rgba(34,197,94,0);    }
+                  }
+                `}</style>
+              </div>
+            )}
 
             {/* Reports (desktop only) */}
             {!isMobile && onReports && (

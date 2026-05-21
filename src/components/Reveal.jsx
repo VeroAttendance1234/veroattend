@@ -1,29 +1,36 @@
 import { useReveal } from '../hooks/useReveal';
 
 /**
- * Reveal · wraps children in a div that fades + slides up when scrolled into view.
+ * Reveal · scroll-triggered entrance with combined fade + slide + slight scale.
  *
- * @param {string|number} delay  - ms to stagger (e.g. 100 → fires 100ms after revealing)
- * @param {string}        as     - HTML tag (default 'div')
- * @param {string}        from   - animation origin: 'up' (default) | 'left' | 'right' | 'scale'
+ * @param {string|number} delay  - ms to stagger
+ * @param {string}        from   - 'up' (default) | 'left' | 'right' | 'scale' | 'down'
+ * @param {boolean}       blur   - add a small blur on entry for "focus pull" feel (default true)
  */
 export default function Reveal({
   children,
   delay = 0,
   as: Tag = 'div',
   from = 'up',
+  blur = true,
   style,
   className = '',
   ...rest
 }) {
   const [ref, visible] = useReveal();
 
-  const directionStyle = {
-    up:    'translate3d(0, 24px, 0)',
-    left:  'translate3d(-24px, 0, 0)',
-    right: 'translate3d(24px, 0, 0)',
-    scale: 'scale(0.96)',
-  }[from] || 'translate3d(0, 24px, 0)';
+  // Combined translate + scale baseline → more cinematic than slide alone
+  const initialTransform = {
+    up:    'translate3d(0, 28px, 0) scale(0.985)',
+    down:  'translate3d(0,-28px, 0) scale(0.985)',
+    left:  'translate3d(-28px, 0, 0) scale(0.985)',
+    right: 'translate3d( 28px, 0, 0) scale(0.985)',
+    scale: 'translate3d(0, 0, 0) scale(0.94)',
+  }[from] || 'translate3d(0, 28px, 0) scale(0.985)';
+
+  // Quintic ease-out — gentle landing, no bounce
+  const easing = 'cubic-bezier(0.22, 1, 0.36, 1)';
+  const duration = '0.65s';
 
   return (
     <Tag
@@ -31,9 +38,13 @@ export default function Reveal({
       className={className}
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? 'translate3d(0,0,0) scale(1)' : directionStyle,
-        transition: `opacity 0.55s cubic-bezier(0.32, 0.72, 0, 1) ${delay}ms, transform 0.55s cubic-bezier(0.32, 0.72, 0, 1) ${delay}ms`,
-        willChange: visible ? 'auto' : 'opacity, transform',
+        transform: visible ? 'translate3d(0,0,0) scale(1)' : initialTransform,
+        filter: blur && !visible ? 'blur(6px)' : 'blur(0px)',
+        transition:
+          `opacity ${duration} ${easing} ${delay}ms, ` +
+          `transform ${duration} ${easing} ${delay}ms, ` +
+          `filter 0.5s ${easing} ${delay}ms`,
+        willChange: visible ? 'auto' : 'opacity, transform, filter',
         ...style,
       }}
       {...rest}

@@ -48,11 +48,47 @@ export default function LoginPage({ onLogin }) {
       minHeight: '100vh',
       background: 'var(--surface)',
       display: 'flex',
-      backgroundImage: `
-        radial-gradient(circle at 15% 20%, var(--teal-glow) 0%, transparent 40%),
-        radial-gradient(circle at 85% 80%, rgba(124,58,237,0.06) 0%, transparent 40%)
-      `,
+      position: 'relative',
+      overflow: 'hidden',
     }}>
+      {/* ── Animated mesh-gradient background ───
+          Four soft blobs that drift slowly behind everything,
+          giving the page a living "atmosphere" without taking
+          focus from the form. Pointer-events: none so it doesn't
+          interfere with anything. */}
+      <div aria-hidden="true" style={{
+        position: 'absolute', inset: 0,
+        pointerEvents: 'none',
+        overflow: 'hidden',
+        zIndex: 0,
+      }}>
+        {[
+          { c: 'rgba(20,184,184,0.18)',  x: '10%',  y: '15%', size: '60vmax', dur: '22s', delay: '0s'   },
+          { c: 'rgba(124,58,237,0.10)',  x: '85%',  y: '78%', size: '55vmax', dur: '28s', delay: '-7s'  },
+          { c: 'rgba(34,197,94,0.07)',   x: '78%',  y: '15%', size: '45vmax', dur: '24s', delay: '-12s' },
+          { c: 'rgba(20,184,184,0.10)',  x: '20%',  y: '85%', size: '50vmax', dur: '30s', delay: '-3s'  },
+        ].map((b, i) => (
+          <div key={i} style={{
+            position: 'absolute',
+            left: b.x, top: b.y,
+            width: b.size, height: b.size,
+            background: `radial-gradient(circle, ${b.c} 0%, transparent 60%)`,
+            transform: 'translate(-50%, -50%)',
+            animation: `loginBlobDrift ${b.dur} ${b.delay} ease-in-out infinite`,
+            filter: 'blur(8px)',
+          }} />
+        ))}
+        <style>{`
+          @keyframes loginBlobDrift {
+            0%, 100% { transform: translate(-50%, -50%) scale(1)   rotate(0deg);   }
+            33%      { transform: translate(-40%, -55%) scale(1.18) rotate(40deg);  }
+            66%      { transform: translate(-58%, -45%) scale(0.92) rotate(-30deg); }
+          }
+        `}</style>
+      </div>
+
+      {/* Login panels sit above the background */}
+      <div style={{ display: 'flex', width: '100%', position: 'relative', zIndex: 1 }}>
       {/* ── Left: brand panel (desktop only) ── */}
       <div className="login-brand" style={{
         flex: '0 0 45%',
@@ -422,6 +458,7 @@ export default function LoginPage({ onLogin }) {
           .login-mobile-logo { display: block !important; }
         }
       `}</style>
+      </div>
     </div>
   );
 }

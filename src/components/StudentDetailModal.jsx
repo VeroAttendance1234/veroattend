@@ -58,6 +58,27 @@ export default function StudentDetailModal({ student, open, onClose }) {
   const status = student.present ? 'present' : 'absent';
   const accent = student.present ? 'var(--green)' : 'var(--red)';
 
+  // Derived contact targets for the footer action buttons
+  const parentEmail = `parent.${student.name.split(' ').slice(-1)[0].toLowerCase()}@families.shore.nsw.edu.au`;
+  function emailStudent() {
+    const subject = encodeURIComponent(`Re: attendance — ${student.name}`);
+    const body = encodeURIComponent(
+      `Hi ${student.name.split(' ')[0]},\n\nJust touching base regarding today's attendance.\n\nKind regards,\nShore School`
+    );
+    window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
+  }
+  function messageParent() {
+    const subject = encodeURIComponent(
+      `Attendance update — ${student.name} (Year ${student.year} ${student.class})`
+    );
+    const body = encodeURIComponent(
+      `Hi,\n\nThis is a quick note from Shore School regarding ${student.name}.\n` +
+      `Status today: ${student.present ? 'Checked in' : 'Not checked in'}\n` +
+      `Term average: ${avg}%\n\nPlease reply if you have any questions.\n\nShore School`
+    );
+    window.location.href = `mailto:${parentEmail}?subject=${subject}&body=${body}`;
+  }
+
   return (
     <Modal
       open={open}
@@ -73,11 +94,21 @@ export default function StudentDetailModal({ student, open, onClose }) {
             Last tap: {student.present ? 'today, 8:42am' : 'no tap recorded today'}
           </span>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button className="btn-secondary" style={{ padding: '7px 14px' }}>
+            <button
+              type="button"
+              onClick={messageParent}
+              className="btn-secondary"
+              style={{ padding: '7px 14px' }}
+            >
               <MessageCircle size={13} strokeWidth={2.5} />
               Message parent
             </button>
-            <button className="btn-primary" style={{ padding: '7px 14px' }}>
+            <button
+              type="button"
+              onClick={emailStudent}
+              className="btn-primary"
+              style={{ padding: '7px 14px' }}
+            >
               <Mail size={13} strokeWidth={2.5} />
               Email student
             </button>

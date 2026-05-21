@@ -1,15 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense, Component } from 'react';
 import {
   X, ArrowRight, ArrowDown, Play, ExternalLink, Copy, CheckCircle,
   Monitor, BookOpen, Heart, Users, CreditCard, Wifi, Cpu, Database,
   Code, Zap, Calendar, Sparkles, Award, TrendingUp, Shield,
-  MessageSquare, ClipboardList, Activity, GitBranch, Globe,
+  MessageSquare, ClipboardList, Activity, GitBranch, Globe, Move3d,
 } from 'lucide-react';
 import Modal from '../components/Modal';
 import Tagline from '../components/Tagline';
 import Reveal from '../components/Reveal';
 import CountUp from '../components/CountUp';
-import CardTapDemo from '../components/CardTapDemo';
+
+// Heavy three.js bundle — lazy-load so the marker page paints fast
+const VeroTapAnimation = lazy(() => import('../components/VeroTapAnimation'));
+const VeroExplodedView = lazy(() => import('../components/VeroExplodedView'));
+
+// Boundary so a 3D failure can't take down the page
+class HeroBoundary extends Component {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(err) { console.error('[VeroTapAnimation]', err); }
+  render() { return this.state.failed ? null : this.props.children; }
+}
 
 /* ─────────────────────────────────────────────
    DATA
@@ -350,28 +361,33 @@ export default function MarkerPage({ onClose, setRole }) {
             </div>
           </div>
 
-          {/* ── Right: 3D card-tap demo (the focal point) ── */}
+          {/* ── Right: real-CAD 3D tap animation ── */}
           <div style={{
             position: 'relative',
             animation: 'taglineWordIn 0.7s 0.35s cubic-bezier(0.32,0.72,0,1) both',
             minHeight: 600,
           }}>
-            <CardTapDemo size="lg" />
+            <HeroBoundary>
+              <Suspense fallback={
+                <div style={{
+                  width: '100%', height: 560, borderRadius: 18,
+                  background: 'linear-gradient(135deg, #f8fafa 0%, #eef3f3 100%)',
+                }} />
+              }>
+                <VeroTapAnimation height={560} interactive />
+              </Suspense>
+            </HeroBoundary>
 
             <div style={{
               position: 'absolute', bottom: -2, left: 0, right: 0,
               textAlign: 'center',
-              fontSize: '0.7rem', fontWeight: 800,
+              fontSize: '0.72rem', fontWeight: 800,
               color: 'var(--text-soft)',
               textTransform: 'uppercase', letterSpacing: '0.18em',
             }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                <span style={{
-                  width: 6, height: 6, borderRadius: '50%',
-                  background: 'var(--green)',
-                  animation: 'pulse-dot 2s ease-in-out infinite',
-                }} />
-                Live · NFC card tap stream
+                <Move3d size={11} strokeWidth={2.6} style={{ color: 'var(--teal)' }} />
+                Drag to spin · scroll to zoom
               </span>
             </div>
           </div>
@@ -575,6 +591,54 @@ export default function MarkerPage({ onClose, setRole }) {
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          §4b INSIDE THE VERO · exploded view
+      ═══════════════════════════════════════ */}
+      <section style={{
+        padding: '90px 28px',
+        background: 'linear-gradient(180deg, rgba(20,184,184,0.04) 0%, transparent 100%)',
+        borderTop: '1px solid var(--border)',
+        borderBottom: '1px solid var(--border)',
+      }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <Reveal>
+            <div className="label-caps" style={{ color: 'var(--teal)', marginBottom: 18 }}>
+              The hardware
+            </div>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+              letterSpacing: '-0.035em', lineHeight: 1.1, marginBottom: 16,
+            }}>
+              Inside the VERO.
+            </h2>
+            <p style={{
+              fontSize: '1.05rem', color: 'var(--text-muted)',
+              lineHeight: 1.65, maxWidth: 640, marginBottom: 36,
+            }}>
+              Every layer of the enclosure, exploded and annotated.
+              The Raspberry Pi runs the Flask-SocketIO server and the
+              <code style={{ fontFamily: 'monospace', color: 'var(--teal-dark)' }}> pyscard </code>
+              NFC bridge; the ACR122U reader sits directly under the antenna
+              coil; the printed cap and base hold the whole stack on the wall.
+            </p>
+          </Reveal>
+
+          <Reveal>
+            <HeroBoundary>
+              <Suspense fallback={
+                <div style={{
+                  width: '100%', height: 520, borderRadius: 18,
+                  background: 'linear-gradient(135deg, #f8fafa 0%, #eef3f3 100%)',
+                  border: '1px solid var(--border)',
+                }} />
+              }>
+                <VeroExplodedView height={520} />
+              </Suspense>
+            </HeroBoundary>
+          </Reveal>
         </div>
       </section>
 

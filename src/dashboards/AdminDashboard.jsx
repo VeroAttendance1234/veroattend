@@ -79,13 +79,47 @@ function DevicePanel({ piConnected }) {
 }
 
 /* ── Quick actions ────────────────────────────── */
-function QuickActions({ onSimulate, students }) {
+function QuickActions({ onSimulate, students = [], filtered = [] }) {
+  // CSV export of the currently filtered student list
+  function exportReport() {
+    const rows = (filtered.length ? filtered : students);
+    const header = ['ID', 'Name', 'Year', 'Class', 'Status', 'Card UID'];
+    const csv = [
+      header.join(','),
+      ...rows.map(s => [
+        s.id,
+        `"${(s.name || '').replace(/"/g, '""')}"`,
+        s.year,
+        s.class,
+        s.present ? 'Present' : 'Absent',
+        s.uid || `SIM-${s.id}`,
+      ].join(',')),
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const date = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `vero-attendance-${date}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function refreshDevice() {
+    // In demo mode there's no real device; do a soft reload so the
+    // dashboard re-renders without losing the auth shell.
+    window.location.reload();
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {[
         { label: 'Simulate card tap', icon: Zap, action: onSimulate, primary: true },
-        { label: 'Refresh device',    icon: RefreshCw, action: () => window.location.reload() },
-        { label: 'Export report',     icon: Download, action: () => {} },
+        { label: 'Refresh device',    icon: RefreshCw, action: refreshDevice },
+        { label: 'Export report',     icon: Download, action: exportReport },
       ].map(({ label, icon: Icon, action, primary }) => (
         <button
           key={label}
@@ -379,7 +413,17 @@ export default function AdminDashboard({
           </Card>
           <Card>
             <p className="section-title" style={{ marginBottom: 14 }}>Quick Actions</p>
-            <QuickActions onSimulate={() => {}} />
+            <QuickActions
+              students={students}
+              filtered={filtered}
+              onSimulate={() => {
+                const pool = students.filter(s => !s.present);
+                const pick = (pool.length ? pool : students)[
+                  Math.floor(Math.random() * (pool.length || students.length))
+                ];
+                if (pick) onTap(pick);
+              }}
+            />
           </Card>
         </div>
       </div>

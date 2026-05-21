@@ -69,7 +69,7 @@ const ADMIN_TOUR_STEPS = [
   {
     target: null,
     title:  'You\'re all set 🎉',
-    body:   'Explore the other roles (Teacher, Student, Parent) using the switcher at the top right. The Marker button shows your HSC project info.',
+    body:   'Explore the other roles (Teacher, Student, Parent) using the switcher at the top right. The Marker button opens the hardware demo and project documentation.',
   },
 ];
 
