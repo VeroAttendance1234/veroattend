@@ -86,32 +86,93 @@ const TECH_GROUPS = [
     title: 'Frontend',
     colour: '#14B8B8',
     items: [
-      { name: 'React 19',         note: 'Latest React with concurrent features' },
-      { name: 'Vite 8',           note: 'Sub-second HMR build tooling' },
-      { name: 'Recharts',         note: 'Responsive data visualisation' },
-      { name: 'Lucide Icons',     note: '1000+ stroke-based icons' },
-      { name: 'Socket.io Client', note: 'Real-time WebSocket' },
+      {
+        name: 'React 19', version: '19.2.6', note: 'Concurrent UI with hooks',
+        why: 'Picked for the concurrent renderer — every NFC tap streams through useState and React batches the dashboard updates without dropping frames. Custom hooks (useReveal, useToast, useMediaQuery) keep cross-component state out of context spaghetti.',
+        link: 'https://react.dev',
+      },
+      {
+        name: 'Vite 8', version: '8.0.12', note: 'Sub-second HMR',
+        why: 'Replaces webpack with native ES modules + esbuild. Cold start under 300ms, HMR under 100ms — meant I could iterate on the marker animation 60+ times in a single coding session.',
+        link: 'https://vitejs.dev',
+      },
+      {
+        name: 'Three.js + R3F', version: '0.184 / 9.6', note: '3D hero + exploded view',
+        why: 'three.js handles the 3MF loader so the real CAD geometry from Fusion is the source of truth. @react-three/fiber wraps it in declarative React — every layer of the exploded view is just a component.',
+        link: 'https://threejs.org',
+      },
+      {
+        name: 'Recharts', version: '3.8.1', note: 'SVG analytics',
+        why: 'Accessible SVG charts (no canvas) so screen readers and zoom both work. Powers the year-group bar chart, monthly trend area, and per-student 12-week sparklines.',
+        link: 'https://recharts.org',
+      },
+      {
+        name: 'Lucide Icons', version: '1.16', note: '1000+ stroke icons',
+        why: 'Tree-shaken — only the ~60 icons actually used end up in the bundle. Every icon respects currentColor so they automatically retint with theme tokens.',
+        link: 'https://lucide.dev',
+      },
+      {
+        name: 'Socket.io Client', version: '4.8.3', note: 'Real-time WebSocket',
+        why: 'Auto-reconnects with exponential backoff when the Pi drops off the network. Falls back to long-polling on networks that block WebSockets (school wifi often does).',
+        link: 'https://socket.io',
+      },
     ],
   },
   {
     title: 'Backend',
     colour: '#2563EB',
     items: [
-      { name: 'Python 3.11',      note: 'Pi-native runtime' },
-      { name: 'Flask',            note: 'Lightweight WSGI framework' },
-      { name: 'Flask-SocketIO',   note: 'Real-time bidirectional events' },
-      { name: 'pyscard',          note: 'PC/SC bindings for NFC' },
-      { name: 'SQLite',           note: 'Embedded relational store' },
+      {
+        name: 'Python 3.11', version: '3.11', note: 'Pi-native runtime',
+        why: '3.11 is 25% faster than 3.10, which matters on the Pi 3B\'s modest CPU. Bundled with Raspberry Pi OS Bookworm, no compilation needed.',
+        link: 'https://python.org',
+      },
+      {
+        name: 'Flask', version: '3.0', note: 'WSGI microframework',
+        why: 'Minimal — the entire backend is ~250 lines of Python. Means I understand every route, every middleware decision, every CORS header.',
+        link: 'https://flask.palletsprojects.com',
+      },
+      {
+        name: 'Flask-SocketIO', version: '5.3', note: 'Bidirectional events',
+        why: 'Adds WebSocket support to Flask without rewriting in async. Emits "card_tap" events the moment pyscard reads a UID — frontend dashboards update within 100ms.',
+        link: 'https://flask-socketio.readthedocs.io',
+      },
+      {
+        name: 'pyscard', version: '2.0', note: 'PC/SC bindings',
+        why: 'Wraps the OS-level PC/SC daemon. Lets Python talk to the ACR122U over USB with one line of code per card read. Cross-platform — same code works on Pi and my macbook.',
+        link: 'https://pyscard.sourceforge.io',
+      },
+      {
+        name: 'SQLite', version: '3.4', note: 'Embedded relational DB',
+        why: 'No server process, no auth surface, single file. Perfect for a Pi appliance. Schema: students, classes, taps, absence_requests, threads, messages.',
+        link: 'https://sqlite.org',
+      },
     ],
   },
   {
     title: 'Hardware',
     colour: '#7C3AED',
     items: [
-      { name: 'Raspberry Pi 3B',     note: 'Quad-core ARM Cortex-A53' },
-      { name: 'ACR122U NFC Reader',  note: 'USB-powered, ISO 14443A/B' },
-      { name: 'PC/SC Daemon',        note: 'Linux smart-card middleware' },
-      { name: 'MIFARE Classic',      note: '13.56 MHz NFC student cards' },
+      {
+        name: 'Raspberry Pi 3B', version: 'rev 1.2', note: 'Quad-core ARM A53',
+        why: 'Powerful enough to run Python + Flask + SocketIO + SQLite + pyscard simultaneously. Has the GPIO pins for status LEDs and the USB headers for the reader.',
+        link: 'https://www.raspberrypi.com/products/raspberry-pi-3-model-b/',
+      },
+      {
+        name: 'ACR122U Reader', version: 'PN532', note: 'ISO 14443 A/B',
+        why: 'Industry-standard USB NFC reader, PC/SC-compatible out of the box. Reads any MIFARE Classic or DESFire card in ~80ms. About $40 retail — affordable for a school to deploy per classroom.',
+        link: 'https://www.acs.com.hk/en/products/3/acr122u-usb-nfc-reader/',
+      },
+      {
+        name: 'PC/SC Daemon', version: 'pcscd', note: 'Smart-card middleware',
+        why: 'Linux service that abstracts the reader from the app. pyscard talks to pcscd, pcscd talks to the ACR122U — clean separation, hot-swappable reader hardware.',
+        link: 'https://pcsclite.apdu.fr',
+      },
+      {
+        name: 'MIFARE Classic', version: '13.56 MHz', note: 'Student NFC cards',
+        why: 'Tap-once, ~100ms read time, works in any light, can\'t be photographed/copied like a QR code. Each student gets a card; UID maps to a database record.',
+        link: 'https://en.wikipedia.org/wiki/MIFARE',
+      },
     ],
   },
 ];
@@ -144,6 +205,127 @@ const SOLUTIONS = [
 /* ─────────────────────────────────────────────
    FEATURE MODAL
 ───────────────────────────────────────────── */
+/* ─────────────────────────────────────────────
+   TECH ITEM · hover preview + click to expand
+───────────────────────────────────────────── */
+function TechItem({ item, accent }) {
+  const [open, setOpen]   = useState(false);
+  const [hover, setHover] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        background: 'var(--surface-card)',
+        border: `1px solid ${open ? accent : (hover ? `${accent}55` : 'var(--border)')}`,
+        borderRadius: 10,
+        transition: 'all 0.2s cubic-bezier(0.32, 0.72, 0, 1)',
+        boxShadow: hover && !open ? `0 4px 14px ${accent}22` : 'none',
+        transform: hover && !open ? 'translateY(-1px)' : 'translateY(0)',
+        overflow: 'hidden',
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        style={{
+          width: '100%', textAlign: 'left',
+          padding: '11px 13px',
+          background: 'transparent',
+          display: 'flex', alignItems: 'center', gap: 10,
+          cursor: 'pointer',
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ fontWeight: 700, fontSize: '0.86rem', color: 'var(--text-primary)' }}>
+              {item.name}
+            </span>
+            {item.version && (
+              <span style={{
+                fontFamily: 'monospace',
+                fontSize: '0.66rem',
+                fontWeight: 700,
+                color: accent,
+                background: `${accent}15`,
+                border: `1px solid ${accent}30`,
+                padding: '1px 6px',
+                borderRadius: 99,
+              }}>
+                {item.version}
+              </span>
+            )}
+          </div>
+          <div style={{
+            fontSize: '0.76rem',
+            color: hover || open ? accent : 'var(--text-muted)',
+            marginTop: 2,
+            transition: 'color 0.18s ease',
+          }}>
+            {item.note}
+          </div>
+        </div>
+        <ArrowDown
+          size={14}
+          strokeWidth={2.5}
+          style={{
+            color: open ? accent : 'var(--text-soft)',
+            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.25s cubic-bezier(0.32, 0.72, 0, 1), color 0.18s ease',
+            flexShrink: 0,
+          }}
+        />
+      </button>
+
+      {/* Expandable detail */}
+      <div style={{
+        maxHeight: open ? 320 : 0,
+        opacity: open ? 1 : 0,
+        overflow: 'hidden',
+        transition: 'max-height 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.22s ease',
+      }}>
+        <div style={{
+          padding: '0 13px 14px',
+          borderTop: `1px solid ${accent}22`,
+          marginTop: 2,
+          paddingTop: 12,
+        }}>
+          <p style={{
+            fontSize: '0.78rem', color: 'var(--text-secondary)',
+            lineHeight: 1.6, margin: 0, marginBottom: item.link ? 10 : 0,
+          }}>
+            {item.why}
+          </p>
+          {item.link && (
+            <a
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                fontSize: '0.72rem', fontWeight: 700,
+                color: accent, textDecoration: 'none',
+                padding: '4px 9px',
+                borderRadius: 6,
+                background: `${accent}10`,
+                border: `1px solid ${accent}30`,
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = `${accent}20`; }}
+              onMouseLeave={e => { e.currentTarget.style.background = `${accent}10`; }}
+            >
+              Docs
+              <ExternalLink size={11} strokeWidth={2.5} />
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FeatureModal({ account, onClose, onOpen }) {
   if (!account) return null;
   const Icon = account.icon;
@@ -804,6 +986,13 @@ export default function MarkerPage({ onClose, setRole }) {
             </h2>
           </Reveal>
 
+          <Reveal>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', marginBottom: 24, marginTop: -24, maxWidth: 640 }}>
+              <strong style={{ color: 'var(--teal)' }}>Hover</strong> any chip for a preview &middot;
+              <strong style={{ color: 'var(--teal)' }}> click </strong> to expand the rationale + docs link.
+            </p>
+          </Reveal>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }} className="tech-grid">
             {TECH_GROUPS.map((g, i) => (
               <Reveal key={g.title} delay={i * 80}>
@@ -823,19 +1012,7 @@ export default function MarkerPage({ onClose, setRole }) {
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
                     {g.items.map(t => (
-                      <div key={t.name} style={{
-                        padding: '11px 13px',
-                        background: 'var(--surface-card)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 10,
-                      }}>
-                        <div style={{ fontWeight: 700, fontSize: '0.86rem', color: 'var(--text-primary)', marginBottom: 2 }}>
-                          {t.name}
-                        </div>
-                        <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
-                          {t.note}
-                        </div>
-                      </div>
+                      <TechItem key={t.name} item={t} accent={g.colour} />
                     ))}
                   </div>
                 </div>
