@@ -9,6 +9,8 @@ import Modal from '../components/Modal';
 import Tagline from '../components/Tagline';
 import Reveal from '../components/Reveal';
 import CountUp from '../components/CountUp';
+import MarkerWelcomeDemo from '../components/MarkerWelcomeDemo';
+import RollImpactCalculator from '../components/RollImpactCalculator';
 
 // Heavy three.js bundle — lazy-load so the marker page paints fast
 const VeroTapAnimation = lazy(() => import('../components/VeroTapAnimation'));
@@ -411,6 +413,9 @@ export default function MarkerPage({ onClose, setRole }) {
       overflowY: 'auto',
       animation: 'fadeIn 0.22s ease',
     }}>
+      {/* First-visit welcome overlay with live pipeline demo */}
+      <MarkerWelcomeDemo />
+
       {/* Close FAB */}
       <button
         onClick={onClose}
@@ -619,6 +624,41 @@ export default function MarkerPage({ onClose, setRole }) {
             ))}
           </div>
         </Reveal>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          §2b IMPACT CALCULATOR · the cost of manual rolls
+      ═══════════════════════════════════════ */}
+      <section style={{
+        padding: '90px 28px 70px',
+        background: 'linear-gradient(180deg, transparent 0%, rgba(220,38,38,0.025) 100%)',
+      }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <Reveal>
+            <div className="label-caps" style={{ color: 'var(--red)', marginBottom: 18 }}>
+              Why it matters
+            </div>
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+              letterSpacing: '-0.035em', lineHeight: 1.1, marginBottom: 16,
+              maxWidth: 720,
+            }}>
+              5 minutes a class. Hundreds of hours a year.
+            </h2>
+            <p style={{
+              fontSize: '1.05rem', color: 'var(--text-muted)',
+              lineHeight: 1.65, maxWidth: 680, marginBottom: 32,
+            }}>
+              Teachers spend roughly five minutes per period marking the roll by hand.
+              Multiply that across every period, every staff member, every week of the
+              year and the number gets uncomfortable. Drag the sliders to model your
+              own school.
+            </p>
+          </Reveal>
+          <Reveal>
+            <RollImpactCalculator />
+          </Reveal>
+        </div>
       </section>
 
       {/* ═══════════════════════════════════════
