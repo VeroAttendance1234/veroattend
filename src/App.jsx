@@ -105,6 +105,11 @@ function AppInner() {
   const [forceTour, setForceTour]     = useState(false);
   const [cmdkOpen, setCmdkOpen]       = useState(false);
 
+  /* Live Pi connection state · only true when the WebSocket
+     handshake has actually succeeded with the Pi. Declared early so
+     the auto-tap simulator below can reference it without a TDZ error. */
+  const [piConnected, setPiConnected] = useState(false);
+
   /* ⌘K / Ctrl-K opens the command palette */
   useCommandPaletteHotkey(cmdkOpen, setCmdkOpen);
 
@@ -131,10 +136,6 @@ function AppInner() {
     return () => { cancelled = true; cleanup?.(); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authedRole, piConnected]);
-
-  /* Live Pi connection state · only true when the WebSocket
-     handshake has actually succeeded with the Pi. */
-  const [piConnected, setPiConnected] = useState(false);
 
   // ── Shared cross-role state ────────────
   const [absenceRequests, setAbsenceRequests] = useState(initialAbsenceRequests);
