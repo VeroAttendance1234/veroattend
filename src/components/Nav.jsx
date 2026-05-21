@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'; // useEffect for scroll listener
 import {
   Wifi, WifiOff, ChevronDown, BookOpen, LogOut,
-  Menu, X, Bell, Monitor, Heart, Users, FileSpreadsheet,
+  Menu, X, Bell, Monitor, Heart, Users, FileSpreadsheet, Search,
 } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
 
@@ -21,7 +21,7 @@ const PAGE_TITLES = {
   Parent:  { title: 'Parent View',        sub: "Your child's attendance & progress" },
 };
 
-export default function Nav({ role, setRole, piConnected, onMarker, onReports, onLogout }) {
+export default function Nav({ role, setRole, piConnected, onMarker, onReports, onLogout, onCommandPalette }) {
   const [imgErr, setImgErr]     = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
@@ -211,6 +211,41 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
                 border: '2px solid var(--surface-card)',
               }} />
             </button>
+
+            {/* Command palette trigger (desktop only) */}
+            {!isMobile && onCommandPalette && (
+              <button
+                onClick={onCommandPalette}
+                aria-label="Open command palette"
+                title="Search · ⌘K"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '6px 10px 6px 12px',
+                  borderRadius: 9,
+                  background: 'var(--surface-card)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-muted)',
+                  fontSize: '0.78rem', fontWeight: 600,
+                  minWidth: 160,
+                  transition: 'all 0.14s ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--teal)'; e.currentTarget.style.color = 'var(--teal)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+              >
+                <Search size={13} strokeWidth={2.4} />
+                <span style={{ flex: 1, textAlign: 'left' }}>Search…</span>
+                <kbd style={{
+                  fontFamily: 'monospace', fontSize: '0.62rem', fontWeight: 700,
+                  color: 'var(--text-soft)',
+                  border: '1px solid var(--border)', borderRadius: 5,
+                  padding: '1px 5px',
+                  background: 'var(--surface)',
+                  lineHeight: 1.2,
+                }}>
+                  ⌘K
+                </kbd>
+              </button>
+            )}
 
             {/* Live clock (desktop only) — gives the dashboard a real-time feel */}
             {!isMobile && (

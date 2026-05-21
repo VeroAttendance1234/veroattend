@@ -466,6 +466,22 @@ function FeatureModal({ account, onClose, onOpen }) {
 export default function MarkerPage({ onClose, setRole }) {
   const [openModal, setOpenModal] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  /* Track scroll progress through the marker page (the page is fixed
+     full-bleed so we read scrollTop on the dialog div, not window). */
+  useEffect(() => {
+    const el = document.getElementById('marker-scroll-root');
+    if (!el) return;
+    function onScroll() {
+      const max = el.scrollHeight - el.clientHeight;
+      const pct = max > 0 ? (el.scrollTop / max) * 100 : 0;
+      setScrollProgress(Math.max(0, Math.min(100, pct)));
+    }
+    el.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
 
   function copyURL() {
     navigator.clipboard.writeText(window.location.origin);
@@ -480,12 +496,31 @@ export default function MarkerPage({ onClose, setRole }) {
   }
 
   return (
-    <div style={{
+    <div id="marker-scroll-root" style={{
       position: 'fixed', inset: 0, zIndex: 999,
       background: 'var(--surface)',
       overflowY: 'auto',
       animation: 'fadeIn 0.22s ease',
     }}>
+      {/* Scroll progress bar — pinned to top of the marker page */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed', top: 0, left: 0, right: 0,
+          height: 3, zIndex: 1001,
+          background: 'rgba(20, 184, 184, 0.08)',
+          pointerEvents: 'none',
+        }}
+      >
+        <div style={{
+          width: `${scrollProgress}%`,
+          height: '100%',
+          background: 'linear-gradient(90deg, var(--teal) 0%, var(--teal-dark) 100%)',
+          boxShadow: '0 0 12px rgba(20, 184, 184, 0.5)',
+          transition: 'width 0.08s linear',
+        }} />
+      </div>
+
       {/* First-visit welcome overlay with live pipeline demo */}
       <MarkerWelcomeDemo />
 

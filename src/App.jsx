@@ -9,6 +9,7 @@ import MarkerPage       from './pages/MarkerPage';
 import LoginPage        from './pages/LoginPage';
 import ReportsPage      from './pages/ReportsPage';
 import OnboardingTour   from './components/OnboardingTour';
+import CommandPalette, { useCommandPaletteHotkey } from './components/CommandPalette';
 import { students as initialStudents } from './data/sampleData';
 import { initialAbsenceRequests, initialThreads } from './data/initialState';
 import './styles/global.css';
@@ -101,6 +102,34 @@ function AppInner() {
   const [showMarker, setShowMarker]   = useState(false);
   const [showReports, setShowReports] = useState(false);
   const [forceTour, setForceTour]     = useState(false);
+  const [cmdkOpen, setCmdkOpen]       = useState(false);
+
+  /* ⌘K / Ctrl-K opens the command palette */
+  useCommandPaletteHotkey(cmdkOpen, setCmdkOpen);
+
+  /* Auto-simulated tap activity — fires every 12–22s while signed in
+     so the live feed and dashboards never look frozen. Pauses while
+     the marker page is open so it doesn't fight the welcome demo. */
+  useEffect(() => {
+    if (!authedRole || piConnected) return; // real Pi takes over when live
+    let cancelled = false;
+    function scheduleNext() {
+      const delay = 12_000 + Math.random() * 10_000;
+      const t = setTimeout(() => {
+        if (cancelled) return;
+        if (document.visibilityState === 'visible' && !document.body.dataset.markerOpen) {
+          const pool = (initialStudents || []).filter((s, i) => i < 200);
+          const pick = pool[Math.floor(Math.random() * pool.length)];
+          if (pick) handleTap(pick);
+        }
+        scheduleNext();
+      }, delay);
+      return () => clearTimeout(t);
+    }
+    const cleanup = scheduleNext();
+    return () => { cancelled = true; cleanup?.(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authedRole, piConnected]);
 
   /* Live Pi connection state · only true when the WebSocket
      handshake has actually succeeded with the Pi. */
@@ -214,8 +243,27 @@ function AppInner() {
   return (
     <>
       {showMarker && (
-        <MarkerPage onClose={() => setShowMarker(false)} setRole={setRole} />
+        <MarkerPage onClose={() => { delete document.body.dataset.markerOpen; setShowMarker(false); }} setRole={setRole} />
       )}
+
+      {/* Global command palette (⌘K) */}
+      <CommandPalette
+        open={cmdkOpen}
+        onClose={() => setCmdkOpen(false)}
+        students={students}
+        role={role}
+        setRole={setRole}
+        onMarker={() => { document.body.dataset.markerOpen = '1'; setShowMarker(true); }}
+        onReports={() => setShowReports(true)}
+        onLogout={() => setAuthedRole(null)}
+        onSimulateTap={() => {
+          const pool = students.filter(s => !s.present);
+          const pick = (pool.length ? pool : students)[
+            Math.floor(Math.random() * (pool.length || students.length))
+          ];
+          if (pick) handleTap(pick);
+        }}
+      />
       {showReports && (
         <ReportsPage onClose={() => setShowReports(false)} students={students} />
       )}
@@ -224,9 +272,10 @@ function AppInner() {
         role={role}
         setRole={setRole}
         piConnected={piConnected}
-        onMarker={() => setShowMarker(true)}
+        onMarker={() => { document.body.dataset.markerOpen = '1'; setShowMarker(true); }}
         onReports={() => setShowReports(true)}
         onLogout={() => setAuthedRole(null)}
+        onCommandPalette={() => setCmdkOpen(true)}
       />
 
       {/* First-visit guided tour · only shows for Admin role */}
