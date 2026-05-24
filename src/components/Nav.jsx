@@ -110,7 +110,7 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
           <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
             {!imgErr ? (
               <img
-                src="/vero-wordmark.png"
+                src="/vero-wordmark-clean.png"
                 alt="VERO."
                 height={isMobile ? 22 : 26}
                 style={{ objectFit: 'contain', display: 'block' }}
@@ -553,7 +553,7 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
               borderBottom: '1px solid var(--border)',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
-              <img src="/vero-wordmark.png" alt="VERO." height={24} style={{ objectFit: 'contain' }} />
+              <img src="/vero-wordmark-clean.png" alt="VERO." height={24} style={{ objectFit: 'contain' }} />
               <button
                 onClick={() => setMenuOpen(false)}
                 aria-label="Close menu"

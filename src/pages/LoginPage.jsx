@@ -173,7 +173,7 @@ export default function LoginPage({ onLogin }) {
         {/* Top: wordmark + live-connection chip */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
           <div>
-            <img src="/vero-wordmark.png" alt="VERO." style={{ height: 34, marginBottom: 10, display: 'block' }} />
+            <img src="/vero-wordmark-clean.png" alt="VERO." style={{ height: 34, marginBottom: 10, display: 'block' }} />
             <Tagline size="md" />
           </div>
           <div style={{
@@ -324,7 +324,7 @@ export default function LoginPage({ onLogin }) {
 
           {/* Mobile-only logo */}
           <div className="login-mobile-logo" style={{ display: 'none', textAlign: 'center', marginBottom: 28, alignItems: 'center' }}>
-            <img src="/vero-wordmark.png" alt="VERO." style={{ height: 32, display: 'block', margin: '0 auto 10px' }} />
+            <img src="/vero-wordmark-clean.png" alt="VERO." style={{ height: 32, display: 'block', margin: '0 auto 10px' }} />
             <div style={{ display: 'flex', justifyContent: 'center' }}><Tagline size="sm" /></div>
           </div>
 
