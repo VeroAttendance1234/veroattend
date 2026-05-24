@@ -192,7 +192,10 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
             {/* Notifications bell */}
             <button
               onClick={() => setBellOpen(!bellOpen)}
-              aria-label="Notifications"
+              aria-label={bellOpen ? 'Close notifications · 3 unread' : 'Open notifications · 3 unread'}
+              aria-haspopup="dialog"
+              aria-expanded={bellOpen}
+              title="Notifications (3 unread)"
               style={{
                 width: 34, height: 34, borderRadius: 9,
                 background: bellOpen ? 'var(--teal-glow)' : 'var(--surface-card)',
@@ -204,12 +207,15 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
               }}
             >
               <Bell size={15} strokeWidth={2.2} />
-              <span style={{
-                position: 'absolute', top: 5, right: 6,
-                width: 8, height: 8, borderRadius: '50%',
-                background: 'var(--red)',
-                border: '2px solid var(--surface-card)',
-              }} />
+              <span
+                aria-hidden="true"
+                style={{
+                  position: 'absolute', top: 5, right: 6,
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: 'var(--red)',
+                  border: '2px solid var(--surface-card)',
+                }}
+              />
             </button>
 
             {/* Command palette trigger (desktop only) */}

@@ -194,9 +194,21 @@ button {
   transition: all 0.14s ease;
 }
 
-button:focus-visible {
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
   outline: 2px solid var(--teal);
   outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* High-contrast focus for keyboard users on inputs */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
 }
 
 input, textarea, select {

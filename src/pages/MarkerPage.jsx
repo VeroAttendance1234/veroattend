@@ -527,7 +527,8 @@ export default function MarkerPage({ onClose, setRole }) {
       {/* Close FAB */}
       <button
         onClick={onClose}
-        aria-label="Close"
+        aria-label="Close marker page · return to dashboard"
+        title="Close marker page"
         style={{
           position: 'fixed', top: 16, right: 16, zIndex: 1000,
           width: 42, height: 42, borderRadius: '50%',

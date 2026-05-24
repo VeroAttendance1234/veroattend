@@ -208,7 +208,7 @@ export default function AttendanceHeatmap({ totalStudents = 1050 } = {}) {
               </span>
               {!isEmpty && (
                 <span style={{
-                  fontSize: '0.5rem',
+                  fontSize: '0.62rem',     /* was 0.5rem (~8px) — below readable floor */
                   fontWeight: 800,
                   opacity: 0.95,
                   letterSpacing: '0.02em',

@@ -117,6 +117,8 @@ function ToastItem({ type = 'info', title, detail, onDismiss }) {
   return (
     <div
       role="status"
+      aria-live="polite"
+      aria-atomic="true"
       style={{
         background: 'var(--surface-card)',
         border: `1px solid ${palette.border}`,
