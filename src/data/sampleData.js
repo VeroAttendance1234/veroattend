@@ -46,7 +46,7 @@ function overrideStudent(students, classCode, position, overrides) {
   }
 }
 
-overrideStudent(_raw, '11A', 0, { id: 'S001', name: 'Aisha Patel',     uid: '67BDE33D', present: false });
+overrideStudent(_raw, '11A', 0, { id: 'S001', name: 'Toby Crowther',   year: 12, class: '12A', house: 'Dixon', email: 'tc.160138@student.shore.nsw.edu.au', uid: '67BDE33D', present: false });
 overrideStudent(_raw, '11B', 0, { id: 'S002', name: 'Liam Chen',       uid: 'A139E43D', present: false });
 overrideStudent(_raw, '12A', 0, { id: 'S003', name: 'Sofia Nguyen',    uid: 'C92BE43D', present: true  });
 overrideStudent(_raw, '12A', 1, { id: 'S004', name: 'Marcus Williams', uid: '1CC9E33D', present: false });
@@ -99,7 +99,7 @@ export const teacherTimetable = {
   Fri: { 'Period 1':'Preparation','Period 2':'9C Maths','Recess':'·',   'Period 3':'11A Maths', 'Period 4':'10D Maths'    },
 };
 
-// ─── Student timetable (Aisha Patel, 11A) ─────────────────────
+// ─── Student timetable (Toby Crowther, 12A) ─────────────────────
 export const timetable = {
   Mon: ['English',    'Mathematics','Recess','Science',    'PDHPE'      ],
   Tue: ['History',    'English',   'Recess','Visual Arts','Mathematics' ],
@@ -135,9 +135,9 @@ export const journalEntries = [
 ];
 
 export const notifications = [
-  { id:1, text:'Aisha Patel marked absent Period 2',    time:'10:05 AM', type:'warn' },
+  { id:1, text:'Toby Crowther marked absent Period 2',  time:'10:05 AM', type:'warn' },
   { id:2, text:'12B · 3 students absent today',         time:'9:30 AM',  type:'warn' },
-  { id:3, text:'Wellbeing check submitted · Aisha',     time:'9:02 AM',  type:'info' },
+  { id:3, text:'Wellbeing check submitted · Toby',      time:'9:02 AM',  type:'info' },
   { id:4, text:'New journal entry added',               time:'8:45 AM',  type:'info' },
   { id:5, text:'7C · 100% attendance today 🎉',         time:'9:10 AM',  type:'info' },
 ];

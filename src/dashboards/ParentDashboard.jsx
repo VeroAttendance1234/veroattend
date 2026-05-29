@@ -166,7 +166,7 @@ export default function ParentDashboard({
       <div style={{ marginBottom: 20 }}>
         <AbsenceRequestForm
           student={child}
-          parent="J. Patel"
+          parent="J. Crowther"
           requests={absenceRequests}
           onSubmit={onSubmitAbsence}
         />
@@ -180,7 +180,7 @@ export default function ParentDashboard({
           <MessageSquare size={16} style={{ color: 'var(--purple)' }} />
           <p className="section-title" style={{ marginBottom: 0 }}>Messages</p>
         </div>
-        <MessagingPanel role="parent" userName="J. Patel" threads={threads} onSend={onSendMessage} />
+        <MessagingPanel role="parent" userName="J. Crowther" threads={threads} onSend={onSendMessage} />
       </Card>
       </Reveal>
 

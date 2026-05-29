@@ -131,8 +131,8 @@ const DEMO_ACCOUNTS = [
     ],
   },
   {
-    role: 'Student', label: 'Aisha Patel', colour: '#16A34A', icon: Heart,
-    description: 'Year 11A student · wellbeing, goals, journal, timetable.',
+    role: 'Student', label: 'Toby Crowther', colour: '#16A34A', icon: Heart,
+    description: 'Year 12A student · Dixon House · wellbeing, goals, journal, timetable.',
     features: [
       { t: 'Welcome banner',        d: 'Personalised greeting with today\'s status and current mood' },
       { t: 'Live timetable',        d: 'Today\'s periods with NOW indicator on the current lesson' },
@@ -143,8 +143,8 @@ const DEMO_ACCOUNTS = [
     ],
   },
   {
-    role: 'Parent', label: 'J. Patel', colour: '#7C3AED', icon: Users,
-    description: 'Parent of Aisha · attendance, wellbeing, absence requests.',
+    role: 'Parent', label: 'J. Crowther', colour: '#7C3AED', icon: Users,
+    description: 'Parent of Toby · attendance, wellbeing, absence requests.',
     features: [
       { t: 'Child status card',     d: 'Border colour shows whether child is present today' },
       { t: 'Week attendance',       d: 'Mon-Fri breakdown with progress bar and weekly rate' },

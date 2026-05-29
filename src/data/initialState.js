@@ -8,9 +8,9 @@ export const initialAbsenceRequests = [
   /* ── Pending ────────────── */
   {
     id: 'AR-1058',
-    student: 'Aisha Patel', studentId: 'S001',
-    year: 11, class: '11A',
-    parent: 'J. Patel',
+    student: 'Toby Crowther', studentId: 'S001',
+    year: 12, class: '12A',
+    parent: 'J. Crowther',
     type: 'sick',
     fromDate: '2026-05-21', toDate: '2026-05-21',
     reason: 'Strep throat · GP appointment in the morning. Will return tomorrow once antibiotics have kicked in.',
@@ -230,14 +230,14 @@ export const initialThreads = [
   /* ────────── PARENT ↔ TEACHER ────────── */
   {
     id: 'T-001',
-    title: 'Aisha · Maths progress',
+    title: 'Toby · Maths progress',
     participants: [
-      { role: 'parent',  name: 'J. Patel' },
+      { role: 'parent',  name: 'J. Crowther' },
       { role: 'teacher', name: 'Mr David Chen' },
     ],
     unread: 1,
     messages: [
-      { id: 'M-1', from: 'parent',  text: 'Hi Mr Chen · just wanted to thank you for the extra help with Aisha\'s trig assignment last week.', time: 'Mon 9:14am' },
+      { id: 'M-1', from: 'parent',  text: 'Hi Mr Chen · just wanted to thank you for the extra help with Toby\'s trig assignment last week.', time: 'Mon 9:14am' },
       { id: 'M-2', from: 'teacher', text: 'You\'re very welcome · she did a great job once she got the unit-circle approach. Her test mark reflected the effort.', time: 'Mon 11:02am' },
       { id: 'M-3', from: 'parent',  text: 'That\'s wonderful. She mentioned the Yr 11 maths competition is coming up · any prep you\'d recommend?', time: 'Tue 7:48am' },
       { id: 'M-4', from: 'teacher', text: 'I\'ll send the past papers home with her today. The 2024 Year 11 paper is the closest to this year\'s style. Also pinging the AMC website · there\'s a sample test there.', time: 'Tue 8:30am' },
@@ -247,10 +247,10 @@ export const initialThreads = [
   },
   {
     id: 'T-002',
-    title: 'Aisha · Today\'s pickup',
+    title: 'Toby · Today\'s pickup',
     participants: [
-      { role: 'parent',  name: 'J. Patel' },
-      { role: 'student', name: 'Aisha Patel' },
+      { role: 'parent',  name: 'J. Crowther' },
+      { role: 'student', name: 'Toby Crowther' },
     ],
     unread: 0,
     messages: [
@@ -266,25 +266,25 @@ export const initialThreads = [
     title: 'Year 11 parent-teacher night',
     participants: [
       { role: 'admin',  name: 'Admin Office' },
-      { role: 'parent', name: 'J. Patel' },
+      { role: 'parent', name: 'J. Crowther' },
     ],
     unread: 0,
     messages: [
-      { id: 'M-1', from: 'admin',  text: 'Hi Mr/Mrs Patel · the Year 11 parent-teacher night is on Thursday 22 May. Booking link inside the portal.', time: '14 May' },
+      { id: 'M-1', from: 'admin',  text: 'Hi Mr/Mrs Crowther · the Year 11 parent-teacher night is on Thursday 22 May. Booking link inside the portal.', time: '14 May' },
       { id: 'M-2', from: 'parent', text: 'Thanks, just booked a slot with Mr Chen for 6:40pm.', time: '14 May' },
       { id: 'M-3', from: 'admin',  text: 'Confirmed · see you then. We\'ll also email a reminder 24 hours before.', time: '14 May' },
     ],
   },
   {
     id: 'T-004',
-    title: 'Aisha · English essay feedback',
+    title: 'Toby · English essay feedback',
     participants: [
-      { role: 'parent',  name: 'J. Patel' },
+      { role: 'parent',  name: 'J. Crowther' },
       { role: 'teacher', name: 'Mrs Sarah Williams' },
     ],
     unread: 2,
     messages: [
-      { id: 'M-1', from: 'teacher', text: 'Hi J · wanted to share that Aisha\'s essay on "The Great Gatsby" was the strongest in the cohort. Her thesis on the green light was beautifully argued.', time: 'Mon 3:42pm' },
+      { id: 'M-1', from: 'teacher', text: 'Hi J · wanted to share that Toby\'s essay on "The Great Gatsby" was the strongest in the cohort. Her thesis on the green light was beautifully argued.', time: 'Mon 3:42pm' },
       { id: 'M-2', from: 'parent',  text: 'Wow · thank you so much. She was nervous about that one.', time: 'Mon 5:18pm' },
       { id: 'M-3', from: 'teacher', text: 'No need! I\'ve marked it 92% with a few small notes. Would love to put her work forward as a sample for the cohort if she\'s comfortable.', time: 'Mon 6:01pm' },
       { id: 'M-4', from: 'parent',  text: 'I\'ll ask her · but I\'m sure she\'ll be honoured.', time: 'Mon 7:30pm' },
@@ -359,7 +359,7 @@ export const initialThreads = [
     title: 'School-wide: Excursion permission',
     participants: [
       { role: 'admin',   name: 'Admin Office' },
-      { role: 'parent',  name: 'J. Patel' },
+      { role: 'parent',  name: 'J. Crowther' },
     ],
     unread: 0,
     messages: [
@@ -387,10 +387,10 @@ export const initialThreads = [
   },
   {
     id: 'T-011',
-    title: 'Aisha · Birthday plans this weekend',
+    title: 'Toby · Birthday plans this weekend',
     participants: [
-      { role: 'parent',  name: 'J. Patel' },
-      { role: 'student', name: 'Aisha Patel' },
+      { role: 'parent',  name: 'J. Crowther' },
+      { role: 'student', name: 'Toby Crowther' },
     ],
     unread: 0,
     messages: [
@@ -420,15 +420,15 @@ export const initialThreads = [
 
 /* ── Extra notifications (more variety) ───────────── */
 export const extraNotifications = [
-  { id: 'N-001', type: 'absence',   icon: '📝', title: 'Absence request submitted',  text: 'J. Patel requested an absence for Aisha (sick · strep throat)',         time: '2 min ago' },
+  { id: 'N-001', type: 'absence',   icon: '📝', title: 'Absence request submitted',  text: 'J. Crowther requested an absence for Toby (sick · strep throat)',         time: '2 min ago' },
   { id: 'N-002', type: 'message',   icon: '💬', title: 'New message from parent',    text: 'Wei Chen replied to Liam\'s Maths extension thread',                  time: '14 min ago' },
   { id: 'N-003', type: 'alert',     icon: '⚠️', title: 'Late arrival flagged',       text: 'James Park scanned in 12 minutes after Period 1 started',             time: '38 min ago' },
   { id: 'N-004', type: 'system',    icon: '🟢', title: 'ACR122U reconnected',        text: 'Hardware bridge restored after brief drop',                           time: '1 hr ago' },
   { id: 'N-005', type: 'milestone', icon: '🎉', title: '95% milestone reached',      text: 'Class 7A hit 95% weekly average · top in school',                     time: '2 hrs ago' },
-  { id: 'N-006', type: 'wellbeing', icon: '💚', title: 'Wellbeing check-in',         text: 'Aisha logged her mood: Great',                                        time: '3 hrs ago' },
+  { id: 'N-006', type: 'wellbeing', icon: '💚', title: 'Wellbeing check-in',         text: 'Toby logged her mood: Great',                                        time: '3 hrs ago' },
   { id: 'N-007', type: 'event',     icon: '📅', title: 'Parent-teacher night',       text: 'Reminders sent to 1,050 families for Thursday',                       time: 'Yesterday' },
   { id: 'N-008', type: 'alert',     icon: '⚠️', title: 'Low attendance alert',       text: 'Year 12 below 88% · second day running',                              time: 'Yesterday' },
   { id: 'N-009', type: 'absence',   icon: '✅', title: 'Absence approved',           text: 'Linh Nguyen\'s request for Sofia approved by admin',                  time: 'Yesterday' },
-  { id: 'N-010', type: 'message',   icon: '💬', title: 'New message thread',         text: 'Mrs Williams started a thread re Aisha\'s English essay',             time: '2 days ago' },
+  { id: 'N-010', type: 'message',   icon: '💬', title: 'New message thread',         text: 'Mrs Williams started a thread re Toby\'s English essay',             time: '2 days ago' },
   { id: 'N-011', type: 'system',    icon: '🛠️', title: 'Weekly report generated',   text: 'Last week\'s attendance report (CSV) available in Reports tab',       time: '2 days ago' },
 ];

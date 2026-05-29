@@ -8,7 +8,7 @@ import Tagline from '../components/Tagline';
 /* Rotates through simulated card-tap events to suggest the system is alive */
 function LiveActivityTicker() {
   const EVENTS = [
-    { name: 'Aisha Patel',     class: '11A · Maths',    when: 'just now', colour: 'var(--green)' },
+    { name: 'Toby Crowther',   class: '12A · Maths',    when: 'just now', colour: 'var(--green)' },
     { name: 'Mr David Chen',   class: 'Year 11 home',   when: '4s ago',   colour: 'var(--blue)' },
     { name: 'Hassan Khan',     class: '8E · Geography', when: '11s ago',  colour: 'var(--teal)' },
     { name: 'Olivia Burns',    class: '12B · Physics',  when: '18s ago',  colour: 'var(--purple)' },
@@ -79,8 +79,8 @@ function LiveActivityTicker() {
 const ROLE_OPTIONS = [
   { role: 'Admin',   label: 'Administrator',   email: 'admin@shore.nsw.edu.au',     colour: '#14B8B8', icon: Monitor },
   { role: 'Teacher', label: 'Mr David Chen',   email: 'd.chen@shore.nsw.edu.au',    colour: '#2563EB', icon: BookOpen },
-  { role: 'Student', label: 'Aisha Patel',     email: 'a.patel@students.shore.nsw', colour: '#16A34A', icon: Heart },
-  { role: 'Parent',  label: 'J. Patel',        email: 'jpatel@parents.shore.nsw',   colour: '#7C3AED', icon: Users },
+  { role: 'Student', label: 'Toby Crowther',   email: 'tc.160138@student.shore.nsw.edu.au', colour: '#16A34A', icon: Heart },
+  { role: 'Parent',  label: 'J. Crowther',     email: 'jcrowther@parents.shore.nsw',        colour: '#7C3AED', icon: Users },
 ];
 
 export default function LoginPage({ onLogin }) {

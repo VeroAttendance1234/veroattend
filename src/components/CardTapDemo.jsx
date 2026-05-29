@@ -18,7 +18,7 @@
 
 /* ─── 6 notification events spawn every 2s in this exact order ─── */
 const EVENTS = [
-  { delay: 0.4,  type: 'student-ontime', label: 'Aisha Patel',       sub: 'Year 11A · on time'      },
+  { delay: 0.4,  type: 'student-ontime', label: 'Toby Crowther',       sub: 'Year 12A · on time'      },
   { delay: 2.4,  type: 'teacher-early',  label: 'Mr Chen',           sub: 'Maths · 5 min early'     },
   { delay: 4.4,  type: 'student-late',   label: 'James Park',        sub: 'Year 11C · 1 min late'   },
   { delay: 6.4,  type: 'student-ontime', label: 'Luna King',         sub: 'Year 7B · on time'       },
@@ -36,7 +36,7 @@ const EVENT_STYLES = {
 /* ─── 5 cards on their own staggered tap cycles ─── */
 const CARDS = [
   {
-    name: 'Aisha Patel', id: 'S001',  hue: 'linear-gradient(135deg, #14B8B8 0%, #0F9898 100%)',
+    name: 'Toby Crowther', id: 'S001',  hue: 'linear-gradient(135deg, #14B8B8 0%, #0F9898 100%)',
     /* approach from right */
     from: 'translate3d(280px,  60px,  120px) rotateY(-32deg) rotateZ(-8deg)',
     delay: 0,

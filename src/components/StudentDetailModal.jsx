@@ -25,11 +25,11 @@ function generateProfile(s) {
   if (!s) return {};
   const slug = s.name.toLowerCase().replace(/\s+/g, '.');
   return {
-    email:   `${slug}@students.shore.nsw.edu.au`,
+    email:   s.email || `${slug}@students.shore.nsw.edu.au`,
     phone:   `+61 ${400 + (s.id.charCodeAt(2) % 100)} ${100 + s.id.charCodeAt(3) % 900} ${100 + s.id.charCodeAt(4) % 900}`,
     address: `${100 + (s.id.charCodeAt(2) % 800)} Pacific Hwy, Sydney NSW`,
     joined:  '2024',
-    house:   ['Burns', 'Eldon', 'Forrest', 'Robson'][s.id.charCodeAt(1) % 4],
+    house:   s.house || ['Burns', 'Eldon', 'Forrest', 'Robson'][s.id.charCodeAt(1) % 4],
     streak:  18 + (s.id.charCodeAt(s.id.length - 1) % 14),
   };
 }

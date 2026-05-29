@@ -3,7 +3,7 @@
  * ─────────────────────────────────────────────────────────────
  * Self-contained, fully interactive messaging trial for the
  * marker page. The viewer plays as Mr Chen (teacher); a
- * simulated parent ("Ms Patel") replies after a realistic
+ * simulated parent ("Ms Crowther") replies after a realistic
  * typing delay using a tiny intent-matching reply engine.
  *
  * Demonstrates:
@@ -26,7 +26,7 @@ function generateParentReply(text) {
 
   // Time-based intents
   if (/(late|absen|sick|miss)/.test(t))
-    return "Thanks for letting me know — Aisha had a dentist appointment this morning. She'll be in for period 3.";
+    return "Thanks for letting me know — Toby had a dentist appointment this morning. She'll be in for period 3.";
   if (/(homework|assignment|task)/.test(t))
     return "We'll make sure it's submitted tonight. Could you remind me of the due date?";
   if (/(meet|chat|catch up|interview)/.test(t))
@@ -38,12 +38,12 @@ function generateParentReply(text) {
   if (/(thank|cheers|appreciate)/.test(t))
     return "You're very welcome — thanks for keeping me in the loop.";
   if (/\?/.test(t))
-    return "Good question — let me check with Aisha tonight and get back to you.";
+    return "Good question — let me check with Toby tonight and get back to you.";
 
   // Generic positive fallbacks
   const fallbacks = [
     "Thanks for the update, Mr Chen!",
-    "Appreciate you reaching out — I'll have a chat with Aisha after school.",
+    "Appreciate you reaching out — I'll have a chat with Toby after school.",
     "Got it, thank you for keeping me posted.",
     "Sounds good — we'll handle it on our end.",
   ];
@@ -59,14 +59,14 @@ function nowTime() {
 const INITIAL_THREADS = [
   {
     id: 'demo-t1',
-    title: 'Ms Patel · Year 11',
+    title: 'Ms Crowther · Year 12',
     participants: [
       { role: 'teacher', name: ME },
-      { role: 'parent',  name: 'Ms J. Patel' },
+      { role: 'parent',  name: 'Ms J. Crowther' },
     ],
     unread: 0,
     messages: [
-      { id: 'd1', from: 'parent',  text: "Hi Mr Chen — just letting you know Aisha was a bit unwell yesterday. Hope she's okay in class today!",        time: '8:14 am' },
+      { id: 'd1', from: 'parent',  text: "Hi Mr Chen — just letting you know Toby was a bit unwell yesterday. Hope she's okay in class today!",        time: '8:14 am' },
       { id: 'd2', from: 'teacher', text: "Morning! She just tapped in at 8:42 and seems good — I'll keep an eye on her in maths and let you know.",       time: '8:43 am' },
       { id: 'd3', from: 'parent',  text: "Thank you so much, really appreciate it 🙏",                                                                     time: '8:45 am' },
     ],
