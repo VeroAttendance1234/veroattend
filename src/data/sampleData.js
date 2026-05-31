@@ -21,6 +21,14 @@ function generateStudents() {
         const lastName  = LAST[idx % LAST.length];
         const uid = idx.toString(16).padStart(8, '0').toUpperCase();
         const present = (idx % 11 !== 0); // ~91% attendance
+        // A real school is never "everyone present, on time": seed a slice of
+        // late arrivals and a few students who've stepped out of class.
+        let status = 'absent';
+        if (present) {
+          if (idx % 13 === 0)      status = 'late'; // ~7% arrived late
+          else if (idx % 29 === 0) status = 'out';  // ~3% stepped out
+          else                     status = 'on-time';
+        }
         list.push({
           id:      `S${idx.toString().padStart(4,'0')}`,
           name:    `${firstName} ${lastName}`,
@@ -28,6 +36,7 @@ function generateStudents() {
           class:   `${year}${letter}`,
           uid,
           present,
+          status,
         });
       }
     }
@@ -43,7 +52,7 @@ const _raw = generateStudents();
 export const DEMO_STUDENT_ID = 'S001';
 export const demoStudent = {
   id: 'S001', name: 'Toby Crowther', year: 12, class: '12A', house: 'Dixon',
-  email: 'tc.160138@student.millpond.nsw.edu.au', uid: '67BDE33D', present: false,
+  email: 'tc.160138@student.millpond.nsw.edu.au', uid: '67BDE33D', present: false, status: 'absent',
 };
 
 // Stamp real RFID card UIDs onto real class rosters for the live Marker demo.
@@ -58,9 +67,9 @@ function overrideStudent(students, classCode, position, overrides) {
 // Order matters: place the 12A students BEFORE moving Toby into 12A, or the
 // class filter re-matches Toby (now in 12A, earlier in the array) and overwrites
 // his identity. Toby is stamped LAST so nothing can clobber him.
-overrideStudent(_raw, '11B', 0, { id: 'S002', name: 'Liam Chen',       uid: 'A139E43D', present: false });
-overrideStudent(_raw, '12A', 0, { id: 'S003', name: 'Sofia Nguyen',    uid: 'C92BE43D', present: true  });
-overrideStudent(_raw, '12A', 1, { id: 'S004', name: 'Marcus Williams', uid: '1CC9E33D', present: false });
+overrideStudent(_raw, '11B', 0, { id: 'S002', name: 'Liam Chen',       uid: 'A139E43D', present: false, status: 'absent'  });
+overrideStudent(_raw, '12A', 0, { id: 'S003', name: 'Sofia Nguyen',    uid: 'C92BE43D', present: true,  status: 'on-time' });
+overrideStudent(_raw, '12A', 1, { id: 'S004', name: 'Marcus Williams', uid: '1CC9E33D', present: false, status: 'absent'  });
 overrideStudent(_raw, '11A', 0, { ...demoStudent });
 
 // Foolproof: guarantee S001 = Toby exists even if generation/order ever changes.
@@ -69,6 +78,44 @@ if (!_raw.some(s => s.id === DEMO_STUDENT_ID)) {
 }
 
 export const students = _raw;
+
+// ─── Simulated tap generator ──────────────────────────────────
+// Drives ALL fake activity (auto-feed + every "Simulate tap" button). It
+// never returns Toby: his physical card (UID 67BDE33D) is reserved for the
+// marker to test the real ACR122U reader, so Toby only ever appears via a
+// genuine hardware `card_tap`. Returns realistic variety — mostly on-time
+// check-ins, some late arrivals, the odd student stepping out of class and
+// later tapping back in — so the feed never looks like a fixed 4-person loop.
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+export function pickSimulatedTap(roster = []) {
+  const pool = roster.filter(s => s && s.id !== DEMO_STUDENT_ID);
+  if (!pool.length) return null;
+
+  const absent  = pool.filter(s => !s.present);
+  const inClass = pool.filter(s => s.present && s.status !== 'out');
+  const out     = pool.filter(s => s.present && s.status === 'out');
+
+  const r = Math.random();
+  const arrival = () => (Math.random() < 0.22 ? 'late' : 'on-time');
+
+  // 70% · check someone IN who isn't here yet (with ~1-in-5 arriving late)
+  if (absent.length && r < 0.70) {
+    return { student: rand(absent), action: 'in', status: arrival() };
+  }
+  // +15% · a student who'd stepped out taps back IN (returning to class)
+  if (out.length && r < 0.85) {
+    return { student: rand(out), action: 'in', status: 'on-time' };
+  }
+  // remainder · someone currently in class taps OUT (bathroom / meeting / sport)
+  if (inClass.length) {
+    return { student: rand(inClass), action: 'out', status: 'out' };
+  }
+  // fallbacks if a category is empty
+  if (absent.length) return { student: rand(absent), action: 'in', status: arrival() };
+  if (out.length)    return { student: rand(out),    action: 'in', status: 'on-time' };
+  return null;
+}
 
 // ─── Toby Crowther · 6-year record (Year 7 → Year 12) ─────────
 // Drives the attendance journey + grades cards on the Student/Parent tabs.

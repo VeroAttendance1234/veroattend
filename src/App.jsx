@@ -11,7 +11,7 @@ import ReportsPage      from './pages/ReportsPage';
 import OnboardingTour   from './components/OnboardingTour';
 import CommandPalette, { useCommandPaletteHotkey } from './components/CommandPalette';
 import MilestoneConfetti from './components/MilestoneConfetti';
-import { students as initialStudents } from './data/sampleData';
+import { students as initialStudents, pickSimulatedTap, DEMO_STUDENT_ID } from './data/sampleData';
 import { initialAbsenceRequests, initialThreads } from './data/initialState';
 import './styles/global.css';
 
@@ -130,9 +130,16 @@ function AppInner() {
   /* ⌘K / Ctrl-K opens the command palette */
   useCommandPaletteHotkey(cmdkOpen, setCmdkOpen);
 
-  /* Auto-simulated tap activity — fires every 12–22s while signed in
-     so the live feed and dashboards never look frozen. Pauses while
-     the marker page is open so it doesn't fight the welcome demo. */
+  /* Live mirror of the roster so handleTap (called from timers and the Pi
+     socket) can read CURRENT student state without going stale in a closure. */
+  const studentsRef = useRef(initialStudents);
+  useEffect(() => { studentsRef.current = students; }, [students]);
+
+  /* Auto-simulated tap activity — fires every 12–22s while signed in so the
+     live feed and dashboards never look frozen. Draws from the WHOLE school
+     (never Toby) and mixes on-time check-ins, late arrivals and students
+     stepping out, so it never looks like a fixed handful of people looping.
+     Pauses while the marker page is open so it doesn't fight the welcome demo. */
   useEffect(() => {
     if (!authedRole || systemLive) return; // real reader takes over only when actually live
     let cancelled = false;
@@ -141,9 +148,8 @@ function AppInner() {
       const t = setTimeout(() => {
         if (cancelled) return;
         if (document.visibilityState === 'visible' && !document.body.dataset.markerOpen) {
-          const pool = (initialStudents || []).filter((s, i) => i < 200);
-          const pick = pool[Math.floor(Math.random() * pool.length)];
-          if (pick) handleTap(pick);
+          const sim = pickSimulatedTap(studentsRef.current);
+          if (sim) handleTap(sim.student, { action: sim.action, status: sim.status });
         }
         scheduleNext();
       }, delay);
@@ -160,11 +166,42 @@ function AppInner() {
 
   const socketRef = useRef(null);
 
-  /* Card tap pipeline */
-  function handleTap(student) {
-    setStudents(prev => prev.map(s => s.id === student.id ? { ...s, present: true } : s));
-    setTaps(prev => [{ ...student, id: `tap-${++tapCounter}`, time: now() }, ...prev]);
-    toast.success(`${student.name} checked in`, `Year ${student.year} · ${student.class}`);
+  /* Card tap pipeline.
+     One tap can be a check-IN (on time / late) or a check-OUT (stepping out
+     of class). `opts` lets the simulator state intent explicitly; a real
+     hardware tap (no opts) toggles based on where the student currently is —
+     tap once to come in, tap again to step out. A check-out keeps `present`
+     true (they still attended today) but flips status to 'out'. */
+  function handleTap(student, opts = {}) {
+    const current = studentsRef.current.find(s => s.id === student.id);
+    let action = opts.action;
+    if (!action) action = (current && current.present && current.status !== 'out') ? 'out' : 'in';
+    const status = action === 'out' ? 'out' : (opts.status || 'on-time');
+
+    setStudents(prev => prev.map(s => s.id === student.id ? { ...s, present: true, status } : s));
+    setTaps(prev => [{ ...student, id: `tap-${++tapCounter}`, action, status, ts: Date.now(), time: now() }, ...prev]);
+
+    if (action === 'out') {
+      toast.success(`${student.name} stepped out`, `Year ${student.year} · ${student.class} · out of class`);
+    } else if (status === 'late') {
+      toast.warn(`${student.name} checked in late`, `Year ${student.year} · ${student.class}`);
+    } else {
+      toast.success(`${student.name} checked in`, `Year ${student.year} · ${student.class}`);
+    }
+  }
+
+  /* Anti-cheat demo trigger: simulate one person tapping a STACK of borrowed
+     cards in quick succession (classic buddy-punching). The rapid burst is
+     caught live by the Integrity Alerts detector — proving the limitation is
+     handled rather than ignored. Never uses Toby's card. */
+  function simulateCheatAttempt() {
+    const pool = studentsRef.current.filter(s => s.id !== DEMO_STUDENT_ID && !s.present);
+    if (pool.length < 3) return;
+    const picks = [...pool].sort(() => Math.random() - 0.5).slice(0, 4);
+    picks.forEach((s, i) => setTimeout(() => {
+      if (document.body.dataset.markerOpen) return;
+      handleTap(s, { action: 'in', status: 'on-time' });
+    }, i * 220));
   }
 
   /* Absence request actions */
@@ -240,6 +277,10 @@ function AppInner() {
           return connected;
         });
       });
+      // A REAL hardware tap from the ACR122U. This is the ONLY path that can
+      // surface Toby: the simulator deliberately excludes him, but when his
+      // physical card (UID 67BDE33D) is tapped on the reader the Pi sends it
+      // here and it flows straight onto the live feed like any other student.
       socket.on('card_tap',  (studentData) => handleTap(studentData));
     });
 
@@ -291,11 +332,8 @@ function AppInner() {
         onReports={() => setShowReports(true)}
         onLogout={() => setAuthedRole(null)}
         onSimulateTap={() => {
-          const pool = students.filter(s => !s.present);
-          const pick = (pool.length ? pool : students)[
-            Math.floor(Math.random() * (pool.length || students.length))
-          ];
-          if (pick) handleTap(pick);
+          const sim = pickSimulatedTap(studentsRef.current);
+          if (sim) handleTap(sim.student, { action: sim.action, status: sim.status });
         }}
       />
       {showReports && (
@@ -326,7 +364,7 @@ function AppInner() {
       {/* Page transition wrapper — key={role} forces a remount with the
           roleSlideIn animation when the user switches dashboards. */}
       <div key={role} style={{ animation: 'roleSlideIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both' }}>
-        {role === 'Admin'   && <AdminDashboard   students={students} setStudents={setStudents} taps={taps} onTap={handleTap} {...sharedProps} />}
+        {role === 'Admin'   && <AdminDashboard   students={students} setStudents={setStudents} taps={taps} onTap={handleTap} onSimulateCheat={simulateCheatAttempt} {...sharedProps} />}
         {role === 'Teacher' && <TeacherDashboard students={students} setStudents={setStudents} taps={taps} onTap={handleTap} {...sharedProps} />}
         {role === 'Student' && <StudentDashboard students={students} {...sharedProps} />}
         {role === 'Parent'  && <ParentDashboard  students={students} {...sharedProps} />}

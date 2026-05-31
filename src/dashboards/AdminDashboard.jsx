@@ -14,6 +14,7 @@ import Badge from '../components/Badge';
 import Avatar from '../components/Avatar';
 import LiveFeed from '../components/LiveFeed';
 import RFIDSimulator from '../components/RFIDSimulator';
+import IntegrityAlerts from '../components/IntegrityAlerts';
 import AbsenceRequestsAdmin from '../components/AbsenceRequestsAdmin';
 import AttendanceLeaders, { CurrentLeaderStrip } from '../components/AttendanceLeaders';
 import AttendanceHeatmap from '../components/AttendanceHeatmap';
@@ -22,7 +23,7 @@ import Reveal from '../components/Reveal';
 import { extraNotifications } from '../data/initialState';
 import {
   notifications, teachers, monthlyAttendance,
-  yearlyStats, yearGroupRates, classLeaderboard,
+  yearlyStats, yearGroupRates, classLeaderboard, pickSimulatedTap,
 } from '../data/sampleData';
 
 const YEARS   = ['All', 7, 8, 9, 10, 11, 12];
@@ -136,7 +137,7 @@ function QuickActions({ onSimulate, students = [], filtered = [] }) {
 }
 
 export default function AdminDashboard({
-  students, setStudents, taps, onTap,
+  students, setStudents, taps, onTap, onSimulateCheat,
   absenceRequests = [], onApproveAbsence, onRejectAbsence,
 }) {
   const [yearFilter, setYearFilter]   = useState('All');
@@ -186,6 +187,9 @@ export default function AdminDashboard({
 
   const schoolPresent = students.filter(s => s.present).length;
   const schoolRate    = Math.round((schoolPresent / students.length) * 100);
+  const schoolAbsent  = students.length - schoolPresent;
+  const schoolLate    = students.filter(s => s.status === 'late').length;
+  const schoolOut     = students.filter(s => s.status === 'out').length;
 
   return (
     <div className="page">
@@ -257,9 +261,9 @@ export default function AdminDashboard({
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
           {[
             { label: 'Present', value: schoolPresent, color: 'var(--green)' },
-            { label: 'Absent',  value: students.length - schoolPresent, color: 'var(--red)' },
-            { label: 'Staff',   value: teachers.length, color: 'var(--blue)' },
-            { label: 'Classes', value: 42, color: 'var(--teal)' },
+            { label: 'Absent',  value: schoolAbsent,   color: 'var(--red)' },
+            { label: 'Late',    value: schoolLate,     color: 'var(--amber)' },
+            { label: 'Out',     value: schoolOut,      color: 'var(--blue)' },
           ].map(({ label, value, color }) => (
             <div key={label} style={{ textAlign: 'center' }}>
               <div style={{
@@ -280,7 +284,11 @@ export default function AdminDashboard({
               <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>Last scan</div>
               <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{taps[0].name}</div>
               <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 2 }}>{taps[0].class} · {taps[0].time}</div>
-              <Badge status="present" dot style={{ marginTop: 6 }}>Checked in</Badge>
+              <div style={{ marginTop: 6 }}>
+                <Badge status={taps[0].action === 'out' ? 'info' : taps[0].status === 'late' ? 'late' : 'present'} dot>
+                  {taps[0].action === 'out' ? 'Stepped out' : taps[0].status === 'late' ? 'Late' : 'Checked in'}
+                </Badge>
+              </div>
             </div>
           </>
         )}
@@ -291,7 +299,7 @@ export default function AdminDashboard({
         <StatCard label="Total Students" value={students.length}         icon={Users}     accent="var(--teal)"  />
         <StatCard label="Present Today"  value={schoolPresent}           icon={UserCheck} accent="var(--green)" sub={`${schoolRate}% rate`} />
         <StatCard label="Absent Today"   value={students.length - schoolPresent} icon={UserX} accent="var(--red)"   />
-        <StatCard label="Late Today"     value={Math.floor(students.length * 0.024)} icon={Clock} accent="var(--amber)" />
+        <StatCard label="Late Today"     value={schoolLate}              icon={Clock}     accent="var(--amber)"  sub={`${schoolOut} out of class`} />
         <StatCard label="Teaching Staff" value={teachers.length}         icon={School}    accent="var(--blue)"  />
         <StatCard label="Active Classes" value={42}                      icon={Award}     accent="var(--purple)" />
       </div>
@@ -417,11 +425,8 @@ export default function AdminDashboard({
               students={students}
               filtered={filtered}
               onSimulate={() => {
-                const pool = students.filter(s => !s.present);
-                const pick = (pool.length ? pool : students)[
-                  Math.floor(Math.random() * (pool.length || students.length))
-                ];
-                if (pick) onTap(pick);
+                const sim = pickSimulatedTap(students);
+                if (sim) onTap(sim.student, { action: sim.action, status: sim.status });
               }}
             />
           </Card>
@@ -472,6 +477,13 @@ export default function AdminDashboard({
           <RFIDSimulator students={students} onTap={onTap} />
         </div>
       </Card>
+      </Reveal>
+
+      {/* ── Anti-cheat · card-sharing detection ── */}
+      <Reveal>
+        <Card data-tour="integrity" style={{ marginBottom: 20 }}>
+          <IntegrityAlerts taps={taps} students={students} onSimulateCheat={onSimulateCheat} />
+        </Card>
       </Reveal>
 
       {/* ── Student roll ───────────────────────── */}
@@ -569,8 +581,11 @@ export default function AdminDashboard({
                   </div>
                 </div>
               </div>
-              <Badge status={s.present ? 'present' : 'absent'} dot>
-                {s.present ? 'Present' : 'Absent'}
+              <Badge
+                status={!s.present ? 'absent' : s.status === 'late' ? 'late' : s.status === 'out' ? 'info' : 'present'}
+                dot
+              >
+                {!s.present ? 'Absent' : s.status === 'late' ? 'Late' : s.status === 'out' ? 'Out' : 'Present'}
               </Badge>
             </div>
           ))}

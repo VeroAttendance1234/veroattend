@@ -2,7 +2,15 @@ import { useEffect, useRef } from 'react';
 import Badge from './Badge';
 import Avatar from './Avatar';
 import Sparkline, { seedHistory } from './Sparkline';
-import { CreditCard, Clock } from 'lucide-react';
+import { CreditCard, Clock, LogOut, LogIn } from 'lucide-react';
+
+// Maps a tap's status to how its row should read. A check-OUT is shown as a
+// neutral "Checked out" pill; arrivals split into on-time vs late.
+const STATUS_VIEW = {
+  'on-time': { badge: 'present', label: 'On time',     dot: 'present', out: false },
+  'late':    { badge: 'late',    label: 'Late',        dot: 'present', out: false },
+  'out':     { badge: 'info',    label: 'Checked out', dot: 'absent',  out: true  },
+};
 
 export default function LiveFeed({ taps }) {
   const listRef = useRef(null);
@@ -49,7 +57,9 @@ export default function LiveFeed({ taps }) {
           .livefeed-spark { display: flex !important; }
         }
       `}</style>
-      {taps.map((tap, i) => (
+      {taps.map((tap, i) => {
+        const view = STATUS_VIEW[tap.status] || STATUS_VIEW['on-time'];
+        return (
         <div
           key={tap.id}
           style={{
@@ -65,7 +75,7 @@ export default function LiveFeed({ taps }) {
             transition: 'background 0.3s',
           }}
         >
-          <Avatar name={tap.name} size={38} status="present" />
+          <Avatar name={tap.name} size={38} status={view.dot} />
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text-primary)', marginBottom: 2 }}>
@@ -100,17 +110,20 @@ export default function LiveFeed({ taps }) {
           </div>
 
           <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5 }}>
-            <Badge status="present" dot>Present</Badge>
+            <Badge status={view.badge} dot>{view.label}</Badge>
             <div style={{
               fontSize: '0.72rem', color: 'var(--text-soft)',
               display: 'flex', alignItems: 'center', gap: 3,
             }}>
-              <Clock size={10} />
+              {view.out
+                ? <LogOut size={10} style={{ color: 'var(--blue)' }} />
+                : <LogIn size={10} style={{ color: 'var(--green)' }} />}
               {tap.time}
             </div>
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

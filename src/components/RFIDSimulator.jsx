@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Wifi, Zap, Loader } from 'lucide-react';
+import { pickSimulatedTap } from '../data/sampleData';
 
 export default function RFIDSimulator({ students, onTap }) {
   const [scanning, setScanning] = useState(false);
@@ -9,12 +10,11 @@ export default function RFIDSimulator({ students, onTap }) {
     if (scanning) return;
     setScanning(true);
     setTimeout(() => {
-      const pool = students.filter(s => !s.present);
-      const student = pool.length > 0
-        ? pool[Math.floor(Math.random() * pool.length)]
-        : students[Math.floor(Math.random() * students.length)];
-      setLastUID(student.uid || 'SIM-' + Math.random().toString(16).slice(2,8).toUpperCase());
-      onTap(student);
+      const sim = pickSimulatedTap(students);
+      if (sim) {
+        setLastUID(sim.student.uid || 'SIM-' + Math.random().toString(16).slice(2,8).toUpperCase());
+        onTap(sim.student, { action: sim.action, status: sim.status });
+      }
       setScanning(false);
     }, 900);
   }
