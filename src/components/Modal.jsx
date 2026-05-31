@@ -37,22 +37,58 @@ export default function Modal({
   useEffect(() => {
     if (!open) return;
 
+    // Remember what was focused before opening, to restore it on close
+    const prevFocused = document.activeElement;
+
     // Lock body scroll
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
-    // Escape closes
+    // All focusable, currently-visible elements inside the dialog
+    function focusables() {
+      const root = dialogRef.current;
+      if (!root) return [];
+      return Array.from(root.querySelectorAll(
+        'a[href], button:not([disabled]), textarea:not([disabled]), ' +
+        'input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )).filter(el => el.offsetParent !== null);
+    }
+
+    // Escape closes · Tab is trapped inside the dialog (a11y / WCAG 2.1)
     function onKey(e) {
-      if (e.key === 'Escape') onClose?.();
+      if (e.key === 'Escape') { onClose?.(); return; }
+      if (e.key !== 'Tab') return;
+
+      const items = focusables();
+      if (items.length === 0) {
+        e.preventDefault();
+        dialogRef.current?.focus();
+        return;
+      }
+      const first = items[0];
+      const last  = items[items.length - 1];
+      const active = document.activeElement;
+
+      if (e.shiftKey && (active === first || active === dialogRef.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
     document.addEventListener('keydown', onKey);
 
-    // Park focus on dialog for a11y
+    // Move focus into the dialog for a11y
     dialogRef.current?.focus();
 
     return () => {
       document.body.style.overflow = prevOverflow;
       document.removeEventListener('keydown', onKey);
+      // Restore focus to whatever opened the modal
+      if (prevFocused && typeof prevFocused.focus === 'function') {
+        prevFocused.focus();
+      }
     };
   }, [open, onClose]);
 

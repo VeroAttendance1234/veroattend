@@ -7,9 +7,10 @@ import Avatar from '../components/Avatar';
 import AbsenceRequestForm from '../components/AbsenceRequestForm';
 import MessagingPanel from '../components/MessagingPanel';
 import Reveal from '../components/Reveal';
+import { AttendanceJourney, AcademicResults } from '../components/AcademicInsights';
 import { MessageSquare } from 'lucide-react';
 import {
-  attendanceHistory, notifications, goals, journalEntries,
+  attendanceHistory, notifications, goals, journalEntries, demoStudent,
 } from '../data/sampleData';
 
 const MOODS = [
@@ -39,7 +40,7 @@ export default function ParentDashboard({
   absenceRequests = [], onSubmitAbsence,
   threads = [], onSendMessage,
 }) {
-  const child    = students.find(s => s.id === 'S001') || students[0];
+  const child    = students.find(s => s.id === demoStudent.id) || demoStudent;
   const rate     = weekRate(attendanceHistory);
   const doneGoals = goals.filter(g => g.done).length;
   const sentiment = sentimentLabel(weekMoods);
@@ -88,6 +89,14 @@ export default function ParentDashboard({
           </div>
         </div>
       </div>
+
+      {/* ── 6-year attendance + academic results ── */}
+      <Reveal>
+        <AttendanceJourney name={child?.name} />
+      </Reveal>
+      <Reveal>
+        <AcademicResults name={child?.name} />
+      </Reveal>
 
       <div className="grid-2" style={{ marginBottom: 20 }}>
 

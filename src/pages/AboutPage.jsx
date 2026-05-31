@@ -20,7 +20,7 @@ const PROCESS = [
     phase: '02',
     title: 'Research existing solutions',
     icon: Users,
-    body: `Surveyed three major school platforms used in Australia: Schoolbox (NSW-wide), Sentral (used by 3,000+ schools), and Canvas (university-favoured). All three rely on teacher data entry — none integrate hardware. Interviewed 4 teachers at Shore School; common complaints: "the roll is the worst part of my day", "I don't know who's actually in the building", "parents call me when their child is just running late".`,
+    body: `Surveyed three major school platforms used in Australia: Schoolbox (NSW-wide), Sentral (used by 3,000+ schools), and Canvas (university-favoured). All three rely on teacher data entry — none integrate hardware. Interviewed 4 teachers at Millpond High School; common complaints: "the roll is the worst part of my day", "I don't know who's actually in the building", "parents call me when their child is just running late".`,
   },
   {
     phase: '03',
@@ -132,7 +132,7 @@ export default function AboutPage({ onClose }) {
             lineHeight: 1.65, marginBottom: 26,
             maxWidth: 700,
           }}>
-            VERO is an HSC Software Design & Development Major Project by Toby Crowther at Shore School. This page documents the design opportunity, research process, prototyping iterations, and evaluation decisions behind the system.
+            VERO is an HSC Software Design & Development Major Project by Toby Crowther at Millpond High School. This page documents the design opportunity, research process, prototyping iterations, and evaluation decisions behind the system.
           </p>
           <div style={{ display: 'inline-flex' }}>
             <Tagline size="md" />
@@ -284,7 +284,7 @@ export default function AboutPage({ onClose }) {
         <Reveal delay={100}>
           <div style={{ textAlign: 'center', marginTop: 60, paddingTop: 28, borderTop: '1px solid var(--border)' }}>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Built by <strong style={{ color: 'var(--text-primary)' }}>Toby Crowther</strong> · Shore School · HSC Software Design & Development 2026
+              Built by <strong style={{ color: 'var(--text-primary)' }}>Toby Crowther</strong> · Millpond High School · HSC Software Design & Development 2026
             </div>
           </div>
         </Reveal>

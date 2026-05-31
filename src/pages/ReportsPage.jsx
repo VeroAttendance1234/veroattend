@@ -127,7 +127,7 @@ export default function ReportsPage({ onClose, students }) {
     toast.info('Print dialog opened');
   }
   function handleEmail() {
-    toast.info('Email report scheduled', 'Will deliver to admin@shore.nsw.edu.au');
+    toast.info('Email report scheduled', 'Will deliver to admin@millpond.nsw.edu.au');
   }
 
   return (

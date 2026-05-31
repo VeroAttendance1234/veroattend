@@ -8,8 +8,9 @@ import Badge from '../components/Badge';
 import Avatar from '../components/Avatar';
 import MessagingPanel from '../components/MessagingPanel';
 import Reveal from '../components/Reveal';
+import { AttendanceJourney, AcademicResults } from '../components/AcademicInsights';
 import { MessageSquare } from 'lucide-react';
-import { timetable, periods, goals as initialGoals, journalEntries as initialJournal } from '../data/sampleData';
+import { timetable, periods, goals as initialGoals, journalEntries as initialJournal, demoStudent } from '../data/sampleData';
 
 const MOODS = [
   { emoji: '😔', label: 'Struggling', value: 0 },
@@ -48,7 +49,7 @@ function currentPeriodIndex() {
 }
 
 export default function StudentDashboard({ students, threads = [], onSendMessage }) {
-  const student = students.find(s => s.id === 'S001') || students[0];
+  const student = students.find(s => s.id === demoStudent.id) || demoStudent;
   const today = todayKey();
   const currentPeriod = currentPeriodIndex();
 
@@ -142,6 +143,14 @@ export default function StudentDashboard({ students, threads = [], onSendMessage
           </div>
         )}
       </div>
+
+      {/* ── 6-year attendance + academic results ── */}
+      <Reveal>
+        <AttendanceJourney name={student?.name} />
+      </Reveal>
+      <Reveal>
+        <AcademicResults name={student?.name} />
+      </Reveal>
 
       {/* ── Timetable + Check-in ───────────────── */}
       <div className="grid-2" style={{ marginBottom: 20 }}>

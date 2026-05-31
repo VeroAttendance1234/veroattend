@@ -5,12 +5,13 @@ import Sparkline, { seedHistory } from './Sparkline';
 import { CreditCard, Clock } from 'lucide-react';
 
 export default function LiveFeed({ taps }) {
-  const topRef = useRef(null);
+  const listRef = useRef(null);
 
+  // Keep the newest tap visible by scrolling THIS panel only — never the
+  // page. (Previously used scrollIntoView, which yanked the whole window
+  // down to the scan feed on every card tap.)
   useEffect(() => {
-    if (topRef.current) {
-      topRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   }, [taps.length]);
 
   if (taps.length === 0) {
@@ -42,7 +43,7 @@ export default function LiveFeed({ taps }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 7, maxHeight: 340, overflowY: 'auto', paddingRight: 2 }}>
+    <div ref={listRef} style={{ display: 'flex', flexDirection: 'column', gap: 7, maxHeight: 340, overflowY: 'auto', paddingRight: 2 }}>
       <style>{`
         @media (min-width: 540px) {
           .livefeed-spark { display: flex !important; }
@@ -51,7 +52,6 @@ export default function LiveFeed({ taps }) {
       {taps.map((tap, i) => (
         <div
           key={tap.id}
-          ref={i === 0 ? topRef : null}
           style={{
             display: 'flex',
             alignItems: 'center',

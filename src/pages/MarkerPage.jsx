@@ -1302,7 +1302,7 @@ export default function MarkerPage({ onClose, setRole }) {
                     Toby Crowther
                   </div>
                   <div style={{ fontSize: '0.86rem', color: 'var(--text-muted)' }}>
-                    Shore School · HSC SDD 2026
+                    Millpond High School · HSC SDD 2026
                   </div>
                 </div>
               </div>

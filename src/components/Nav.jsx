@@ -21,7 +21,7 @@ const PAGE_TITLES = {
   Parent:  { title: 'Parent View',        sub: "Your child's attendance & progress" },
 };
 
-export default function Nav({ role, setRole, piConnected, onMarker, onReports, onLogout, onCommandPalette }) {
+export default function Nav({ role, setRole, piConnected, readerConnected, onMarker, onReports, onLogout, onCommandPalette }) {
   const [imgErr, setImgErr]     = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
@@ -30,6 +30,19 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
   const isMobile = useIsMobile();
   const meta = ROLE_META[role];
   const page = PAGE_TITLES[role];
+
+  /* Honest hardware status for the header pill:
+       'live'      → Pi reachable AND ACR122U confirmed present → green
+       'no-reader' → Pi reachable but reader missing/offline    → amber
+       'sim'       → no Pi at all (e.g. the deployed demo build) → grey
+     The pill is ONLY green when the whole VERO system is genuinely up. */
+  const systemLive = piConnected && readerConnected;
+  const sysStatus  = systemLive ? 'live' : piConnected ? 'no-reader' : 'sim';
+  const SYS = {
+    live:        { label: 'VERO system', long: 'VERO system · live',          color: 'var(--green)',      bg: 'var(--green-light)',     border: 'var(--green-border)', online: true  },
+    'no-reader': { label: 'No reader',   long: 'Pi online · reader offline',  color: 'var(--amber)',      bg: 'var(--amber-light)',     border: 'var(--amber-border)', online: false },
+    sim:         { label: 'Simulator',   long: 'Simulator mode',              color: 'var(--text-muted)', bg: 'rgba(90,122,146,0.09)',  border: 'var(--border)',       online: false },
+  }[sysStatus];
 
   /* Live wall clock — re-renders every 30 s so seconds aren't burnt
      into the layout but the minute always reads current. */
@@ -130,20 +143,20 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
 
             {/* Pi status pill · desktop only */}
             {!isMobile && (
-              <div style={{
+              <div title={SYS.long} style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 padding: '3px 9px 3px 7px',
                 borderRadius: 99,
                 fontSize: '0.7rem', fontWeight: 700,
-                background: piConnected ? 'var(--green-light)' : 'rgba(90,122,146,0.09)',
-                color: piConnected ? 'var(--green)' : 'var(--text-muted)',
-                border: `1px solid ${piConnected ? 'var(--green-border)' : 'var(--border)'}`,
+                background: SYS.bg,
+                color: SYS.color,
+                border: `1px solid ${SYS.border}`,
               }}>
-                {piConnected
+                {SYS.online
                   ? <Wifi size={11} strokeWidth={2.5} />
                   : <WifiOff size={11} strokeWidth={2.5} />
                 }
-                {piConnected ? 'Live' : 'Sim'}
+                {SYS.label}
               </div>
             )}
           </div>
@@ -275,9 +288,9 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
                 }}>
                   <span style={{
                     width: 6, height: 6, borderRadius: '50%',
-                    background: piConnected ? 'var(--green)' : 'var(--text-soft)',
-                    boxShadow: piConnected ? '0 0 0 0 rgba(34,197,94,0.55)' : 'none',
-                    animation: piConnected ? 'navHeartbeat 1.8s ease-out infinite' : 'none',
+                    background: systemLive ? 'var(--green)' : sysStatus === 'no-reader' ? 'var(--amber)' : 'var(--text-soft)',
+                    boxShadow: systemLive ? '0 0 0 0 rgba(34,197,94,0.55)' : 'none',
+                    animation: systemLive ? 'navHeartbeat 1.8s ease-out infinite' : 'none',
                   }} />
                   {timeStr}
                 </div>
@@ -671,16 +684,16 @@ export default function Nav({ role, setRole, piConnected, onMarker, onReports, o
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 7,
                 padding: '8px 12px',
-                background: piConnected ? 'var(--green-light)' : 'var(--surface)',
-                border: `1px solid ${piConnected ? 'var(--green-border)' : 'var(--border)'}`,
+                background: SYS.bg,
+                border: `1px solid ${SYS.border}`,
                 borderRadius: 10,
                 marginBottom: 10,
               }}>
-                {piConnected
-                  ? <Wifi size={13} strokeWidth={2.5} style={{ color: 'var(--green)' }} />
-                  : <WifiOff size={13} strokeWidth={2.5} style={{ color: 'var(--text-muted)' }} />}
-                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: piConnected ? 'var(--green)' : 'var(--text-muted)' }}>
-                  {piConnected ? 'Pi connected · Live mode' : 'Simulator mode'}
+                {SYS.online
+                  ? <Wifi size={13} strokeWidth={2.5} style={{ color: SYS.color }} />
+                  : <WifiOff size={13} strokeWidth={2.5} style={{ color: SYS.color }} />}
+                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: SYS.color }}>
+                  {SYS.long}
                 </span>
               </div>
               {onLogout && (

@@ -7,6 +7,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'veroattend-secret'
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
+# Whether the ACR122U reader is *actually* present right now. This is the
+# source of truth for the UI's "VERO system" pill — the Flask server being
+# reachable does NOT mean the reader works, so we track it separately.
+reader_connected = False
+
 # ---------------------------------------------------------------
 # Called by rfid_reader.py when a physical card is tapped
 # ---------------------------------------------------------------
@@ -18,6 +23,16 @@ def on_card_tap(uid):
         print(f"[app] Tap logged: {student['name']} ({uid})")
     else:
         print(f"[app] Unknown card: {uid}")
+
+
+# ---------------------------------------------------------------
+# Called by rfid_reader.py whenever the reader appears/disappears
+# ---------------------------------------------------------------
+def on_reader_status(connected):
+    global reader_connected
+    reader_connected = bool(connected)
+    socketio.emit('reader_status', {'connected': reader_connected})
+    print(f"[app] ACR122U reader {'CONNECTED' if reader_connected else 'OFFLINE'}")
 
 
 # ---------------------------------------------------------------
@@ -46,6 +61,9 @@ def route_simulate(uid):
 @socketio.on('connect')
 def handle_connect():
     print('[ws] Client connected')
+    # Tell the freshly-connected page the current reader state right away,
+    # so it doesn't have to wait for the next status change.
+    emit('reader_status', {'connected': reader_connected})
 
 
 @socketio.on('disconnect')
@@ -59,7 +77,11 @@ def handle_disconnect():
 def start_rfid_thread():
     try:
         from rfid_reader import start_reader
-        t = threading.Thread(target=start_reader, args=(on_card_tap,), daemon=True)
+        t = threading.Thread(
+            target=start_reader,
+            args=(on_card_tap, on_reader_status),
+            daemon=True,
+        )
         t.start()
         print('[app] RFID reader thread started')
     except Exception as e:

@@ -77,15 +77,15 @@ function LiveActivityTicker() {
 }
 
 const ROLE_OPTIONS = [
-  { role: 'Admin',   label: 'Administrator',   email: 'admin@shore.nsw.edu.au',     colour: '#14B8B8', icon: Monitor },
-  { role: 'Teacher', label: 'Mr David Chen',   email: 'd.chen@shore.nsw.edu.au',    colour: '#2563EB', icon: BookOpen },
-  { role: 'Student', label: 'Toby Crowther',   email: 'tc.160138@student.shore.nsw.edu.au', colour: '#16A34A', icon: Heart },
-  { role: 'Parent',  label: 'J. Crowther',     email: 'jcrowther@parents.shore.nsw',        colour: '#7C3AED', icon: Users },
+  { role: 'Admin',   label: 'Administrator',   email: 'admin@millpond.nsw.edu.au',     colour: '#14B8B8', icon: Monitor },
+  { role: 'Teacher', label: 'Mr David Chen',   email: 'd.chen@millpond.nsw.edu.au',    colour: '#2563EB', icon: BookOpen },
+  { role: 'Student', label: 'Toby Crowther',   email: 'tc.160138@student.millpond.nsw.edu.au', colour: '#16A34A', icon: Heart },
+  { role: 'Parent',  label: 'J. Crowther',     email: 'jcrowther@parents.millpond.nsw',        colour: '#7C3AED', icon: Users },
 ];
 
 export default function LoginPage({ onLogin }) {
   const [selectedRole, setSelectedRole]   = useState('Admin');
-  const [email, setEmail]                 = useState('admin@shore.nsw.edu.au');
+  const [email, setEmail]                 = useState('admin@millpond.nsw.edu.au');
   const [password, setPassword]           = useState('demo1234');
   const [showPassword, setShowPassword]   = useState(false);
   const [scanning, setScanning]           = useState(false);

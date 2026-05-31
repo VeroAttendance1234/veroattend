@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Evidence of Creativity — Physical Enclosure Sketch Development</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --purple:      #7C5CFC;
+    --purple-dark: #5B3FD6;
+    --purple-pale: #EFEAFF;
+    --ink:         #1A1A1A;
+    --ink-soft:    #4A4A4A;
+    --ink-muted:   #7A7A8A;
+    --rule:        #E4E2EE;
+    --surface:     #F7F6FB;
+    --paper:       #FBFAF4;
+    --navy:        #2A2740;
+    --navy-2:      #3A3760;
+    --green:       #1C7A4F;
+    --green-bg:    #E1F5EA;
+    --amber:       #92530A;
+    --amber-bg:    #FEF3DC;
+    --red:         #B23B3B;
+    --red-bg:      #FBE7E7;
+    --eval-bg:     #F0EFF8;
+  }
+
+  html, body {
+    height: 100%;
+    background: #8A8A94;
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body { display: flex; align-items: center; justify-content: center; padding: 24px; }
+
+  /* ── Page ── */
+  .page {
+    width: 297mm;
+    height: 210mm;
+    background: #fff;
+    border: 8px solid var(--purple);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.32);
+    overflow: hidden;
+    position: relative;
+  }
+  .page::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--purple) 0%, #B49DFF 100%);
+    z-index: 2;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 16px 26px 12px;
+    border-bottom: 1.5px solid var(--rule);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+  .title { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+  .outcome { margin-top: 4px; font-size: 9.5px; color: var(--ink-muted); font-style: italic; }
+  .section-badge {
+    background: var(--purple); color: #fff;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+    padding: 5px 12px; border-radius: 6px; white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* ── Body ── */
+  .body {
+    flex: 1;
+    padding: 14px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .col-label {
+    font-size: 8px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--purple); display: flex; align-items: center; gap: 7px; margin-bottom: 9px;
+  }
+  .col-label::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+  .mono {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8px; background: #F1EDFF; color: var(--purple-dark);
+    padding: 0 3px; border-radius: 3px;
+  }
+
+  /* ── Iteration journey (hero) ── */
+  .journey { flex-shrink: 0; }
+  .iterations {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+    align-items: stretch;
+    gap: 0;
+  }
+  .iter {
+    background: var(--surface);
+    border: 1.5px solid var(--rule);
+    border-radius: 9px;
+    padding: 9px 10px 10px;
+    display: flex;
+    flex-direction: column;
+  }
+  .iter.final {
+    background: var(--purple-pale);
+    border-color: #C4B5FD;
+  }
+  .iter-head { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; }
+  .iter-tag {
+    font-size: 7px; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--navy); color: #fff; padding: 2px 7px; border-radius: 10px;
+  }
+  .iter.final .iter-tag { background: var(--purple); }
+  .iter-name { font-size: 9.5px; font-weight: 800; color: var(--ink); }
+  /* sketch placeholder — paper feel */
+  .sketch {
+    height: 78px;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 11px, rgba(124,92,252,0.06) 11px, rgba(124,92,252,0.06) 12px),
+      var(--paper);
+    border: 1.5px dashed #CFC9DE;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    padding: 6px; margin-bottom: 8px;
+  }
+  .sketch .hint { font-size: 7.5px; line-height: 1.4; color: var(--ink-muted); font-weight: 600; }
+  .sketch .pencil { font-size: 14px; display: block; margin-bottom: 3px; opacity: 0.6; }
+  .iter-note { font-size: 8px; line-height: 1.45; color: var(--ink-soft); }
+  .iter-note strong { color: var(--ink); font-weight: 800; }
+  .iter-fix {
+    margin-top: 5px; font-size: 7.5px; line-height: 1.4;
+    padding-left: 8px; position: relative; color: var(--ink-muted);
+  }
+  .iter-fix::before {
+    content: ""; position: absolute; left: 0; top: 4px;
+    width: 3px; height: 3px; border-radius: 50%; background: var(--red);
+  }
+  .iter.final .iter-fix::before { background: var(--green); }
+  .iter-arrow {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--purple); font-size: 16px; font-weight: 800; opacity: 0.55;
+    padding: 0 4px;
+  }
+
+  /* ── Lower split: drivers + materials ── */
+  .lower {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.45fr 1fr;
+    gap: 22px;
+    min-height: 0;
+  }
+
+  /* design drivers */
+  .drivers {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .driver {
+    background: #fff; border: 1.5px solid var(--rule); border-radius: 7px;
+    padding: 8px 9px;
+  }
+  .driver-top { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+  .driver-icon { font-size: 13px; }
+  .driver-name { font-size: 8.5px; font-weight: 800; color: var(--ink); }
+  .driver-desc { font-size: 7.5px; line-height: 1.4; color: var(--ink-soft); }
+
+  /* materials — dark panel */
+  .materials {
+    background: var(--navy);
+    border-radius: 9px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .materials::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 13px 13px; pointer-events: none;
+  }
+  .mat-label {
+    font-size: 8px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45); margin-bottom: 10px; position: relative; z-index: 1;
+  }
+  .mat-row {
+    display: grid; grid-template-columns: 1fr auto; gap: 2px 8px;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+    position: relative; z-index: 1;
+  }
+  .mat-row:last-child { border-bottom: none; }
+  .mat-name { font-size: 9px; font-weight: 800; color: #fff; }
+  .mat-badge {
+    font-size: 6.5px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 9px; align-self: start; white-space: nowrap;
+  }
+  .mat-badge.chosen { background: var(--green-bg); color: var(--green); }
+  .mat-badge.proto  { background: #DBEAFE; color: #1E40AF; }
+  .mat-badge.defer  { background: var(--amber-bg); color: var(--amber); }
+  .mat-desc {
+    grid-column: 1 / 3; font-size: 7.5px; line-height: 1.45;
+    color: rgba(255,255,255,0.62);
+  }
+
+  /* ── Evaluation footer ── */
+  .evaluation {
+    border-top: 1.5px solid var(--rule);
+    background: var(--eval-bg);
+    padding: 9px 26px 11px;
+    display: flex; align-items: baseline; gap: 14px;
+    flex-shrink: 0;
+  }
+  .eval-title {
+    font-size: 7.5px; font-weight: 900; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--purple); white-space: nowrap; flex-shrink: 0;
+  }
+  .eval-body { font-size: 9px; line-height: 1.5; color: var(--ink-soft); }
+
+  @media print {
+    html, body { background: #fff; }
+    body { padding: 0; }
+    .page { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1 class="title">Evidence of Creativity &mdash; Physical Enclosure Sketch Development</h1>
+      <p class="outcome">Demonstrates the substantial application of creativity in the development of the MDP</p>
+    </div>
+    <div class="section-badge">3.X.X</div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- Iteration journey -->
+    <div class="journey">
+      <div class="col-label">Design iteration journey &mdash; concept to refined dock</div>
+      <div class="iterations">
+
+        <div class="iter">
+          <div class="iter-head"><span class="iter-tag">Concept A</span><span class="iter-name">Flat tray</span></div>
+          <div class="sketch"><div class="hint"><span class="pencil">✏️</span>Paste sketch A<br/>(open tray layout)</div></div>
+          <div class="iter-note"><strong>First idea</strong> — Pi and reader sat openly on a laser-cut base for easy wiring access.</div>
+          <div class="iter-fix">Reader slid on each tap, wiring exposed, no clear tap target.</div>
+        </div>
+
+        <div class="iter-arrow">→</div>
+
+        <div class="iter">
+          <div class="iter-head"><span class="iter-tag">Concept B</span><span class="iter-name">Angled stand</span></div>
+          <div class="sketch"><div class="hint"><span class="pencil">✏️</span>Paste sketch B<br/>(angled reader face)</div></div>
+          <div class="iter-note"><strong>Raised the reader</strong> on a 15&deg; face with a printed target ring for a natural tap.</div>
+          <div class="iter-fix">The Raspberry Pi still sat exposed beneath the stand.</div>
+        </div>
+
+        <div class="iter-arrow">→</div>
+
+        <div class="iter">
+          <div class="iter-head"><span class="iter-tag">Concept C</span><span class="iter-name">Enclosed dock</span></div>
+          <div class="sketch"><div class="hint"><span class="pencil">✏️</span>Paste sketch C<br/>(boxed enclosure)</div></div>
+          <div class="iter-note"><strong>Sealed the Pi</strong> inside a box with side vents and a single rear cable port.</div>
+          <div class="iter-fix">The status LED was now hidden inside the case.</div>
+        </div>
+
+        <div class="iter-arrow">→</div>
+
+        <div class="iter final">
+          <div class="iter-head"><span class="iter-tag">Final</span><span class="iter-name">Refined dock</span></div>
+          <div class="sketch"><div class="hint"><span class="pencil">✏️</span>Paste final sketch<br/>(refined dock)</div></div>
+          <div class="iter-note"><strong>Added a light pipe</strong> for the LED, rounded edges, a snap-fit lid and a branded tap zone.</div>
+          <div class="iter-fix">Resolves every issue raised by the earlier concepts.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Lower: drivers + materials -->
+    <div class="lower">
+
+      <div>
+        <div class="col-label">Design drivers &mdash; the creative constraints that shaped each iteration</div>
+        <div class="drivers">
+          <div class="driver">
+            <div class="driver-top"><span class="driver-icon">🎯</span><span class="driver-name">Tap ergonomics</span></div>
+            <div class="driver-desc">Reader angled and raised so the tap target is intuitive and comfortable to reach.</div>
+          </div>
+          <div class="driver">
+            <div class="driver-top"><span class="driver-icon">🌬️</span><span class="driver-name">Thermal venting</span></div>
+            <div class="driver-desc">Side slots keep the Pi 3B cool across a full school day of use.</div>
+          </div>
+          <div class="driver">
+            <div class="driver-top"><span class="driver-icon">🔌</span><span class="driver-name">Cable routing</span></div>
+            <div class="driver-desc">Power and USB hidden internally, exiting through one tidy rear port.</div>
+          </div>
+          <div class="driver">
+            <div class="driver-top"><span class="driver-icon">💡</span><span class="driver-name">Feedback visibility</span></div>
+            <div class="driver-desc">A light pipe carries the "tap accepted" LED up to the top surface.</div>
+          </div>
+          <div class="driver">
+            <div class="driver-top"><span class="driver-icon">🛡️</span><span class="driver-name">Student durability</span></div>
+            <div class="driver-desc">Thick walls and rounded corners survive daily handling by students.</div>
+          </div>
+          <div class="driver">
+            <div class="driver-top"><span class="driver-icon">🎨</span><span class="driver-name">Visual identity</span></div>
+            <div class="driver-desc">A circular tap zone carries the school crest as a branded focal point.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="materials">
+        <div class="mat-label">Materials explored</div>
+        <div class="mat-row">
+          <span class="mat-name">Cardboard mockup</span>
+          <span class="mat-badge proto">Prototype</span>
+          <div class="mat-desc">Built first — free and fast. Validated tap height and footprint in minutes before any digital modelling.</div>
+        </div>
+        <div class="mat-row">
+          <span class="mat-name">3D-printed PLA</span>
+          <span class="mat-badge chosen">Chosen</span>
+          <div class="mat-desc">Cheap and highly iterable — lets me print custom vent slots and the internal light-pipe channel.</div>
+        </div>
+        <div class="mat-row">
+          <span class="mat-name">Laser-cut acrylic</span>
+          <span class="mat-badge defer">Deferred</span>
+          <div class="mat-desc">Premium finish, but curved surfaces and the light pipe are difficult to form from flat sheet.</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Evaluation footer -->
+  <div class="evaluation">
+    <div class="eval-title">Ongoing Evaluation</div>
+    <p class="eval-body">
+      Sketching the enclosure on paper let me explore its form and ergonomics for free before committing filament to a 3D print. Each iteration deliberately solved a problem the previous one exposed — a sliding reader, then exposed wiring, then a hidden status LED — so the final dock is the product of refinement rather than a first guess. The next step is to model the refined dock in Fusion 360 and print a test fit to confirm vent placement and light-pipe alignment.
+    </p>
+  </div>
+
+</main>
+</body>
+</html>

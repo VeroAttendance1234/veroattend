@@ -530,24 +530,58 @@ export default function VeroExplodedView({
   interactive = true,
 }) {
   if (!hasWebGL()) {
+    // Static, accessible breakdown — renders anywhere (no WebGL, no image asset).
+    // Mirrors the layers in the 3D model so markers always see the hardware design.
+    const layers = [
+      { name: 'VERO enclosure',   sub: '3D-printed PETG shell',        dot: TEAL },
+      { name: 'NFC antenna coil', sub: '13.56 MHz · ISO 14443A',       dot: COPPER },
+      { name: 'ACR122U reader',   sub: 'USB NFC controller · PN532',   dot: '#1f2937' },
+      { name: 'Raspberry Pi 3B',  sub: 'Flask-SocketIO + pyscard',     dot: PCB_GREEN },
+      { name: 'Base plate',       sub: 'Cable routing · wall mount',   dot: '#9aa6ad' },
+    ];
     return (
-      <div className={className} style={{
-        width: '100%', height, borderRadius: 18,
-        background: 'linear-gradient(135deg, #f8fafa 0%, #eef3f3 100%)',
-        border: '1px dashed var(--border)',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        gap: 8, padding: 24, textAlign: 'center',
-      }}>
+      <div
+        className={className}
+        role="img"
+        aria-label="VERO hardware breakdown, top to bottom: 3D-printed enclosure, NFC antenna coil, ACR122U reader board, Raspberry Pi 3B, and base plate."
+        style={{
+          width: '100%', height, borderRadius: 18,
+          background: 'linear-gradient(135deg, #f8fafa 0%, #eef3f3 100%)',
+          border: '1px solid var(--border)',
+          display: 'flex', flexDirection: 'column',
+          gap: 12, padding: 24, overflow: 'auto',
+        }}
+      >
         <div style={{
           fontFamily: 'Bricolage Grotesque, sans-serif',
           fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)',
         }}>
-          Exploded view unavailable
+          Inside the VERO enclosure
         </div>
-        <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', maxWidth: 320 }}>
-          WebGL is disabled in this browser. Enable hardware acceleration in
-          settings, or try a different browser to see the live 3D breakdown.
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {layers.map((l, i) => (
+            <div key={l.name} style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              padding: '10px 14px', borderRadius: 12,
+              background: 'var(--surface-card, #fff)',
+              border: '1px solid var(--border)',
+            }}>
+              <span aria-hidden="true" style={{
+                width: 26, height: 26, borderRadius: 7, flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: `${l.dot}1a`, color: l.dot,
+                border: `1.5px solid ${l.dot}40`,
+                fontWeight: 800, fontSize: '0.78rem',
+              }}>{i + 1}</span>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--text-primary)' }}>{l.name}</div>
+                <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>{l.sub}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 'auto' }}>
+          Static view — the interactive 3D model needs WebGL / hardware acceleration.
         </div>
       </div>
     );

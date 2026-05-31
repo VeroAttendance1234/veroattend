@@ -37,7 +37,16 @@ function generateStudents() {
 
 const _raw = generateStudents();
 
-// Override first students in key classes with real RFID card UIDs
+// ─── Canonical demo identity ──────────────────────────────────
+// The Student tab is viewed AS Toby; the Parent tab AS Toby's guardian.
+// Dashboards resolve this id (never students[0]) so the viewer is always Toby.
+export const DEMO_STUDENT_ID = 'S001';
+export const demoStudent = {
+  id: 'S001', name: 'Toby Crowther', year: 12, class: '12A', house: 'Dixon',
+  email: 'tc.160138@student.millpond.nsw.edu.au', uid: '67BDE33D', present: false,
+};
+
+// Stamp real RFID card UIDs onto real class rosters for the live Marker demo.
 function overrideStudent(students, classCode, position, overrides) {
   const classStudents = students.filter(s => s.class === classCode);
   if (classStudents[position]) {
@@ -46,12 +55,51 @@ function overrideStudent(students, classCode, position, overrides) {
   }
 }
 
-overrideStudent(_raw, '11A', 0, { id: 'S001', name: 'Toby Crowther',   year: 12, class: '12A', house: 'Dixon', email: 'tc.160138@student.shore.nsw.edu.au', uid: '67BDE33D', present: false });
+// Order matters: place the 12A students BEFORE moving Toby into 12A, or the
+// class filter re-matches Toby (now in 12A, earlier in the array) and overwrites
+// his identity. Toby is stamped LAST so nothing can clobber him.
 overrideStudent(_raw, '11B', 0, { id: 'S002', name: 'Liam Chen',       uid: 'A139E43D', present: false });
 overrideStudent(_raw, '12A', 0, { id: 'S003', name: 'Sofia Nguyen',    uid: 'C92BE43D', present: true  });
 overrideStudent(_raw, '12A', 1, { id: 'S004', name: 'Marcus Williams', uid: '1CC9E33D', present: false });
+overrideStudent(_raw, '11A', 0, { ...demoStudent });
+
+// Foolproof: guarantee S001 = Toby exists even if generation/order ever changes.
+if (!_raw.some(s => s.id === DEMO_STUDENT_ID)) {
+  Object.assign(_raw[0], demoStudent);
+}
 
 export const students = _raw;
+
+// ─── Toby Crowther · 6-year record (Year 7 → Year 12) ─────────
+// Drives the attendance journey + grades cards on the Student/Parent tabs.
+export const studentYears = [
+  { year: 'Year 7',  level: 7,  attendance: 97.4, present: 187, absent: 4,  late: 5, average: 79 },
+  { year: 'Year 8',  level: 8,  attendance: 96.1, present: 184, absent: 7,  late: 6, average: 81 },
+  { year: 'Year 9',  level: 9,  attendance: 93.8, present: 180, absent: 12, late: 9, average: 80 },
+  { year: 'Year 10', level: 10, attendance: 95.2, present: 183, absent: 9,  late: 7, average: 84 },
+  { year: 'Year 11', level: 11, attendance: 94.6, present: 181, absent: 10, late: 8, average: 85 },
+  { year: 'Year 12', level: 12, attendance: 96.9, present: 186, absent: 5,  late: 3, average: 88 },
+];
+
+// Term-by-term attendance across all six years (deterministic, ~24 points)
+export const studentAttendanceByTerm = studentYears.flatMap(y =>
+  [1, 2, 3, 4].map(t => ({
+    period: `Y${y.level} T${t}`,
+    year: y.year,
+    term: `Term ${t}`,
+    rate: Math.round((y.attendance + ((t * 7 + y.level * 3) % 5) - 2) * 10) / 10,
+  }))
+);
+
+// Current Year 12 HSC course results
+export const studentGrades = [
+  { subject: 'Software Design & Development', mark: 91, grade: 'A', band: 'Band 6', trend: 4,  teacher: 'Mr D. Chen'     },
+  { subject: 'Mathematics Advanced',         mark: 88, grade: 'A', band: 'Band 6', trend: 2,  teacher: 'Ms L. Patel'    },
+  { subject: 'Mathematics Extension 1',      mark: 82, grade: 'A', band: 'E3',     trend: 5,  teacher: 'Ms L. Patel'    },
+  { subject: 'Physics',                      mark: 79, grade: 'B', band: 'Band 5', trend: 3,  teacher: 'Dr A. Nguyen'   },
+  { subject: 'English Advanced',             mark: 74, grade: 'B', band: 'Band 4', trend: -1, teacher: 'Ms E. Richards' },
+  { subject: 'Design & Technology',          mark: 94, grade: 'A', band: 'Band 6', trend: 6,  teacher: 'Mr S. Hill'     },
+];
 
 // ─── Teachers ─────────────────────────────────────────────────
 export const teachers = [

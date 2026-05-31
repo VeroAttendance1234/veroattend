@@ -17,14 +17,21 @@ import './styles/global.css';
 
 /* ───────────────────────────────────────────────
    Hardware integration:
-   We only ATTEMPT to connect to the Pi when running locally.
-   The actual `Live` / `Sim` pill reflects whether the
-   WebSocket handshake succeeded, not just where the app is hosted.
+   We only ATTEMPT to connect to the Pi when running locally. The deployed
+   Vercel build stays in Simulator mode on purpose — it can't reach a
+   .local address, and an https page can't talk to an http Pi anyway.
+
+   PI_URL points at the Raspberry Pi's Flask-SocketIO server. Override it
+   WITHOUT editing code by creating a `.env` file with a VITE_PI_URL line:
+       VITE_PI_URL=http://veroattendance.local:5000   ← Pi on the network (default)
+       VITE_PI_URL=http://localhost:5000              ← backend running on this Mac
+   Restart `npm run dev` after changing .env. The "VERO system" pill
+   reflects the real handshake + reader status, not where the app is hosted.
 ─────────────────────────────────────────────── */
 const IS_LOCAL = typeof window !== 'undefined'
   && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.endsWith('.local'));
 
-const PI_URL = 'http://localhost:5000';
+const PI_URL = import.meta.env.VITE_PI_URL || 'http://veroattendance.local:5000';
 
 /* ── Admin onboarding tour ────────────────── */
 const ADMIN_TOUR_STEPS = [
@@ -110,6 +117,16 @@ function AppInner() {
      the auto-tap simulator below can reference it without a TDZ error. */
   const [piConnected, setPiConnected] = useState(false);
 
+  /* Whether the ACR122U reader itself is actually present, as reported
+     by the Pi over the `reader_status` event. The Flask server being
+     reachable (piConnected) does NOT mean the reader works — so the
+     "VERO system" pill only goes green when BOTH are true. */
+  const [readerConnected, setReaderConnected] = useState(false);
+
+  /* The only state that should ever show as "live": the Pi is reachable
+     AND its ACR122U reader is confirmed present. */
+  const systemLive = piConnected && readerConnected;
+
   /* ⌘K / Ctrl-K opens the command palette */
   useCommandPaletteHotkey(cmdkOpen, setCmdkOpen);
 
@@ -117,7 +134,7 @@ function AppInner() {
      so the live feed and dashboards never look frozen. Pauses while
      the marker page is open so it doesn't fight the welcome demo. */
   useEffect(() => {
-    if (!authedRole || piConnected) return; // real Pi takes over when live
+    if (!authedRole || systemLive) return; // real reader takes over only when actually live
     let cancelled = false;
     function scheduleNext() {
       const delay = 12_000 + Math.random() * 10_000;
@@ -135,7 +152,7 @@ function AppInner() {
     const cleanup = scheduleNext();
     return () => { cancelled = true; cleanup?.(); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authedRole, piConnected]);
+  }, [authedRole, systemLive]);
 
   // ── Shared cross-role state ────────────
   const [absenceRequests, setAbsenceRequests] = useState(initialAbsenceRequests);
@@ -201,13 +218,28 @@ function AppInner() {
 
       socket.on('connect', () => {
         setPiConnected(true);
-        toast.success('Raspberry Pi connected', 'ACR122U reader is live.');
+        // Honest: reaching the Pi does NOT mean the reader works. We wait
+        // for `reader_status` before claiming the ACR122U is live.
+        toast.success('Pi reachable', 'Checking for ACR122U reader…');
       });
       socket.on('disconnect', () => {
         setPiConnected(false);
-        toast.warn('Pi disconnected', 'Reconnecting...');
+        setReaderConnected(false); // can't trust the reader once the Pi is gone
+        toast.warn('Pi disconnected', 'Reconnecting…');
       });
-      socket.on('connect_error', () => setPiConnected(false));
+      socket.on('connect_error', () => {
+        setPiConnected(false);
+        setReaderConnected(false);
+      });
+      // The Pi tells us whether the ACR122U is actually plugged in & working.
+      socket.on('reader_status', (s) => {
+        const connected = !!s?.connected;
+        setReaderConnected(prev => {
+          if (connected && !prev) toast.success('ACR122U reader live', 'Card taps will appear in real time.');
+          if (!connected && prev) toast.warn('Reader offline', 'Pi is online but no ACR122U detected.');
+          return connected;
+        });
+      });
       socket.on('card_tap',  (studentData) => handleTap(studentData));
     });
 
@@ -274,6 +306,7 @@ function AppInner() {
         role={role}
         setRole={setRole}
         piConnected={piConnected}
+        readerConnected={readerConnected}
         onMarker={() => { document.body.dataset.markerOpen = '1'; setShowMarker(true); }}
         onReports={() => setShowReports(true)}
         onLogout={() => setAuthedRole(null)}

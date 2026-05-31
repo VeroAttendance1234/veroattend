@@ -25,7 +25,7 @@ function generateProfile(s) {
   if (!s) return {};
   const slug = s.name.toLowerCase().replace(/\s+/g, '.');
   return {
-    email:   s.email || `${slug}@students.shore.nsw.edu.au`,
+    email:   s.email || `${slug}@students.millpond.nsw.edu.au`,
     phone:   `+61 ${400 + (s.id.charCodeAt(2) % 100)} ${100 + s.id.charCodeAt(3) % 900} ${100 + s.id.charCodeAt(4) % 900}`,
     address: `${100 + (s.id.charCodeAt(2) % 800)} Pacific Hwy, Sydney NSW`,
     joined:  '2024',
@@ -59,11 +59,11 @@ export default function StudentDetailModal({ student, open, onClose }) {
   const accent = student.present ? 'var(--green)' : 'var(--red)';
 
   // Derived contact targets for the footer action buttons
-  const parentEmail = `parent.${student.name.split(' ').slice(-1)[0].toLowerCase()}@families.shore.nsw.edu.au`;
+  const parentEmail = `parent.${student.name.split(' ').slice(-1)[0].toLowerCase()}@families.millpond.nsw.edu.au`;
   function emailStudent() {
     const subject = encodeURIComponent(`Re: attendance — ${student.name}`);
     const body = encodeURIComponent(
-      `Hi ${student.name.split(' ')[0]},\n\nJust touching base regarding today's attendance.\n\nKind regards,\nShore School`
+      `Hi ${student.name.split(' ')[0]},\n\nJust touching base regarding today's attendance.\n\nKind regards,\nMillpond High School`
     );
     window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
   }
@@ -72,9 +72,9 @@ export default function StudentDetailModal({ student, open, onClose }) {
       `Attendance update — ${student.name} (Year ${student.year} ${student.class})`
     );
     const body = encodeURIComponent(
-      `Hi,\n\nThis is a quick note from Shore School regarding ${student.name}.\n` +
+      `Hi,\n\nThis is a quick note from Millpond High School regarding ${student.name}.\n` +
       `Status today: ${student.present ? 'Checked in' : 'Not checked in'}\n` +
-      `Term average: ${avg}%\n\nPlease reply if you have any questions.\n\nShore School`
+      `Term average: ${avg}%\n\nPlease reply if you have any questions.\n\nMillpond High School`
     );
     window.location.href = `mailto:${parentEmail}?subject=${subject}&body=${body}`;
   }

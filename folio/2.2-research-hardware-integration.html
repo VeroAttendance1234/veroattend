@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>2.2 · Research &amp; Experimentation — Hardware Integration</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --purple:      #7C5CFC;
+    --purple-dark: #5B3FD6;
+    --purple-pale: #EFEAFF;
+    --ink:         #1A1A1A;
+    --ink-soft:    #4A4A4A;
+    --ink-muted:   #7A7A8A;
+    --rule:        #E4E2EE;
+    --surface:     #F7F6FB;
+    --navy:        #2A2740;
+    --navy-2:      #3A3760;
+    --teal:        #1B6B6B;
+    --teal-pale:   #E6F4F4;
+    --green:       #1C7A4F;
+    --green-bg:    #E1F5EA;
+    --amber:       #92530A;
+    --amber-bg:    #FEF3DC;
+    --eval-bg:     #F0EFF8;
+  }
+
+  html, body {
+    height: 100%;
+    background: #8A8A94;
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body { display: flex; align-items: center; justify-content: center; padding: 24px; }
+
+  /* ── Page ── */
+  .page {
+    width: 297mm;
+    height: 210mm;
+    background: #fff;
+    border: 8px solid var(--purple);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.32);
+    overflow: hidden;
+    position: relative;
+  }
+  .page::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--purple) 0%, #B49DFF 100%);
+    z-index: 2;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 16px 26px 12px;
+    border-bottom: 1.5px solid var(--rule);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+  .title { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+  .outcome { margin-top: 4px; font-size: 9.5px; color: var(--ink-muted); font-style: italic; }
+  .section-badge {
+    background: var(--purple); color: #fff;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+    padding: 5px 12px; border-radius: 6px; white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* ── 3-column body ── */
+  .body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr 1px 1fr;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .col-divider { background: var(--rule); }
+
+  /* ── Column shared ── */
+  .col { padding: 14px 18px; display: flex; flex-direction: column; gap: 11px; overflow: hidden; }
+
+  .col-label {
+    font-size: 7.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--purple); display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+  }
+  .col-label::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+
+  .body-text { font-size: 9px; line-height: 1.55; color: var(--ink-soft); }
+  .mono {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8px; background: #F1EDFF; color: var(--purple-dark);
+    padding: 0 3px; border-radius: 3px;
+  }
+
+  /* ── Col 1: Overview ── */
+  .hw-cards { display: flex; flex-direction: column; gap: 7px; flex: 1; }
+  .hw-card {
+    background: var(--surface); border: 1.5px solid var(--rule); border-radius: 7px;
+    padding: 8px 10px; display: flex; gap: 9px; align-items: flex-start;
+  }
+  .hw-icon {
+    font-size: 18px; flex-shrink: 0; width: 28px; text-align: center; line-height: 1;
+  }
+  .hw-name { font-size: 9.5px; font-weight: 800; color: var(--ink); margin-bottom: 2px; }
+  .hw-desc { font-size: 8.5px; line-height: 1.45; color: var(--ink-soft); }
+  .hw-spec {
+    margin-top: 4px; display: flex; flex-wrap: wrap; gap: 3px;
+  }
+  .spec-chip {
+    font-size: 7px; font-weight: 700; background: #fff; border: 1px solid var(--rule);
+    border-radius: 4px; padding: 1px 5px; color: var(--ink-muted);
+  }
+
+  /* ── Col 2: Signal path + problems ── */
+  .flow-wrap {
+    background: var(--surface); border: 1.5px solid var(--rule);
+    border-radius: 7px; padding: 10px 12px; flex-shrink: 0;
+  }
+  .flow-title {
+    font-size: 7.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-muted); margin-bottom: 8px;
+  }
+  .flow { display: flex; flex-direction: column; gap: 3px; }
+  .node {
+    display: flex; align-items: center; gap: 7px;
+    background: #fff; border: 1.5px solid var(--rule);
+    border-radius: 5px; padding: 4px 8px;
+  }
+  .node.accent { background: var(--purple-pale); border-color: #C4B5FD; }
+  .node-num {
+    font-size: 7px; font-weight: 900; color: var(--purple);
+    background: var(--purple-pale); width: 14px; height: 14px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .node.accent .node-num { background: var(--purple); color: #fff; }
+  .node-text { font-size: 8.5px; font-weight: 700; color: var(--ink); }
+  .node-sub { font-size: 7.5px; color: var(--ink-muted); margin-left: auto; }
+  .flow-arrow {
+    text-align: center; color: var(--rule); font-size: 8px; line-height: 1;
+    margin: 0 auto; letter-spacing: 0;
+  }
+
+  .probs { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .prob {
+    border: 1.5px solid var(--rule); border-radius: 6px;
+    padding: 7px 9px; display: grid;
+    grid-template-columns: auto 1fr auto; gap: 0 8px; align-items: start;
+  }
+  .prob-icon {
+    font-size: 12px; grid-row: 1 / 3; align-self: center;
+  }
+  .prob-title { font-size: 9px; font-weight: 800; color: var(--ink); line-height: 1.3; }
+  .prob-badge {
+    font-size: 6.5px; font-weight: 800; letter-spacing: 0.05em;
+    padding: 2px 6px; border-radius: 8px; text-transform: uppercase;
+    background: var(--green-bg); color: var(--green);
+    align-self: center; white-space: nowrap;
+  }
+  .prob-body { font-size: 8px; line-height: 1.45; color: var(--ink-soft); grid-column: 2 / 4; }
+
+  /* ── Col 3: Integration testing table ── */
+  .test-table {
+    width: 100%; border-collapse: collapse; flex: 1;
+    font-size: 8.5px;
+  }
+  .test-table thead tr {
+    background: var(--navy);
+  }
+  .test-table thead th {
+    color: rgba(255,255,255,0.85); font-size: 7.5px; font-weight: 800;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 6px 8px; text-align: left;
+  }
+  .test-table tbody tr { border-bottom: 1px solid var(--rule); }
+  .test-table tbody tr:last-child { border-bottom: none; }
+  .test-table td { padding: 7px 8px; vertical-align: top; line-height: 1.4; }
+  .td-comp { font-weight: 800; font-size: 8.5px; color: var(--ink); }
+  .td-purpose { font-size: 8px; color: var(--ink-soft); }
+  .td-outcome { font-size: 8px; color: var(--ink-soft); }
+  .outcome-badge {
+    font-size: 7px; font-weight: 800; letter-spacing: 0.04em;
+    padding: 1px 5px; border-radius: 4px; text-transform: uppercase;
+    display: inline-block; margin-bottom: 2px;
+  }
+  .pass  { background: var(--green-bg);  color: var(--green); }
+  .risk  { background: var(--amber-bg);  color: var(--amber); }
+  .defer { background: #EEF2FF; color: #3730A3; }
+
+  .rfid-note {
+    background: var(--navy); border-radius: 6px; padding: 10px 12px;
+    color: rgba(255,255,255,0.85); flex-shrink: 0;
+  }
+  .rfid-note-title {
+    font-size: 7.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); margin-bottom: 5px;
+  }
+  .rfid-cmd {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8px; color: #C4B5FD; letter-spacing: 0.04em;
+    line-height: 1.6;
+  }
+  .rfid-cmd span { color: rgba(255,255,255,0.45); }
+
+  /* ── Evaluation footer ── */
+  .evaluation {
+    border-top: 1.5px solid var(--rule);
+    background: var(--eval-bg);
+    padding: 9px 26px 11px;
+    display: flex; align-items: baseline; gap: 14px;
+    flex-shrink: 0;
+  }
+  .eval-title {
+    font-size: 7.5px; font-weight: 900; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--purple); white-space: nowrap; flex-shrink: 0;
+  }
+  .eval-body { font-size: 9px; line-height: 1.5; color: var(--ink-soft); }
+
+  @media print {
+    html, body { background: #fff; }
+    body { padding: 0; }
+    .page { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1 class="title">Research &amp; Experimentation &mdash; Raspberry Pi 3B and ACR122U Hardware Integration</h1>
+      <p class="outcome">Undertakes, evaluates and applies a range of appropriate research, experimentation and design solution testing in the development of the MDP</p>
+    </div>
+    <div class="section-badge">2.2.X</div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- Col 1: Hardware overview -->
+    <div class="col">
+      <div class="col-label">Hardware Overview</div>
+      <p class="body-text">
+        The system required a way to identify students physically. Two pieces of hardware were chosen: a Raspberry Pi 3B to host the software and an ACR122U NFC reader to capture card taps via USB.
+      </p>
+
+      <div class="hw-cards">
+        <div class="hw-card">
+          <div class="hw-icon">🖥️</div>
+          <div>
+            <div class="hw-name">Raspberry Pi 3B</div>
+            <div class="hw-desc">Acts as the on-site server — runs <span class="mono">rfid_reader.py</span>, the Flask backend, and the SQLite database locally. No external server needed.</div>
+            <div class="hw-spec">
+              <span class="spec-chip">1.2 GHz quad-core</span>
+              <span class="spec-chip">1 GB RAM</span>
+              <span class="spec-chip">Wi-Fi + USB</span>
+              <span class="spec-chip">Raspberry Pi OS 64-bit</span>
+            </div>
+          </div>
+        </div>
+        <div class="hw-card">
+          <div class="hw-icon">📡</div>
+          <div>
+            <div class="hw-name">ACR122U NFC Reader</div>
+            <div class="hw-desc">Reads 13.56 MHz ISO 14443 cards over USB. Exposes a standard PC/SC interface so no proprietary driver was needed — <span class="mono">pyscard</span> communicates via <span class="mono">pcscd</span>.</div>
+            <div class="hw-spec">
+              <span class="spec-chip">ISO 14443 A/B</span>
+              <span class="spec-chip">USB 2.0</span>
+              <span class="spec-chip">PC/SC compliant</span>
+            </div>
+          </div>
+        </div>
+        <div class="hw-card">
+          <div class="hw-icon">🪪</div>
+          <div>
+            <div class="hw-name">NFC Student Cards</div>
+            <div class="hw-desc">MIFARE Classic 1K cards. Each stores a unique UID which the reader returns in response to the APDU command. No data is written to the card.</div>
+            <div class="hw-spec">
+              <span class="spec-chip">MIFARE Classic 1K</span>
+              <span class="spec-chip">4-byte UID</span>
+              <span class="spec-chip">13.56 MHz</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-divider"></div>
+
+    <!-- Col 2: Signal path + problems -->
+    <div class="col">
+      <div class="col-label">Signal path &amp; integration problems</div>
+
+      <div class="flow-wrap">
+        <div class="flow-title">Tap → screen · 7-step signal path</div>
+        <div class="flow">
+          <div class="node accent"><div class="node-num">1</div><div class="node-text">NFC Card</div><div class="node-sub">student tag</div></div>
+          <div class="flow-arrow">▼</div>
+          <div class="node"><div class="node-num">2</div><div class="node-text">ACR122U</div><div class="node-sub">USB reader</div></div>
+          <div class="flow-arrow">▼</div>
+          <div class="node"><div class="node-num">3</div><div class="node-text">pcscd · PC/SC</div><div class="node-sub">Linux daemon</div></div>
+          <div class="flow-arrow">▼</div>
+          <div class="node"><div class="node-num">4</div><div class="node-text">pyscard</div><div class="node-sub">APDU FF CA 00 00 00</div></div>
+          <div class="flow-arrow">▼</div>
+          <div class="node"><div class="node-num">5</div><div class="node-text">Flask backend</div><div class="node-sub">UID → attendance record</div></div>
+          <div class="flow-arrow">▼</div>
+          <div class="node"><div class="node-num">6</div><div class="node-text">Socket.IO</div><div class="node-sub">WebSocket push</div></div>
+          <div class="flow-arrow">▼</div>
+          <div class="node accent"><div class="node-num">7</div><div class="node-text">Website</div><div class="node-sub">live update</div></div>
+        </div>
+      </div>
+
+      <div class="col-label">Problems solved</div>
+      <div class="probs">
+        <div class="prob">
+          <div class="prob-icon">🔧</div>
+          <div class="prob-title">pyscard failed to build</div>
+          <div class="prob-badge">Fixed</div>
+          <div class="prob-body"><span class="mono">error: command 'swig' failed</span> — resolved with <span class="mono">sudo apt install swig libpcsclite-dev pcscd</span>.</div>
+        </div>
+        <div class="prob">
+          <div class="prob-icon">🔒</div>
+          <div class="prob-title">Reader access denied · 0x8010006A</div>
+          <div class="prob-badge">Fixed</div>
+          <div class="prob-body">pcscd blocked the read context. Fixed by starting the service and granting PC/SC access to the user account.</div>
+        </div>
+        <div class="prob">
+          <div class="prob-icon">⚡</div>
+          <div class="prob-title">Disconnect crashed the polling thread</div>
+          <div class="prob-badge">Fixed</div>
+          <div class="prob-body">Unplugging the reader threw an unhandled exception. Wrapped in <span class="mono">try / except</span> — reader now reports "offline" without crashing.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-divider"></div>
+
+    <!-- Col 3: Integration testing + APDU note -->
+    <div class="col">
+      <div class="col-label">Integration testing summary</div>
+
+      <table class="test-table">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Purpose</th>
+            <th>Testing Outcome</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="td-comp">Raspberry Pi 3B</div></td>
+            <td><div class="td-purpose">Runs scanner, backend and database locally</div></td>
+            <td>
+              <span class="outcome-badge pass">PASS</span>
+              <div class="td-outcome">Selected as final processing unit — supports USB, Wi-Fi, Python and local hosting.</div>
+            </td>
+          </tr>
+          <tr>
+            <td><div class="td-comp">ACR122U NFC Reader</div></td>
+            <td><div class="td-purpose">Reads NFC card UID over USB</div></td>
+            <td>
+              <span class="outcome-badge pass">PASS</span>
+              <div class="td-outcome">Reader detected cards and returned a UID for database matching.</div>
+            </td>
+          </tr>
+          <tr>
+            <td><div class="td-comp">NFC Cards</div></td>
+            <td><div class="td-purpose">Student identity token</div></td>
+            <td>
+              <span class="outcome-badge pass">PASS</span>
+              <div class="td-outcome">Cards linked to a student name and displayed correctly on the website.</div>
+            </td>
+          </tr>
+          <tr>
+            <td><div class="td-comp">USB Connection</div></td>
+            <td><div class="td-purpose">Reader to Pi connection</div></td>
+            <td>
+              <span class="outcome-badge pass">PASS</span>
+              <div class="td-outcome">Direct USB reduced wiring complexity and made the prototype cleaner.</div>
+            </td>
+          </tr>
+          <tr>
+            <td><div class="td-comp">School Wi-Fi</div></td>
+            <td><div class="td-purpose">Allows dashboard access from any device</div></td>
+            <td>
+              <span class="outcome-badge risk">RISK</span>
+              <div class="td-outcome">Live viewing depends on a reliable network connection — a limitation for deployment.</div>
+            </td>
+          </tr>
+          <tr>
+            <td><div class="td-comp">Boot Startup</div></td>
+            <td><div class="td-purpose">Auto-launch Flask + reader on power-on</div></td>
+            <td>
+              <span class="outcome-badge defer">DEFERRED</span>
+              <div class="td-outcome">Systemd service not yet configured — manual start required during testing.</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="rfid-note">
+        <div class="rfid-note-title">APDU command sent to reader</div>
+        <div class="rfid-cmd">
+          <span>transmit:</span> FF CA 00 00 00<br/>
+          <span>response: </span> [UID bytes] 90 00<br/>
+          <span>example:  </span> A3 4F 2B 11 → student_id lookup
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Evaluation footer -->
+  <div class="evaluation">
+    <div class="eval-title">Ongoing Evaluation</div>
+    <p class="eval-body">
+      Integrating the ACR122U with the Pi proved the system could capture real NFC taps using standard, off-the-shelf hardware with no custom electronics. The hardest challenge was not the application code but the Linux driver stack — PC/SC permissions and missing build dependencies required several iterations to resolve. The integration testing table confirms all core components passed, with school Wi-Fi reliability and automatic boot startup identified as the two remaining risks to address before a full deployment.
+    </p>
+  </div>
+
+</main>
+</body>
+</html>
