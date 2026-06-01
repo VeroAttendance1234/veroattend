@@ -1,7 +1,7 @@
 /**
- * MilestoneConfetti — pure-DOM particle burst when a milestone is crossed.
+ * MilestoneConfetti - pure-DOM particle burst when a milestone is crossed.
  *
- * No external library — 80 lightweight absolutely-positioned divs animated
+ * No external library - 80 lightweight absolutely-positioned divs animated
  * with CSS transforms. Total cost: ~6 KB minified, no canvas allocation,
  * GC-friendly (everything cleans up when the component unmounts).
  *
@@ -60,7 +60,7 @@ export default function MilestoneConfetti({
 
   return (
     <>
-      {/* Banner — slides down from top, auto-dismisses */}
+      {/* Banner - slides down from top, auto-dismisses */}
       <div
         role="status"
         aria-live="polite"
@@ -91,7 +91,7 @@ export default function MilestoneConfetti({
         </div>
       </div>
 
-      {/* Confetti — two bursts from the bottom corners */}
+      {/* Confetti - two bursts from the bottom corners */}
       {['left', 'right'].map((side) => (
         <div
           key={side}

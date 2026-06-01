@@ -44,7 +44,7 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
     sim:         { label: 'Simulator',   long: 'Simulator mode',              color: 'var(--text-muted)', bg: 'rgba(90,122,146,0.09)',  border: 'var(--border)',       online: false },
   }[sysStatus];
 
-  /* Live wall clock — re-renders every 30 s so seconds aren't burnt
+  /* Live wall clock - re-renders every 30 s so seconds aren't burnt
      into the layout but the minute always reads current. */
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30_000);
@@ -266,7 +266,7 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
               </button>
             )}
 
-            {/* Live clock (desktop only) — gives the dashboard a real-time feel */}
+            {/* Live clock (desktop only) - gives the dashboard a real-time feel */}
             {!isMobile && (
               <div
                 aria-label={`Current time ${timeStr}, ${dateStr}`}

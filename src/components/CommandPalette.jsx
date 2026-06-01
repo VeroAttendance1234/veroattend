@@ -1,5 +1,5 @@
 /**
- * CommandPalette — ⌘K / Ctrl-K spotlight-style search and quick actions.
+ * CommandPalette - ⌘K / Ctrl-K spotlight-style search and quick actions.
  *
  * Indexes:
  *   - All students (search by name, year, class)

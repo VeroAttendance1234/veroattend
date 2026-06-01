@@ -1,5 +1,5 @@
 /**
- * Sparkline — zero-dependency mini trend chart.
+ * Sparkline - zero-dependency mini trend chart.
  *
  * Renders an SVG polyline + optional area fill from a small numeric array.
  * Deterministic if the same data is passed (no animation jitter).

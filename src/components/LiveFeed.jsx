@@ -15,7 +15,7 @@ const STATUS_VIEW = {
 export default function LiveFeed({ taps }) {
   const listRef = useRef(null);
 
-  // Keep the newest tap visible by scrolling THIS panel only — never the
+  // Keep the newest tap visible by scrolling THIS panel only - never the
   // page. (Previously used scrollIntoView, which yanked the whole window
   // down to the scan feed on every card tap.)
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function LiveFeed({ taps }) {
             </div>
           </div>
 
-          {/* 7-day attendance sparkline — gives every row instant context */}
+          {/* 7-day attendance sparkline - gives every row instant context */}
           <div style={{
             flexShrink: 0, display: 'none', alignItems: 'center',
             paddingRight: 4,

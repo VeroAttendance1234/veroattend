@@ -13,7 +13,7 @@ import MarkerWelcomeDemo from '../components/MarkerWelcomeDemo';
 import RollImpactCalculator from '../components/RollImpactCalculator';
 import MessagingDemo from '../components/MessagingDemo';
 
-// Heavy three.js bundle — lazy-load so the marker page paints fast
+// Heavy three.js bundle - lazy-load so the marker page paints fast
 const VeroTapAnimation = lazy(() => import('../components/VeroTapAnimation'));
 const VeroExplodedView = lazy(() => import('../components/VeroExplodedView'));
 
@@ -52,7 +52,7 @@ function HeroSkeleton({ height = 520, label = 'Loading…' }) {
   );
 }
 
-// Boundary so a 3D failure can't take down the page — shows a visible
+// Boundary so a 3D failure can't take down the page - shows a visible
 // fallback so the marker can tell loading from broken.
 class HeroBoundary extends Component {
   state = { failed: false, err: null };
@@ -163,17 +163,17 @@ const TECH_GROUPS = [
     items: [
       {
         name: 'React 19', version: '19.2.6', note: 'Concurrent UI with hooks',
-        why: 'Picked for the concurrent renderer — every NFC tap streams through useState and React batches the dashboard updates without dropping frames. Custom hooks (useReveal, useToast, useMediaQuery) keep cross-component state out of context spaghetti.',
+        why: 'Picked for the concurrent renderer - every NFC tap streams through useState and React batches the dashboard updates without dropping frames. Custom hooks (useReveal, useToast, useMediaQuery) keep cross-component state out of context spaghetti.',
         link: 'https://react.dev',
       },
       {
         name: 'Vite 8', version: '8.0.12', note: 'Sub-second HMR',
-        why: 'Replaces webpack with native ES modules + esbuild. Cold start under 300ms, HMR under 100ms — meant I could iterate on the marker animation 60+ times in a single coding session.',
+        why: 'Replaces webpack with native ES modules + esbuild. Cold start under 300ms, HMR under 100ms - meant I could iterate on the marker animation 60+ times in a single coding session.',
         link: 'https://vitejs.dev',
       },
       {
         name: 'Three.js + R3F', version: '0.184 / 9.6', note: '3D hero + exploded view',
-        why: 'three.js handles the 3MF loader so the real CAD geometry from Fusion is the source of truth. @react-three/fiber wraps it in declarative React — every layer of the exploded view is just a component.',
+        why: 'three.js handles the 3MF loader so the real CAD geometry from Fusion is the source of truth. @react-three/fiber wraps it in declarative React - every layer of the exploded view is just a component.',
         link: 'https://threejs.org',
       },
       {
@@ -183,7 +183,7 @@ const TECH_GROUPS = [
       },
       {
         name: 'Lucide Icons', version: '1.16', note: '1000+ stroke icons',
-        why: 'Tree-shaken — only the ~60 icons actually used end up in the bundle. Every icon respects currentColor so they automatically retint with theme tokens.',
+        why: 'Tree-shaken - only the ~60 icons actually used end up in the bundle. Every icon respects currentColor so they automatically retint with theme tokens.',
         link: 'https://lucide.dev',
       },
       {
@@ -204,17 +204,17 @@ const TECH_GROUPS = [
       },
       {
         name: 'Flask', version: '3.0', note: 'WSGI microframework',
-        why: 'Minimal — the entire backend is ~250 lines of Python. Means I understand every route, every middleware decision, every CORS header.',
+        why: 'Minimal - the entire backend is ~250 lines of Python. Means I understand every route, every middleware decision, every CORS header.',
         link: 'https://flask.palletsprojects.com',
       },
       {
         name: 'Flask-SocketIO', version: '5.3', note: 'Bidirectional events',
-        why: 'Adds WebSocket support to Flask without rewriting in async. Emits "card_tap" events the moment pyscard reads a UID — frontend dashboards update within 100ms.',
+        why: 'Adds WebSocket support to Flask without rewriting in async. Emits "card_tap" events the moment pyscard reads a UID - frontend dashboards update within 100ms.',
         link: 'https://flask-socketio.readthedocs.io',
       },
       {
         name: 'pyscard', version: '2.0', note: 'PC/SC bindings',
-        why: 'Wraps the OS-level PC/SC daemon. Lets Python talk to the ACR122U over USB with one line of code per card read. Cross-platform — same code works on Pi and my macbook.',
+        why: 'Wraps the OS-level PC/SC daemon. Lets Python talk to the ACR122U over USB with one line of code per card read. Cross-platform - same code works on Pi and my macbook.',
         link: 'https://pyscard.sourceforge.io',
       },
       {
@@ -235,12 +235,12 @@ const TECH_GROUPS = [
       },
       {
         name: 'ACR122U Reader', version: 'PN532', note: 'ISO 14443 A/B',
-        why: 'Industry-standard USB NFC reader, PC/SC-compatible out of the box. Reads any MIFARE Classic or DESFire card in ~80ms. About $40 retail — affordable for a school to deploy per classroom.',
+        why: 'Industry-standard USB NFC reader, PC/SC-compatible out of the box. Reads any MIFARE Classic or DESFire card in ~80ms. About $40 retail - affordable for a school to deploy per classroom.',
         link: 'https://www.acs.com.hk/en/products/3/acr122u-usb-nfc-reader/',
       },
       {
         name: 'PC/SC Daemon', version: 'pcscd', note: 'Smart-card middleware',
-        why: 'Linux service that abstracts the reader from the app. pyscard talks to pcscd, pcscd talks to the ACR122U — clean separation, hot-swappable reader hardware.',
+        why: 'Linux service that abstracts the reader from the app. pyscard talks to pcscd, pcscd talks to the ACR122U - clean separation, hot-swappable reader hardware.',
         link: 'https://pcsclite.apdu.fr',
       },
       {
@@ -502,7 +502,7 @@ export default function MarkerPage({ onClose, setRole }) {
       overflowY: 'auto',
       animation: 'fadeIn 0.22s ease',
     }}>
-      {/* Scroll progress bar — pinned to top of the marker page */}
+      {/* Scroll progress bar - pinned to top of the marker page */}
       <div
         aria-hidden="true"
         style={{
@@ -988,7 +988,7 @@ export default function MarkerPage({ onClose, setRole }) {
               lineHeight: 1.65, maxWidth: 680, marginBottom: 32,
             }}>
               The integrated messaging system replaces the email + SMS scramble
-              between parents and teachers. You're logged in as Mr Chen (teacher) —
+              between parents and teachers. You're logged in as Mr Chen (teacher) -
               send a message, watch the parent type back in real time. Try keywords
               like <em>"absent"</em>, <em>"meeting"</em>, <em>"homework"</em>, or
               just say thanks.

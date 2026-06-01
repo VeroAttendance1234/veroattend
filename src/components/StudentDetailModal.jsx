@@ -61,7 +61,7 @@ export default function StudentDetailModal({ student, open, onClose }) {
   // Derived contact targets for the footer action buttons
   const parentEmail = `parent.${student.name.split(' ').slice(-1)[0].toLowerCase()}@families.millpond.nsw.edu.au`;
   function emailStudent() {
-    const subject = encodeURIComponent(`Re: attendance — ${student.name}`);
+    const subject = encodeURIComponent(`Re: attendance - ${student.name}`);
     const body = encodeURIComponent(
       `Hi ${student.name.split(' ')[0]},\n\nJust touching base regarding today's attendance.\n\nKind regards,\nMillpond High School`
     );
@@ -69,7 +69,7 @@ export default function StudentDetailModal({ student, open, onClose }) {
   }
   function messageParent() {
     const subject = encodeURIComponent(
-      `Attendance update — ${student.name} (Year ${student.year} ${student.class})`
+      `Attendance update - ${student.name} (Year ${student.year} ${student.class})`
     );
     const body = encodeURIComponent(
       `Hi,\n\nThis is a quick note from Millpond High School regarding ${student.name}.\n` +

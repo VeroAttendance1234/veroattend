@@ -18,7 +18,7 @@ import './styles/global.css';
 /* ───────────────────────────────────────────────
    Hardware integration:
    We only ATTEMPT to connect to the Pi when running locally. The deployed
-   Vercel build stays in Simulator mode on purpose — it can't reach a
+   Vercel build stays in Simulator mode on purpose - it can't reach a
    .local address, and an https page can't talk to an http Pi anyway.
 
    PI_URL points at the Raspberry Pi's Flask-SocketIO server. Override it
@@ -119,7 +119,7 @@ function AppInner() {
 
   /* Whether the ACR122U reader itself is actually present, as reported
      by the Pi over the `reader_status` event. The Flask server being
-     reachable (piConnected) does NOT mean the reader works — so the
+     reachable (piConnected) does NOT mean the reader works - so the
      "VERO system" pill only goes green when BOTH are true. */
   const [readerConnected, setReaderConnected] = useState(false);
 
@@ -135,7 +135,7 @@ function AppInner() {
   const studentsRef = useRef(initialStudents);
   useEffect(() => { studentsRef.current = students; }, [students]);
 
-  /* Auto-simulated tap activity — fires every 12–22s while signed in so the
+  /* Auto-simulated tap activity - fires every 12–22s while signed in so the
      live feed and dashboards never look frozen. Draws from the WHOLE school
      (never Toby) and mixes on-time check-ins, late arrivals and students
      stepping out, so it never looks like a fixed handful of people looping.
@@ -163,13 +163,17 @@ function AppInner() {
   // ── Shared cross-role state ────────────
   const [absenceRequests, setAbsenceRequests] = useState(initialAbsenceRequests);
   const [threads, setThreads]                 = useState(initialThreads);
+  // IDs submitted this session (parent → shows "NEW" badge on admin side)
+  const [newAbsenceIds, setNewAbsenceIds]         = useState(new Set());
+  // IDs resolved this session (admin → shows alert banner on parent side)
+  const [resolvedAbsenceIds, setResolvedAbsenceIds] = useState(new Set());
 
   const socketRef = useRef(null);
 
   /* Card tap pipeline.
      One tap can be a check-IN (on time / late) or a check-OUT (stepping out
      of class). `opts` lets the simulator state intent explicitly; a real
-     hardware tap (no opts) toggles based on where the student currently is —
+     hardware tap (no opts) toggles based on where the student currently is -
      tap once to come in, tap again to step out. A check-out keeps `present`
      true (they still attended today) but flips status to 'out'. */
   function handleTap(student, opts = {}) {
@@ -192,7 +196,7 @@ function AppInner() {
 
   /* Anti-cheat demo trigger: simulate one person tapping a STACK of borrowed
      cards in quick succession (classic buddy-punching). The rapid burst is
-     caught live by the Integrity Alerts detector — proving the limitation is
+     caught live by the Integrity Alerts detector - proving the limitation is
      handled rather than ignored. Never uses Toby's card. */
   function simulateCheatAttempt() {
     const pool = studentsRef.current.filter(s => s.id !== DEMO_STUDENT_ID && !s.present);
@@ -207,16 +211,19 @@ function AppInner() {
   /* Absence request actions */
   function submitAbsenceRequest(req) {
     setAbsenceRequests(prev => [req, ...prev]);
+    setNewAbsenceIds(prev => new Set([...prev, req.id]));
     toast.success('Absence request submitted', 'Admin will review shortly.');
   }
   function approveAbsenceRequest(id) {
     const r = absenceRequests.find(x => x.id === id);
     setAbsenceRequests(prev => prev.map(x => x.id === id ? { ...x, status: 'approved' } : x));
+    setResolvedAbsenceIds(prev => new Set([...prev, id]));
     if (r) toast.success('Request approved', `${r.student} (${r.class}) · ${r.fromDate}`);
   }
   function rejectAbsenceRequest(id) {
     const r = absenceRequests.find(x => x.id === id);
     setAbsenceRequests(prev => prev.map(x => x.id === id ? { ...x, status: 'rejected' } : x));
+    setResolvedAbsenceIds(prev => new Set([...prev, id]));
     if (r) toast.warn('Request declined', `${r.student} (${r.class}) · parent will be notified`);
   }
 
@@ -308,9 +315,11 @@ function AppInner() {
   /* Shared bundle to keep dashboards tidy */
   const sharedProps = {
     absenceRequests,
-    onSubmitAbsence: submitAbsenceRequest,
+    onSubmitAbsence:  submitAbsenceRequest,
     onApproveAbsence: approveAbsenceRequest,
-    onRejectAbsence: rejectAbsenceRequest,
+    onRejectAbsence:  rejectAbsenceRequest,
+    newAbsenceIds,
+    resolvedAbsenceIds,
     threads,
     onSendMessage: sendMessage,
   };
@@ -361,7 +370,7 @@ function AppInner() {
         />
       )}
 
-      {/* Page transition wrapper — key={role} forces a remount with the
+      {/* Page transition wrapper - key={role} forces a remount with the
           roleSlideIn animation when the user switches dashboards. */}
       <div key={role} style={{ animation: 'roleSlideIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both' }}>
         {role === 'Admin'   && <AdminDashboard   students={students} setStudents={setStudents} taps={taps} onTap={handleTap} onSimulateCheat={simulateCheatAttempt} {...sharedProps} />}

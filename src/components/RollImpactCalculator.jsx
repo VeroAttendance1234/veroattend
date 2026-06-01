@@ -210,7 +210,7 @@ export default function RollImpactCalculator() {
             colour="#0F9898"
           />
 
-          {/* Visual bar — annual hours */}
+          {/* Visual bar - annual hours */}
           <div style={{
             gridColumn: '1 / -1',
             padding: '12px 14px',

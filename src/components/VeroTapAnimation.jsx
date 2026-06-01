@@ -54,7 +54,7 @@ const TEAL_DARK     = '#00A9A5';
 function VeroBody({ debugMeshes = false, rainbowMeshes = false }) {
   const group = useLoader(ThreeMFLoader, MODEL_URL);
 
-  // Material setup — applied once on load.
+  // Material setup - applied once on load.
   // The 3MF has 8 bodies. The one with the most vertices is the enclosure
   // (white satin plastic). Every other body is an extruded surface detail
   // (VERO letters + contactless icon) and gets the teal material.
@@ -78,7 +78,7 @@ function VeroBody({ debugMeshes = false, rainbowMeshes = false }) {
       emissiveIntensity: 0.12,
     });
 
-    // Whole model gets the white plastic material — teal branding is
+    // Whole model gets the white plastic material - teal branding is
     // applied via the SVG overlay in the parent (because the O + wifi
     // icon are fused into the main body in the CAD file).
     root.traverse((obj) => {
@@ -182,12 +182,12 @@ function TappingCard({ index, startTime, cardGeom, cardMat, onTap, totalCycle })
       x = THREE.MathUtils.lerp(-2.0, 0,       p);
       y = THREE.MathUtils.lerp( 1.6, HOVER_Y, p);
       z = THREE.MathUtils.lerp(-0.8, 0,       p);
-      // Slight wobble that flattens out — card arrives face-down, parallel
+      // Slight wobble that flattens out - card arrives face-down, parallel
       tiltX = THREE.MathUtils.lerp(0.25, 0, p);
       tiltZ = THREE.MathUtils.lerp(0.30, 0, p);
     } else if (t < TAP_END) {
       const p = easeOut((t - ENTER_END) / (TAP_END - ENTER_END));
-      // Card lowers flat onto the tap zone — face-to-face
+      // Card lowers flat onto the tap zone - face-to-face
       x = 0;
       y = THREE.MathUtils.lerp(HOVER_Y, TAP_Y, p);
       z = 0;
@@ -389,7 +389,7 @@ export default function VeroTapAnimation({
           camera={{ position: [0.8, 1.2, 2.6], fov: 42 }}
           gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
         >
-          {/* Pure-local studio lighting — no remote HDRI fetch.
+          {/* Pure-local studio lighting - no remote HDRI fetch.
               Hemisphere gives sky/ground tint, two directionals plus
               a fill/back keep the white plastic looking lit from all
               sides without needing an environment map. */}
@@ -428,7 +428,7 @@ export default function VeroTapAnimation({
         </Canvas>
       )}
 
-      {/* "Drag to interact" hint chip — only when interactive */}
+      {/* "Drag to interact" hint chip - only when interactive */}
       {interactive && (
         <div
           aria-hidden="true"

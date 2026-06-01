@@ -3,8 +3,8 @@
  * ─────────────────────────────────────────────────────────────
  * Welcome overlay that pops the first time the marker opens the
  * project. Invites them to "tap a card" and then plays back a
- * realistic NFC pipeline cascade — UID generation, WebSocket
- * round-trip, DB write, dashboard push, toast — all with the
+ * realistic NFC pipeline cascade - UID generation, WebSocket
+ * round-trip, DB write, dashboard push, toast - all with the
  * same timings the real Pi setup produces.
  *
  * Built to show off:
@@ -147,7 +147,7 @@ export default function MarkerWelcomeDemo() {
                 fontWeight: 800, fontSize: '1.02rem',
                 color: 'var(--text-primary)', letterSpacing: '-0.015em',
               }}>
-                Hi marker — try the real pipeline
+                Hi marker - try the real pipeline
               </div>
               <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
                 Tap the card · live trace of every step
@@ -340,7 +340,7 @@ export default function MarkerWelcomeDemo() {
               style={{ padding: '9px 16px' }}
             >
               <Zap size={13} strokeWidth={2.5} />
-              Got it — explore the project
+              Got it - explore the project
             </button>
           </div>
         </div>

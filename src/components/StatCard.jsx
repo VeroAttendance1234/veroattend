@@ -12,7 +12,7 @@ import CountUp from './CountUp';
  *   "91%"   → animates 91, appends %
  *   "1050"  → animates 1050 with thousands separator
  */
-export default function StatCard({ label, value, sub, accent, icon: Icon, trend }) {
+export default function StatCard({ label, value, sub, accent, icon: Icon, trend, onClick }) {
   /* Parse `value` once: detect numeric portion + suffix (%, etc.) */
   const parsed = useMemo(() => {
     if (typeof value === 'number') return { num: value, prefix: '', suffix: '' };
@@ -23,20 +23,23 @@ export default function StatCard({ label, value, sub, accent, icon: Icon, trend 
   }, [value]);
 
   return (
-    <div style={{
-      background: 'var(--surface-card)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--radius-lg)',
-      padding: '18px 20px',
-      boxShadow: 'var(--shadow-md)',
-      borderTop: `3px solid ${accent || 'var(--teal)'}`,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 4,
-      position: 'relative',
-      overflow: 'hidden',
-      transition: 'transform 0.18s cubic-bezier(0.32,0.72,0,1), box-shadow 0.18s cubic-bezier(0.32,0.72,0,1)',
-    }}
+    <div
+      onClick={onClick}
+      style={{
+        background: 'var(--surface-card)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '18px 20px',
+        boxShadow: 'var(--shadow-md)',
+        borderTop: `3px solid ${accent || 'var(--teal)'}`,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 4,
+        position: 'relative',
+        overflow: 'hidden',
+        cursor: onClick ? 'pointer' : 'default',
+        transition: 'transform 0.18s cubic-bezier(0.32,0.72,0,1), box-shadow 0.18s cubic-bezier(0.32,0.72,0,1)',
+      }}
       onMouseEnter={e => {
         e.currentTarget.style.transform = 'translateY(-3px)';
         e.currentTarget.style.boxShadow = `0 8px 28px ${accent ? `${accent}22` : 'rgba(20,184,184,0.18)'}, 0 2px 6px rgba(47,62,70,0.06)`;
@@ -112,6 +115,17 @@ export default function StatCard({ label, value, sub, accent, icon: Icon, trend 
           marginTop: 2,
         }}>
           {trend > 0 ? '↑' : trend < 0 ? '↓' : '→'} {Math.abs(trend)}% vs last week
+        </div>
+      )}
+
+      {onClick && (
+        <div style={{
+          fontSize: '0.67rem', fontWeight: 700,
+          color: accent || 'var(--teal)',
+          marginTop: 6, opacity: 0.75,
+          letterSpacing: '0.03em',
+        }}>
+          Click to see who -&gt;
         </div>
       )}
     </div>

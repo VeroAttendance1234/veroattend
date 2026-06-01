@@ -83,9 +83,9 @@ export const students = _raw;
 // Drives ALL fake activity (auto-feed + every "Simulate tap" button). It
 // never returns Toby: his physical card (UID 67BDE33D) is reserved for the
 // marker to test the real ACR122U reader, so Toby only ever appears via a
-// genuine hardware `card_tap`. Returns realistic variety — mostly on-time
+// genuine hardware `card_tap`. Returns realistic variety - mostly on-time
 // check-ins, some late arrivals, the odd student stepping out of class and
-// later tapping back in — so the feed never looks like a fixed 4-person loop.
+// later tapping back in - so the feed never looks like a fixed 4-person loop.
 function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 export function pickSimulatedTap(roster = []) {

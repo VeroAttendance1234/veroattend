@@ -6,7 +6,7 @@
  * board, the antenna coil, the Raspberry Pi 3B, and the base.
  *
  * Layers are stylised stand-ins (the real ACR122U/Pi geometry
- * isn't shipped — using primitives keeps the bundle tiny and
+ * isn't shipped - using primitives keeps the bundle tiny and
  * still reads as a believable cutaway). Each layer is labelled
  * with a leader line via drei's Html helper.
  *
@@ -94,7 +94,7 @@ function AntennaCoil(props) {
         <boxGeometry args={[1.9, 0.04, 1.9]} />
         <meshStandardMaterial color="#e7e0d0" roughness={0.85} />
       </mesh>
-      {/* Spiral coil — concentric thin rings of copper */}
+      {/* Spiral coil - concentric thin rings of copper */}
       {[0.85, 0.74, 0.63, 0.52, 0.41].map((r) => (
         <mesh key={r} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]} castShadow>
           <torusGeometry args={[r, 0.018, 12, 96]} />
@@ -164,7 +164,7 @@ function TraceLine({ from, to, y = 0.075 }) {
 }
 
 function NfcReaderBoard(props) {
-  // Stand-in for the ACR122U PCB — beefed-up detail
+  // Stand-in for the ACR122U PCB - beefed-up detail
   return (
     <group {...props}>
       {/* Board */}
@@ -179,7 +179,7 @@ function NfcReaderBoard(props) {
         <meshStandardMaterial color="#0a4a30" roughness={0.85} />
       </mesh>
 
-      {/* Mounting holes — four corners */}
+      {/* Mounting holes - four corners */}
       <MountingHole x={-0.85} z={-0.6} />
       <MountingHole x={ 0.85} z={-0.6} />
       <MountingHole x={-0.85} z={ 0.6} />
@@ -259,7 +259,7 @@ function NfcReaderBoard(props) {
 }
 
 function RaspberryPi(props) {
-  // Stand-in for the Pi 3B — recognisable silhouette, beefed-up detail
+  // Stand-in for the Pi 3B - recognisable silhouette, beefed-up detail
   return (
     <group {...props}>
       {/* Board */}
@@ -274,7 +274,7 @@ function RaspberryPi(props) {
         <meshStandardMaterial color="#0a4a30" roughness={0.85} />
       </mesh>
 
-      {/* Mounting holes — 4 corners */}
+      {/* Mounting holes - 4 corners */}
       <MountingHole x={-0.9} z={-0.6} />
       <MountingHole x={ 0.9} z={-0.6} />
       <MountingHole x={-0.9} z={ 0.6} />
@@ -309,7 +309,7 @@ function RaspberryPi(props) {
         <meshStandardMaterial color="#3a3a3a" roughness={0.6} />
       </mesh>
 
-      {/* Yellow Ethernet jack — with grid */}
+      {/* Yellow Ethernet jack - with grid */}
       <group position={[0.75, 0.13, 0.4]}>
         <mesh castShadow>
           <boxGeometry args={[0.45, 0.22, 0.4]} />
@@ -347,7 +347,7 @@ function RaspberryPi(props) {
         </mesh>
       </group>
 
-      {/* GPIO 40-pin header — actual gold pin strip */}
+      {/* GPIO 40-pin header - actual gold pin strip */}
       <group position={[-0.85, 0.075, 0.55]}>
         <mesh castShadow>
           <boxGeometry args={[1.0, 0.04, 0.12]} />
@@ -465,7 +465,7 @@ function Annotation({ position, label, sub, side = 'right' }) {
 }
 
 /* ── Animated stack ──────────────────────────────
- * 4 layers (no separate base — the 3MF enclosure
+ * 4 layers (no separate base - the 3MF enclosure
  * is the housing). Top to bottom:
  *   cap     → real CAD enclosure
  *   antenna → NFC antenna coil
@@ -530,7 +530,7 @@ export default function VeroExplodedView({
   interactive = true,
 }) {
   if (!hasWebGL()) {
-    // Static, accessible breakdown — renders anywhere (no WebGL, no image asset).
+    // Static, accessible breakdown - renders anywhere (no WebGL, no image asset).
     // Mirrors the layers in the 3D model so markers always see the hardware design.
     const layers = [
       { name: 'VERO enclosure',   sub: '3D-printed PETG shell',        dot: TEAL },
@@ -581,7 +581,7 @@ export default function VeroExplodedView({
           ))}
         </div>
         <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 'auto' }}>
-          Static view — the interactive 3D model needs WebGL / hardware acceleration.
+          Static view - the interactive 3D model needs WebGL / hardware acceleration.
         </div>
       </div>
     );
@@ -606,7 +606,7 @@ export default function VeroExplodedView({
         camera={{ position: [4.5, 2.5, 5], fov: 36 }}
         gl={{ antialias: true, alpha: true }}
       >
-        {/* Pure-local lighting — no remote HDRI fetch */}
+        {/* Pure-local lighting - no remote HDRI fetch */}
         <hemisphereLight args={['#ffffff', '#d6dee4', 0.6]} />
         <ambientLight intensity={0.32} />
         <directionalLight

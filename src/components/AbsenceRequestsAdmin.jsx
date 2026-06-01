@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import {
-  ClipboardList, Check, X, Filter, MessageCircle, Stethoscope, Inbox,
+  ClipboardList, Check, X, MessageCircle, Stethoscope, Inbox, Sparkles,
 } from 'lucide-react';
 import Avatar from './Avatar';
 import { ABSENCE_TYPES } from './AbsenceRequestForm';
 
 const FILTERS = ['Pending', 'Approved', 'Declined', 'All'];
 
-export default function AbsenceRequestsAdmin({ requests, onApprove, onReject }) {
+export default function AbsenceRequestsAdmin({ requests, onApprove, onReject, newIds = new Set() }) {
   const [filter, setFilter] = useState('Pending');
   const [expanded, setExpanded] = useState(null);
 
@@ -20,6 +20,7 @@ export default function AbsenceRequestsAdmin({ requests, onApprove, onReject }) 
   }, [requests, filter]);
 
   const pendingCount = requests.filter(r => r.status === 'pending').length;
+  const newCount     = filtered.filter(r => newIds.has(r.id)).length;
 
   return (
     <div>
@@ -33,8 +34,21 @@ export default function AbsenceRequestsAdmin({ requests, onApprove, onReject }) 
               background: 'var(--amber-light)', color: 'var(--amber)',
               border: '1px solid var(--amber-border)',
               padding: '2px 9px', borderRadius: 99,
+              animation: 'pulse-dot 2s ease-in-out infinite',
             }}>
               {pendingCount} pending
+            </span>
+          )}
+          {newCount > 0 && filter === 'Pending' && (
+            <span style={{
+              fontSize: '0.66rem', fontWeight: 800,
+              background: 'var(--teal-glow)', color: 'var(--teal)',
+              border: '1px solid var(--teal-border)',
+              padding: '2px 8px', borderRadius: 99,
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+            }}>
+              <Sparkles size={9} strokeWidth={2.5} />
+              {newCount} new
             </span>
           )}
         </div>
@@ -64,10 +78,7 @@ export default function AbsenceRequestsAdmin({ requests, onApprove, onReject }) 
       </div>
 
       {filtered.length === 0 ? (
-        <div style={{
-          textAlign: 'center', padding: '32px 0',
-          color: 'var(--text-soft)',
-        }}>
+        <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-soft)' }}>
           <Inbox size={28} strokeWidth={1.5} style={{ margin: '0 auto 10px', color: 'var(--border-strong)' }} />
           <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-muted)' }}>
             No {filter.toLowerCase()} requests
@@ -78,6 +89,7 @@ export default function AbsenceRequestsAdmin({ requests, onApprove, onReject }) 
           {filtered.map(r => {
             const t = ABSENCE_TYPES.find(x => x.id === r.type);
             const isExpanded = expanded === r.id;
+            const isNew = newIds.has(r.id);
             const statusMap = {
               pending:  { bg: 'var(--amber-light)', border: 'var(--amber-border)', color: 'var(--amber)' },
               approved: { bg: 'var(--green-light)', border: 'var(--green-border)', color: 'var(--green)' },
@@ -89,9 +101,10 @@ export default function AbsenceRequestsAdmin({ requests, onApprove, onReject }) 
                 style={{
                   padding: '14px 16px',
                   borderRadius: 12,
-                  background: 'var(--surface-soft)',
-                  border: `1px solid ${statusMap.border}`,
-                  borderLeft: `3px solid ${statusMap.color}`,
+                  background: isNew ? 'var(--teal-glow)' : 'var(--surface-soft)',
+                  border: `1px solid ${isNew ? 'var(--teal-border)' : statusMap.border}`,
+                  borderLeft: `3px solid ${isNew ? 'var(--teal)' : statusMap.color}`,
+                  transition: 'background 0.3s ease',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -114,12 +127,25 @@ export default function AbsenceRequestsAdmin({ requests, onApprove, onReject }) 
                           Medical
                         </span>
                       )}
+                      {isNew && (
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 3,
+                          fontSize: '0.64rem', fontWeight: 800,
+                          color: 'var(--teal)', background: 'var(--surface-card)',
+                          padding: '1px 7px', borderRadius: 99,
+                          border: '1px solid var(--teal-border)',
+                          letterSpacing: '0.05em',
+                        }}>
+                          <Sparkles size={8} strokeWidth={2.5} />
+                          NEW
+                        </span>
+                      )}
                     </div>
                     <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                       <span style={{ marginRight: 6 }}>{t?.icon}</span>
                       <strong style={{ color: t?.colour, fontWeight: 700 }}>{t?.label}</strong>
                       <span style={{ margin: '0 6px', color: 'var(--border-strong)' }}>·</span>
-                      {r.fromDate}{r.fromDate !== r.toDate ? ` → ${r.toDate}` : ''}
+                      {r.fromDate}{r.fromDate !== r.toDate ? ` - ${r.toDate}` : ''}
                       <span style={{ margin: '0 6px', color: 'var(--border-strong)' }}>·</span>
                       <span style={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>{r.id}</span>
                     </div>
@@ -132,8 +158,7 @@ export default function AbsenceRequestsAdmin({ requests, onApprove, onReject }) 
                         title="Approve"
                         style={{
                           width: 34, height: 34, borderRadius: 9,
-                          background: 'var(--green)',
-                          color: '#fff',
+                          background: 'var(--green)', color: '#fff',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}
                       >
@@ -177,7 +202,7 @@ export default function AbsenceRequestsAdmin({ requests, onApprove, onReject }) 
                   }}
                 >
                   <MessageCircle size={11} />
-                  {isExpanded ? 'Hide details' : 'View parent\'s reason'}
+                  {isExpanded ? 'Hide details' : "View parent's reason"}
                 </button>
 
                 {isExpanded && (

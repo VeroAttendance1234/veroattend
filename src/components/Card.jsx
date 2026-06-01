@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 
 /**
  * Card · base surface with cursor-following spotlight + lift on hover.
- * Drop-in compatible with the previous Card — same className and props.
+ * Drop-in compatible with the previous Card - same className and props.
  *
  * The spotlight is a soft teal radial gradient that follows the mouse,
  * letting any data-driven card (StatCard, leaderboard rows, etc.) feel

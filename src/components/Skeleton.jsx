@@ -1,21 +1,21 @@
 /**
- * Skeleton — reusable shimmering loading placeholder.
+ * Skeleton - reusable shimmering loading placeholder.
  *
  * Three primitives + four composed presets. All use the same
  * `shimmer` keyframe defined in global.css (110° linear-gradient
  * sweep, 1.6 s loop) so every skeleton across the app pulses
- * together (premium feel — like a real product, not a demo).
+ * together (premium feel - like a real product, not a demo).
  *
  * Primitives:
- *   <Skeleton.Block />   — solid filled rectangle (any size)
- *   <Skeleton.Line  />   — thin text-line placeholder
- *   <Skeleton.Circle />  — avatar/dot placeholder
+ *   <Skeleton.Block />   - solid filled rectangle (any size)
+ *   <Skeleton.Line  />   - thin text-line placeholder
+ *   <Skeleton.Circle />  - avatar/dot placeholder
  *
  * Composed presets:
- *   <Skeleton.Card />    — stat card with title + big number + sub
- *   <Skeleton.Row  />    — list/roster row with avatar + 2 lines
- *   <Skeleton.Chart />   — chart placeholder with header + bars
- *   <Skeleton.Hero  />   — large 3D-canvas-sized placeholder
+ *   <Skeleton.Card />    - stat card with title + big number + sub
+ *   <Skeleton.Row  />    - list/roster row with avatar + 2 lines
+ *   <Skeleton.Chart />   - chart placeholder with header + bars
+ *   <Skeleton.Hero  />   - large 3D-canvas-sized placeholder
  *
  * All variants honour prefers-reduced-motion via the global rule
  * in global.css (animation-duration shrinks to 0.01 ms).

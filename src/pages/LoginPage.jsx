@@ -216,7 +216,7 @@ export default function LoginPage({ onLogin }) {
             lineHeight: 1.6, maxWidth: 460, margin: 0,
           }}>
             Replace the 5-minute roll call with a single NFC tap. Every
-            classroom, every period, every parent — synced in under 100ms.
+            classroom, every period, every parent - synced in under 100ms.
           </p>
 
           {/* Focal stat: the one number that should burn in */}
@@ -256,13 +256,13 @@ export default function LoginPage({ onLogin }) {
                 fontSize: '0.88rem', color: 'var(--text-secondary)',
                 marginTop: 6, lineHeight: 1.5,
               }}>
-                of teaching time reclaimed when manual roll calls are replaced —
+                of teaching time reclaimed when manual roll calls are replaced -
                 across a typical 30-staff secondary school.
               </div>
             </div>
           </div>
 
-          {/* Live activity ticker — rotates through simulated taps */}
+          {/* Live activity ticker - rotates through simulated taps */}
           <LiveActivityTicker />
         </div>
 
@@ -337,7 +337,7 @@ export default function LoginPage({ onLogin }) {
             Welcome<span style={{ color: 'var(--teal)' }}>.</span>
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', marginBottom: 18, lineHeight: 1.5 }}>
-            Pick a role — every dashboard is fully wired with seeded data.
+            Pick a role - every dashboard is fully wired with seeded data.
           </p>
 
           {/* Demo helper banner · makes it obvious what to do */}

@@ -157,8 +157,8 @@ export default function AttendanceHeatmap({ totalStudents = 1050 } = {}) {
             <button
               key={c.day}
               aria-label={isEmpty
-                ? `${c.date.toDateString()} — no data`
-                : `${c.date.toDateString()} — ${c.rate}% attendance`}
+                ? `${c.date.toDateString()} - no data`
+                : `${c.date.toDateString()} - ${c.rate}% attendance`}
               aria-pressed={pinned?.day === c.day}
               onClick={() => {
                 if (isEmpty) return;
@@ -208,7 +208,7 @@ export default function AttendanceHeatmap({ totalStudents = 1050 } = {}) {
               </span>
               {!isEmpty && (
                 <span style={{
-                  fontSize: '0.62rem',     /* was 0.5rem (~8px) — below readable floor */
+                  fontSize: '0.62rem',     /* was 0.5rem (~8px) - below readable floor */
                   fontWeight: 800,
                   opacity: 0.95,
                   letterSpacing: '0.02em',

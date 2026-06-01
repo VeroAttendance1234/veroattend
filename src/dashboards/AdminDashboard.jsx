@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Card from '../components/Card';
 import StatCard from '../components/StatCard';
+import StatDrillModal from '../components/StatDrillModal';
 import Badge from '../components/Badge';
 import Avatar from '../components/Avatar';
 import LiveFeed from '../components/LiveFeed';
@@ -139,6 +140,7 @@ function QuickActions({ onSimulate, students = [], filtered = [] }) {
 export default function AdminDashboard({
   students, setStudents, taps, onTap, onSimulateCheat,
   absenceRequests = [], onApproveAbsence, onRejectAbsence,
+  newAbsenceIds = new Set(),
 }) {
   const [yearFilter, setYearFilter]   = useState('All');
   const [classFilter, setClassFilter] = useState('All');
@@ -147,6 +149,7 @@ export default function AdminDashboard({
   const [chartView, setChartView]     = useState('2Y');
   const [leaderView, setLeaderView]   = useState('All Classes');
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [drill, setDrill]             = useState(null); // { title, accent, icon, students }
 
   const classOptions = useMemo(() => {
     if (yearFilter === 'All') return ['All'];
@@ -201,107 +204,148 @@ export default function AdminDashboard({
         onClose={() => setSelectedStudent(null)}
       />
 
-      {/* ── Current Leader strip (replaces fun facts) ─ */}
+      {/* Stat drill modal */}
+      {drill && (
+        <StatDrillModal
+          title={drill.title}
+          accent={drill.accent}
+          icon={drill.icon}
+          students={drill.students}
+          emptyText={drill.emptyText}
+          onClose={() => setDrill(null)}
+          onSelectStudent={s => { setSelectedStudent(s); setDrill(null); }}
+        />
+      )}
+
+      {/* ── Current Leader strip ─────────────── */}
       <CurrentLeaderStrip students={students} />
 
-      {/* ── Hero status widget ──────────────────── */}
-      <div data-tour="hero-status" style={{
-        background: 'var(--surface-card)',
-        border: '1px solid var(--border)',
-        borderRadius: 'var(--radius-xl)',
-        padding: '24px 28px',
+      {/* ── Two-column top section ───────────── */}
+      {/* Left: hero + stat cards   Right: absence requests (key feature) */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 400px',
+        gap: 20,
         marginBottom: 20,
-        boxShadow: 'var(--shadow-md)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 28,
-        flexWrap: 'wrap',
+        alignItems: 'start',
       }}>
-        {/* Left: big status */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 18, flex: 1, minWidth: 260 }}>
-          <div style={{
-            width: 64, height: 64, borderRadius: 18,
-            background: 'var(--teal-glow)',
-            border: '2px solid var(--teal-border)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
+
+        {/* ── LEFT: Hero + Stats ──────────────── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* Hero status */}
+          <div data-tour="hero-status" style={{
+            background: 'var(--surface-card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-xl)',
+            padding: '22px 24px',
+            boxShadow: 'var(--shadow-md)',
+            display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap',
           }}>
-            <div style={{ position: 'relative' }}>
-              <Activity size={28} strokeWidth={2} style={{ color: 'var(--teal)' }} />
-              <span style={{
-                position: 'absolute', top: -4, right: -4,
-                width: 10, height: 10, borderRadius: '50%',
-                background: 'var(--green)',
-                border: '2px solid var(--surface-card)',
-                animation: 'pulse-dot 2s ease-in-out infinite',
-              }} />
-            </div>
-          </div>
-          <div>
-            <div style={{
-              fontFamily: 'Bricolage Grotesque, sans-serif',
-              fontSize: '2.25rem', fontWeight: 800,
-              color: 'var(--teal)', letterSpacing: '-0.04em', lineHeight: 1,
-            }}>
-              {schoolRate}%
-            </div>
-            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)', marginTop: 3 }}>
-              School attendance today
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 2 }}>
-              {schoolPresent} of {students.length} students checked in
-            </div>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div style={{ width: 1, height: 60, background: 'var(--border)', flexShrink: 0 }} />
-
-        {/* Right: quick stats */}
-        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-          {[
-            { label: 'Present', value: schoolPresent, color: 'var(--green)' },
-            { label: 'Absent',  value: schoolAbsent,   color: 'var(--red)' },
-            { label: 'Late',    value: schoolLate,     color: 'var(--amber)' },
-            { label: 'Out',     value: schoolOut,      color: 'var(--blue)' },
-          ].map(({ label, value, color }) => (
-            <div key={label} style={{ textAlign: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 220 }}>
               <div style={{
-                fontFamily: 'Bricolage Grotesque, sans-serif',
-                fontSize: '1.75rem', fontWeight: 800,
-                color, lineHeight: 1, letterSpacing: '-0.03em',
-              }}>{value}</div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Last scan */}
-        {taps.length > 0 && (
-          <>
-            <div style={{ width: 1, height: 60, background: 'var(--border)', flexShrink: 0 }} />
-            <div>
-              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>Last scan</div>
-              <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{taps[0].name}</div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 2 }}>{taps[0].class} · {taps[0].time}</div>
-              <div style={{ marginTop: 6 }}>
-                <Badge status={taps[0].action === 'out' ? 'info' : taps[0].status === 'late' ? 'late' : 'present'} dot>
-                  {taps[0].action === 'out' ? 'Stepped out' : taps[0].status === 'late' ? 'Late' : 'Checked in'}
-                </Badge>
+                width: 60, height: 60, borderRadius: 16,
+                background: 'var(--teal-glow)', border: '2px solid var(--teal-border)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <div style={{ position: 'relative' }}>
+                  <Activity size={26} strokeWidth={2} style={{ color: 'var(--teal)' }} />
+                  <span style={{
+                    position: 'absolute', top: -4, right: -4,
+                    width: 10, height: 10, borderRadius: '50%',
+                    background: 'var(--green)', border: '2px solid var(--surface-card)',
+                    animation: 'pulse-dot 2s ease-in-out infinite',
+                  }} />
+                </div>
+              </div>
+              <div>
+                <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '2.1rem', fontWeight: 800, color: 'var(--teal)', letterSpacing: '-0.04em', lineHeight: 1 }}>
+                  {schoolRate}%
+                </div>
+                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)', marginTop: 3 }}>School attendance today</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 2 }}>{schoolPresent} of {students.length} students checked in</div>
               </div>
             </div>
-          </>
-        )}
-      </div>
+            <div style={{ width: 1, height: 56, background: 'var(--border)', flexShrink: 0 }} />
+            <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+              {[
+                { label: 'Present', value: schoolPresent, color: 'var(--green)' },
+                { label: 'Absent',  value: schoolAbsent,  color: 'var(--red)'   },
+                { label: 'Late',    value: schoolLate,    color: 'var(--amber)' },
+                { label: 'Out',     value: schoolOut,     color: 'var(--blue)'  },
+              ].map(({ label, value, color }) => (
+                <div key={label} style={{ textAlign: 'center' }}>
+                  <div style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: '1.6rem', fontWeight: 800, color, lineHeight: 1, letterSpacing: '-0.03em' }}>{value}</div>
+                  <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--text-soft)', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
+                </div>
+              ))}
+            </div>
+            {taps.length > 0 && (
+              <>
+                <div style={{ width: 1, height: 56, background: 'var(--border)', flexShrink: 0 }} />
+                <div>
+                  <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 5 }}>Last scan</div>
+                  <div style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--text-primary)' }}>{taps[0].name}</div>
+                  <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: 2 }}>{taps[0].class} · {taps[0].time}</div>
+                  <div style={{ marginTop: 5 }}>
+                    <Badge status={taps[0].action === 'out' ? 'info' : taps[0].status === 'late' ? 'late' : 'present'} dot>
+                      {taps[0].action === 'out' ? 'Stepped out' : taps[0].status === 'late' ? 'Late' : 'Checked in'}
+                    </Badge>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
 
-      {/* ── Stat cards ─────────────────────────── */}
-      <div data-tour="stats-row" className="stats-row-6" style={{ marginBottom: 20 }}>
-        <StatCard label="Total Students" value={students.length}         icon={Users}     accent="var(--teal)"  />
-        <StatCard label="Present Today"  value={schoolPresent}           icon={UserCheck} accent="var(--green)" sub={`${schoolRate}% rate`} />
-        <StatCard label="Absent Today"   value={students.length - schoolPresent} icon={UserX} accent="var(--red)"   />
-        <StatCard label="Late Today"     value={schoolLate}              icon={Clock}     accent="var(--amber)"  sub={`${schoolOut} out of class`} />
-        <StatCard label="Teaching Staff" value={teachers.length}         icon={School}    accent="var(--blue)"  />
-        <StatCard label="Active Classes" value={42}                      icon={Award}     accent="var(--purple)" />
+          {/* Stat cards - 3 columns in this narrower layout */}
+          <div data-tour="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+            <StatCard
+              label="Total Students" value={students.length} icon={Users} accent="var(--teal)"
+              onClick={() => setDrill({ title: 'All Students', accent: 'var(--teal)', icon: Users, students, emptyText: 'No students' })}
+            />
+            <StatCard
+              label="Present Today" value={schoolPresent} icon={UserCheck} accent="var(--green)" sub={`${schoolRate}% rate`}
+              onClick={() => setDrill({ title: 'Present Today', accent: 'var(--green)', icon: UserCheck, students: students.filter(s => s.present), emptyText: 'Nobody present yet' })}
+            />
+            <StatCard
+              label="Absent Today" value={schoolAbsent} icon={UserX} accent="var(--red)"
+              onClick={() => setDrill({ title: 'Absent Today', accent: 'var(--red)', icon: UserX, students: students.filter(s => !s.present), emptyText: 'No absences - great!' })}
+            />
+            <StatCard
+              label="Late Today" value={schoolLate} icon={Clock} accent="var(--amber)" sub={`${schoolOut} out of class`}
+              onClick={() => setDrill({ title: 'Late Arrivals', accent: 'var(--amber)', icon: Clock, students: students.filter(s => s.status === 'late'), emptyText: 'No late arrivals' })}
+            />
+            <StatCard
+              label="Out of Class" value={schoolOut} icon={Activity} accent="var(--blue)"
+              onClick={() => setDrill({ title: 'Currently Out', accent: 'var(--blue)', icon: Activity, students: students.filter(s => s.status === 'out'), emptyText: 'Nobody stepped out' })}
+            />
+            <StatCard label="Teaching Staff" value={teachers.length} icon={School} accent="var(--purple)" />
+          </div>
+        </div>
+
+        {/* ── RIGHT: Absence Requests (key feature) ── */}
+        <Card
+          data-tour="absence-requests"
+          style={{
+            position: 'sticky', top: 80,
+            border: absenceRequests.filter(r => r.status === 'pending').length > 0
+              ? '1.5px solid var(--amber-border)'
+              : '1px solid var(--border)',
+            boxShadow: absenceRequests.filter(r => r.status === 'pending').length > 0
+              ? '0 0 0 3px color-mix(in srgb, var(--amber) 8%, transparent)'
+              : 'var(--shadow-md)',
+            maxHeight: 'calc(100vh - 120px)',
+            overflowY: 'auto',
+            transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
+          }}
+        >
+          <AbsenceRequestsAdmin
+            requests={absenceRequests}
+            onApprove={onApproveAbsence}
+            onReject={onRejectAbsence}
+            newIds={newAbsenceIds}
+          />
+        </Card>
       </div>
 
       {/* ── Charts row ─────────────────────────── */}
@@ -440,23 +484,12 @@ export default function AdminDashboard({
         </Card>
       </Reveal>
 
-      {/* ── Absence requests + Leaderboard ────── */}
-      <div className="grid-2" style={{ marginBottom: 20 }}>
-        <Reveal delay={0}>
-          <Card data-tour="absence-requests">
-            <AbsenceRequestsAdmin
-              requests={absenceRequests}
-              onApprove={onApproveAbsence}
-              onReject={onRejectAbsence}
-            />
-          </Card>
-        </Reveal>
-        <Reveal delay={120}>
-          <Card>
-            <AttendanceLeaders students={students} onSelectStudent={setSelectedStudent} />
-          </Card>
-        </Reveal>
-      </div>
+      {/* ── Attendance leaders ─────────────────── */}
+      <Reveal>
+        <Card style={{ marginBottom: 20 }}>
+          <AttendanceLeaders students={students} onSelectStudent={setSelectedStudent} />
+        </Card>
+      </Reveal>
 
       {/* ── Live feed ──────────────────────────── */}
       <Reveal>

@@ -14,13 +14,13 @@ const PROCESS = [
     phase: '01',
     title: 'Identify the opportunity',
     icon: Lightbulb,
-    body: `Schools waste 5-8 minutes per period on manual roll-marking — that's nearly 30 minutes of teaching time lost every day. Beyond the time cost, paper rolls get lost, parents don't know if their child arrived safely, and admins can't see attendance trends until hours later. The design opportunity: replace this fragmented workflow with a single real-time system.`,
+    body: `Schools waste 5-8 minutes per period on manual roll-marking - that's nearly 30 minutes of teaching time lost every day. Beyond the time cost, paper rolls get lost, parents don't know if their child arrived safely, and admins can't see attendance trends until hours later. The design opportunity: replace this fragmented workflow with a single real-time system.`,
   },
   {
     phase: '02',
     title: 'Research existing solutions',
     icon: Users,
-    body: `Surveyed three major school platforms used in Australia: Schoolbox (NSW-wide), Sentral (used by 3,000+ schools), and Canvas (university-favoured). All three rely on teacher data entry — none integrate hardware. Interviewed 4 teachers at Millpond High School; common complaints: "the roll is the worst part of my day", "I don't know who's actually in the building", "parents call me when their child is just running late".`,
+    body: `Surveyed three major school platforms used in Australia: Schoolbox (NSW-wide), Sentral (used by 3,000+ schools), and Canvas (university-favoured). All three rely on teacher data entry - none integrate hardware. Interviewed 4 teachers at Millpond High School; common complaints: "the roll is the worst part of my day", "I don't know who's actually in the building", "parents call me when their child is just running late".`,
   },
   {
     phase: '03',
@@ -44,7 +44,7 @@ const PROCESS = [
     phase: '06',
     title: 'Test, evaluate, refine',
     icon: CheckCircle,
-    body: `Built an absence request system after teacher feedback that "rolls don't tell the whole story". Added messaging after observing that teachers + parents resort to email/SMS. Mobile testing on iPhone 14 and Android — added a bottom tab bar after realising the desktop role-switcher was inaccessible on small screens. Performed an accessibility audit: added ARIA labels, keyboard navigation, prefers-reduced-motion support.`,
+    body: `Built an absence request system after teacher feedback that "rolls don't tell the whole story". Added messaging after observing that teachers + parents resort to email/SMS. Mobile testing on iPhone 14 and Android - added a bottom tab bar after realising the desktop role-switcher was inaccessible on small screens. Performed an accessibility audit: added ARIA labels, keyboard navigation, prefers-reduced-motion support.`,
   },
 ];
 
@@ -268,7 +268,7 @@ export default function AboutPage({ onClose }) {
               boxShadow: 'var(--shadow-sm)',
             }}>
               <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 14 }}>
-                VERO began as a frustration with my own school's roll-marking process and grew into a fully integrated platform spanning hardware, backend, and frontend. The biggest lesson was that <strong style={{ color: 'var(--text-primary)' }}>great functionality alone is not enough</strong> — early teacher feedback showed me that information density mattered just as much as accuracy.
+                VERO began as a frustration with my own school's roll-marking process and grew into a fully integrated platform spanning hardware, backend, and frontend. The biggest lesson was that <strong style={{ color: 'var(--text-primary)' }}>great functionality alone is not enough</strong> - early teacher feedback showed me that information density mattered just as much as accuracy.
               </p>
               <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 14 }}>
                 I went through six major design iterations. Each one was driven by direct user feedback or a measurable shortcoming. The current version meets every functional criterion I set out at the start and exceeds my original aesthetic ambitions.

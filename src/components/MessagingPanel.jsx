@@ -339,7 +339,7 @@ export default function MessagingPanel({
             <button
               type="button"
               aria-label="Emoji (demo only)"
-              title="Emoji picker — demo only"
+              title="Emoji picker - demo only"
               style={{
                 width: 34, height: 34, borderRadius: 9,
                 background: 'transparent',
@@ -357,7 +357,7 @@ export default function MessagingPanel({
             <button
               type="button"
               aria-label="Attach (demo only)"
-              title="Attachment — demo only"
+              title="Attachment - demo only"
               style={{
                 width: 34, height: 34, borderRadius: 9,
                 background: 'transparent',

@@ -28,7 +28,7 @@ export default function Reveal({
     scale: 'translate3d(0, 0, 0) scale(0.94)',
   }[from] || 'translate3d(0, 28px, 0) scale(0.985)';
 
-  // Quintic ease-out — gentle landing, no bounce
+  // Quintic ease-out - gentle landing, no bounce
   const easing = 'cubic-bezier(0.22, 1, 0.36, 1)';
   const duration = '0.65s';
 

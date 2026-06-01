@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import {
-  Heart, Target, Bell, TrendingUp, CheckCircle, Circle,
+  Heart, Target, Bell, TrendingUp, CheckCircle, Circle, X,
 } from 'lucide-react';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
@@ -39,11 +40,24 @@ export default function ParentDashboard({
   students,
   absenceRequests = [], onSubmitAbsence,
   threads = [], onSendMessage,
+  resolvedAbsenceIds = new Set(),
 }) {
   const child    = students.find(s => s.id === demoStudent.id) || demoStudent;
   const rate     = weekRate(attendanceHistory);
   const doneGoals = goals.filter(g => g.done).length;
   const sentiment = sentimentLabel(weekMoods);
+
+  // Track which resolved-request alerts the parent has dismissed this session
+  const [dismissed, setDismissed] = useState(new Set());
+
+  // Requests for this child that were resolved by admin in this session
+  const resolvedAlerts = absenceRequests.filter(
+    r => r.studentId === child?.id && resolvedAbsenceIds.has(r.id) && !dismissed.has(r.id)
+  );
+
+  function dismissAlert(id) {
+    setDismissed(prev => new Set([...prev, id]));
+  }
 
   return (
     <div className="page">
@@ -88,6 +102,58 @@ export default function ParentDashboard({
             Week rate
           </div>
         </div>
+      </div>
+
+      {/* ── Admin decision alerts ─────────────── */}
+      {resolvedAlerts.map(r => {
+        const isApproved = r.status === 'approved';
+        return (
+          <div key={r.id} style={{
+            display: 'flex', alignItems: 'flex-start', gap: 14,
+            padding: '14px 18px', borderRadius: 'var(--radius-lg)',
+            marginBottom: 14,
+            background: isApproved ? 'var(--green-light)' : 'var(--red-light)',
+            border: `1.5px solid ${isApproved ? 'var(--green-border)' : 'var(--red-border)'}`,
+            boxShadow: `0 0 0 3px ${isApproved ? 'color-mix(in srgb, var(--green) 8%, transparent)' : 'color-mix(in srgb, var(--red) 8%, transparent)'}`,
+            animation: 'slideUp 0.28s cubic-bezier(0.22,1,0.36,1)',
+          }}>
+            <span style={{ fontSize: '1.3rem', lineHeight: 1, flexShrink: 0, marginTop: 1 }}>
+              {isApproved ? '✅' : '❌'}
+            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 800, fontSize: '0.9rem', color: isApproved ? 'var(--green)' : 'var(--red)', marginBottom: 3 }}>
+                Absence request {isApproved ? 'approved' : 'declined'} by admin
+              </div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                <strong>{r.fromDate}{r.fromDate !== r.toDate ? ` - ${r.toDate}` : ''}</strong>
+                {' · '}{r.type.charAt(0).toUpperCase() + r.type.slice(1)}
+                {' · '}<span style={{ fontFamily: 'monospace', fontSize: '0.72rem' }}>{r.id}</span>
+              </div>
+              {!isApproved && (
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                  Contact the school office if you need to discuss this decision.
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => dismissAlert(r.id)}
+              style={{ color: 'var(--text-soft)', background: 'none', padding: 4, flexShrink: 0 }}
+              title="Dismiss"
+            >
+              <X size={14} strokeWidth={2.5} />
+            </button>
+          </div>
+        );
+      })}
+
+      {/* ── Absence request ───────────────────── */}
+      <div style={{ marginBottom: 22 }}>
+        <AbsenceRequestForm
+          student={child}
+          parent="J. Crowther"
+          requests={absenceRequests}
+          onSubmit={onSubmitAbsence}
+        />
       </div>
 
       {/* ── 6-year attendance + academic results ── */}
@@ -169,18 +235,6 @@ export default function ParentDashboard({
           </div>
         </Card>
       </div>
-
-      {/* ── Absence request ───────────────────── */}
-      <Reveal>
-      <div style={{ marginBottom: 20 }}>
-        <AbsenceRequestForm
-          student={child}
-          parent="J. Crowther"
-          requests={absenceRequests}
-          onSubmit={onSubmitAbsence}
-        />
-      </div>
-      </Reveal>
 
       {/* ── Messaging ─────────────────────────── */}
       <Reveal>
