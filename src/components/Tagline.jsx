@@ -8,8 +8,9 @@
  * @param {string} size      'sm' | 'md' | 'lg' | 'xl' | 'hero'
  * @param {bool}   stacked   render on two lines (default false = single line)
  * @param {bool}   muted     low-emphasis (footer)
+ * @param {bool}   light     for dark backgrounds (white text, bright teal accent)
  */
-export default function Tagline({ size = 'md', stacked = false, muted = false, style }) {
+export default function Tagline({ size = 'md', stacked = false, muted = false, light = false, style }) {
   const sizes = {
     sm:   { font: '0.72rem',  tracking: '0.16em', dot: '0.28em' },
     md:   { font: '0.95rem',  tracking: '0.18em', dot: '0.3em'  },
@@ -18,8 +19,8 @@ export default function Tagline({ size = 'md', stacked = false, muted = false, s
     hero: { font: '2rem',     tracking: '0.24em', dot: '0.32em' },
   }[size] || { font: '0.95rem', tracking: '0.18em', dot: '0.3em' };
 
-  const primary = muted ? 'var(--text-soft)' : 'var(--text-primary)';
-  const accent  = muted ? 'var(--text-muted)' : 'var(--teal)';
+  const primary = light ? '#F7FDFC' : muted ? 'var(--text-soft)' : 'var(--text-primary)';
+  const accent  = light ? '#5EEAD4' : muted ? 'var(--text-muted)' : 'var(--teal)';
 
   const dotStyle = {
     display: 'inline-block',

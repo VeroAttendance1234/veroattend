@@ -3,7 +3,7 @@ import {
   Wifi, WifiOff, ChevronDown, BookOpen, LogOut,
   Menu, X, Bell, Monitor, Heart, Users, FileSpreadsheet, Search,
 } from 'lucide-react';
-import { useIsMobile } from '../hooks/useMediaQuery';
+import { useIsMobile, useMediaQuery } from '../hooks/useMediaQuery';
 
 const ROLES = ['Admin', 'Teacher', 'Student', 'Parent'];
 
@@ -28,6 +28,10 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
   const [scrolled, setScrolled] = useState(false);
   const [now, setNow]           = useState(() => new Date());
   const isMobile = useIsMobile();
+  // Compact desktop band (small laptops / iPad landscape): the full nav can't
+  // fit below ~1220px, so we drop the standalone clock and collapse the
+  // Reports / marker buttons to icon-only to keep everything on one line.
+  const isCompact = useMediaQuery('(min-width: 701px) and (max-width: 1220px)');
   const meta = ROLE_META[role];
   const page = PAGE_TITLES[role];
 
@@ -97,7 +101,7 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
           height: isMobile ? (scrolled ? 48 : 54) : (scrolled ? 52 : 60),
           display: 'flex',
           alignItems: 'center',
-          gap: isMobile ? 10 : 20,
+          gap: isMobile ? 10 : 10,
           transition: 'height 0.25s cubic-bezier(0.32, 0.72, 0, 1)',
         }}>
 
@@ -200,7 +204,7 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
           {isMobile && <div style={{ flex: 1 }} />}
 
           {/* ── Right cluster ─────────────────── */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 8, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 6, flexShrink: 0 }}>
 
             {/* Notifications bell */}
             <button
@@ -235,24 +239,22 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
             {!isMobile && onCommandPalette && (
               <button
                 onClick={onCommandPalette}
-                aria-label="Open command palette"
+                aria-label="Open command palette · Search"
                 title="Search · ⌘K"
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '6px 10px 6px 12px',
+                  display: 'flex', alignItems: 'center', gap: 7,
+                  padding: '6px 9px',
                   borderRadius: 9,
                   background: 'var(--surface-card)',
                   border: '1px solid var(--border)',
                   color: 'var(--text-muted)',
                   fontSize: '0.78rem', fontWeight: 600,
-                  minWidth: 160,
                   transition: 'all 0.14s ease',
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--teal)'; e.currentTarget.style.color = 'var(--teal)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
               >
                 <Search size={13} strokeWidth={2.4} />
-                <span style={{ flex: 1, textAlign: 'left' }}>Search…</span>
                 <kbd style={{
                   fontFamily: 'monospace', fontSize: '0.62rem', fontWeight: 700,
                   color: 'var(--text-soft)',
@@ -266,8 +268,8 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
               </button>
             )}
 
-            {/* Live clock (desktop only) - gives the dashboard a real-time feel */}
-            {!isMobile && (
+            {/* Live clock (full desktop only) - gives the dashboard a real-time feel */}
+            {!isMobile && !isCompact && (
               <div
                 aria-label={`Current time ${timeStr}, ${dateStr}`}
                 style={{
@@ -311,9 +313,11 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
             {!isMobile && onReports && (
               <button
                 onClick={onReports}
+                title={isCompact ? 'Reports' : undefined}
+                aria-label="Reports"
                 style={{
                   display: 'flex', alignItems: 'center', gap: 5,
-                  padding: '6px 12px', borderRadius: 9,
+                  padding: isCompact ? '6px 9px' : '6px 12px', borderRadius: 9,
                   background: 'var(--surface-card)',
                   border: '1px solid var(--border)',
                   color: 'var(--text-muted)',
@@ -324,7 +328,7 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
                 onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
               >
                 <FileSpreadsheet size={13} strokeWidth={2.5} />
-                Reports
+                {!isCompact && 'Reports'}
               </button>
             )}
 
@@ -332,9 +336,11 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
             {!isMobile && (
               <button
                 onClick={onMarker}
+                title={isCompact ? 'For the marker' : undefined}
+                aria-label="For the marker"
                 style={{
                   display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '7px 14px', borderRadius: 10,
+                  padding: isCompact ? '7px 11px' : '7px 14px', borderRadius: 10,
                   background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)',
                   border: 'none',
                   color: '#fff',
@@ -348,13 +354,13 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
                 onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; }}
               >
                 <BookOpen size={14} strokeWidth={2.6} />
-                <span>For the marker</span>
-                <span style={{
+                {!isCompact && <span>For the marker</span>}
+                {!isCompact && <span style={{
                   fontSize: '0.95rem', lineHeight: 1,
                   animation: 'markerWave 1.6s ease-in-out infinite',
                 }}>
                   👋
-                </span>
+                </span>}
                 <style>{`
                   @keyframes markerPulse {
                     0%, 100% { box-shadow: 0 4px 14px rgba(20,184,184,0.32), 0 0 0 0 rgba(20,184,184,0.45); }
@@ -384,7 +390,7 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
                     key={r}
                     onClick={() => setRole(r)}
                     style={{
-                      padding: '4px 11px',
+                      padding: '4px 9px',
                       borderRadius: 8,
                       background: role === r ? 'var(--surface-card)' : 'transparent',
                       color: role === r ? 'var(--text-primary)' : 'var(--text-muted)',
@@ -407,7 +413,7 @@ export default function Nav({ role, setRole, piConnected, readerConnected, onMar
               borderRadius: 10,
               border: '1px solid var(--border)',
               background: 'var(--surface-card)',
-              width: isMobile ? 'auto' : 168,
+              width: isMobile ? 'auto' : 150,
               flexShrink: 0,
             }}>
               <div style={{

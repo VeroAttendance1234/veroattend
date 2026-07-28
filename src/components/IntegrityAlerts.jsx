@@ -30,7 +30,7 @@ function nowLabel() {
    beat the limitation" narrative made concrete. */
 const DEFENCES = [
   { icon: Layers,      title: 'Burst detection',     text: 'Several cards tapped in seconds = one hand on a stack. Flagged instantly.' },
-  { icon: MapPin,      title: 'Impossible travel',   text: 'Same ID at two readers too far apart, too fast - physically impossible.' },
+  { icon: MapPin,      title: 'Impossible travel',   text: 'Same ID at two readers too far apart, too fast to be physically possible.' },
   { icon: Copy,        title: 'Duplicate presence',  text: 'A card can\'t be in two rooms at once. Double presence is held, not trusted.' },
   { icon: Camera,      title: 'Photo confirmation',  text: 'Flagged taps surface the enrolled photo so staff verify the right student.' },
 ];
@@ -41,19 +41,19 @@ const SEED_ALERTS = [
   {
     id: 'seed-dup', severity: 'high', type: 'duplicate', state: 'open',
     title: 'Same card, two locations',
-    detail: 'Card A91C-44E2 (S0412 · 9C) registered at the Main Gate reader while already marked present in B-Block 11s earlier. One card cannot be in two places - likely shared between students.',
+    detail: 'Card A91C-44E2 (S0412 · 9C) registered at the Main Gate reader while already marked present in B-Block 11s earlier. One card cannot be in two places, so it was likely shared between students.',
     students: ['Aisha Nguyen'], reader: 'Main Gate ↔ B-Block', time: '8:47 am',
   },
   {
     id: 'seed-vel', severity: 'medium', type: 'velocity', state: 'open',
     title: 'Impossible travel time',
-    detail: 'S0233 tapped the Gym reader just 9s after the Library reader - 180 m apart. Faster than physically possible; the card may have been handed to a friend.',
+    detail: 'S0233 tapped the Gym reader just 9s after the Library reader, 180 m apart. Faster than physically possible; the card may have been handed to a friend.',
     students: ['Marcus Lee'], reader: 'Library → Gym', time: '8:51 am',
   },
   {
     id: 'seed-pat', severity: 'low', type: 'pattern', state: 'monitoring',
     title: 'Recurring morning cluster',
-    detail: 'Four 8F cards have tapped within the same 3-second window every morning this week. Not proof on its own, but a classic card-pooling signature - worth a spot check.',
+    detail: 'Four 8F cards have tapped within the same 3-second window every morning this week. Not proof on its own, but a classic card-pooling signature worth a spot check.',
     students: ['8F · 4 students'], reader: 'East Door', time: 'This week',
   },
 ];
@@ -130,7 +130,7 @@ export default function IntegrityAlerts({ taps = [], students = [], onSimulateCh
         borderRadius: 'var(--radius-md)', padding: '13px 16px', margin: '14px 0 16px',
       }}>
         <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.55, marginBottom: 12 }}>
-          <strong style={{ color: 'var(--text-primary)' }}>The known weakness of any RFID system is card-sharing</strong> - a
+          <strong style={{ color: 'var(--text-primary)' }}>The known weakness of any RFID system is card-sharing</strong>: a
           student hands their card to a friend, or one person taps a stack of cards to mark absent mates
           present (&ldquo;buddy-punching&rdquo;). VERO doesn&rsquo;t ignore this. Every tap is scored against
           four signals, and anything suspicious is <em>held for human confirmation</em> rather than silently trusted.

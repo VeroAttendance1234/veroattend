@@ -441,6 +441,9 @@ img[src*="vero-"] {
 @media (max-width: 700px) {
   .grid-2 { grid-template-columns: 1fr; }
   .page   { padding: 16px 16px 64px; }
+  /* Top summary strip (Top Student / Class / Year / Biggest Gain) sets its
+     4-column grid inline, so !important is needed to collapse it to 2×2. */
+  .leader-strip { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 @media (max-width: 600px) {

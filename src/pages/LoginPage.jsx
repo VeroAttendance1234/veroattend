@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Monitor, BookOpen, Heart, Users, CreditCard, Lock,
-  Mail, Eye, EyeOff, ChevronRight, Wifi, Shield, Zap, Clock, TrendingUp,
+  Mail, Eye, EyeOff, ChevronRight, Wifi, Shield, Zap, Clock, TrendingUp, Sparkles,
 } from 'lucide-react';
 import Tagline from '../components/Tagline';
 
@@ -23,8 +23,9 @@ function LiveActivityTicker() {
   const ev = EVENTS[idx];
   return (
     <div style={{
-      border: '1px solid var(--border)',
-      background: 'var(--surface-soft)',
+      border: '1px solid rgba(255,255,255,0.12)',
+      background: 'rgba(255,255,255,0.06)',
+      backdropFilter: 'blur(6px)',
       borderRadius: 14,
       padding: '12px 14px',
       display: 'flex', alignItems: 'center', gap: 12,
@@ -32,9 +33,9 @@ function LiveActivityTicker() {
     }} aria-live="polite">
       <div style={{
         width: 36, height: 36, borderRadius: 10,
-        background: 'var(--teal-glow)',
-        border: '1px solid var(--teal-border)',
-        color: 'var(--teal)',
+        background: 'rgba(45,212,191,0.14)',
+        border: '1px solid rgba(45,212,191,0.30)',
+        color: '#5EEAD4',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         flexShrink: 0,
       }}>
@@ -43,7 +44,7 @@ function LiveActivityTicker() {
       <div key={idx} style={{ flex: 1, minWidth: 0, animation: 'tickerIn 0.32s cubic-bezier(0.22,1,0.36,1) both' }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
-          fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)',
+          fontSize: '0.85rem', fontWeight: 700, color: '#F7FDFC',
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>
           {ev.name}
@@ -56,16 +57,16 @@ function LiveActivityTicker() {
           </span>
         </div>
         <div style={{
-          fontSize: '0.74rem', color: 'var(--text-muted)',
+          fontSize: '0.74rem', color: 'rgba(214,240,238,0.62)',
           display: 'flex', gap: 6, alignItems: 'center',
         }}>
           <span>{ev.class}</span>
-          <span style={{ color: 'var(--border-strong)' }}>·</span>
+          <span style={{ color: 'rgba(255,255,255,0.25)' }}>·</span>
           <Clock size={10} strokeWidth={2.5} />
           <span>{ev.when}</span>
         </div>
       </div>
-      <TrendingUp size={14} strokeWidth={2.4} style={{ color: 'var(--teal)', flexShrink: 0, opacity: 0.6 }} />
+      <TrendingUp size={14} strokeWidth={2.4} style={{ color: '#5EEAD4', flexShrink: 0, opacity: 0.7 }} />
       <style>{`
         @keyframes tickerIn {
           from { opacity: 0; transform: translateX(10px); }
@@ -135,7 +136,7 @@ export default function LoginPage({ onLogin }) {
       }}>
         {[
           { c: 'rgba(20,184,184,0.18)',  x: '10%',  y: '15%', size: '60vmax', dur: '22s', delay: '0s'   },
-          { c: 'rgba(124,58,237,0.10)',  x: '85%',  y: '78%', size: '55vmax', dur: '28s', delay: '-7s'  },
+          { c: 'rgba(20,184,184,0.12)',  x: '85%',  y: '78%', size: '55vmax', dur: '28s', delay: '-7s'  },
           { c: 'rgba(34,197,94,0.07)',   x: '78%',  y: '15%', size: '45vmax', dur: '24s', delay: '-12s' },
           { c: 'rgba(20,184,184,0.10)',  x: '20%',  y: '85%', size: '50vmax', dur: '30s', delay: '-3s'  },
         ].map((b, i) => (
@@ -165,22 +166,38 @@ export default function LoginPage({ onLogin }) {
         flex: '0 0 50%',
         padding: '48px 56px',
         display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-        borderRight: '1px solid var(--border)',
-        background: 'var(--surface-card)',
+        background: 'linear-gradient(160deg, #052726 0%, #0A403E 52%, #0E5450 100%)',
         position: 'relative',
         overflow: 'hidden',
       }}>
+        {/* Ambient glows inside the dark panel */}
+        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+          <div style={{
+            position: 'absolute', top: '-18%', right: '-12%',
+            width: '58%', height: '52%',
+            background: 'radial-gradient(circle, rgba(45,212,191,0.20) 0%, transparent 65%)',
+            filter: 'blur(28px)',
+          }} />
+          <div style={{
+            position: 'absolute', bottom: '-22%', left: '-10%',
+            width: '68%', height: '58%',
+            background: 'radial-gradient(circle, rgba(20,184,184,0.14) 0%, transparent 65%)',
+            filter: 'blur(28px)',
+          }} />
+        </div>
+
         {/* Top: wordmark + live-connection chip */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap', position: 'relative' }}>
           <div>
-            <img src="/vero-wordmark-clean.png" alt="VERO." style={{ height: 34, marginBottom: 10, display: 'block' }} />
-            <Tagline size="md" />
+            <img src="/vero-wordmark-clean.png" alt="VERO." style={{ height: 34, marginBottom: 10, display: 'block', filter: 'brightness(0) invert(1)' }} />
+            <Tagline size="md" light />
           </div>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 7,
-            background: 'var(--teal-glow)',
-            border: '1px solid var(--teal-border)',
+            background: 'rgba(255,255,255,0.07)',
+            border: '1px solid rgba(255,255,255,0.16)',
             borderRadius: 99, padding: '6px 12px',
+            backdropFilter: 'blur(6px)',
           }}>
             <div style={{
               width: 7, height: 7, borderRadius: '50%',
@@ -188,14 +205,14 @@ export default function LoginPage({ onLogin }) {
               boxShadow: '0 0 0 0 rgba(34,197,94,0.6)',
               animation: 'heroHeartbeat 1.8s ease-out infinite',
             }} />
-            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--teal-dark)', letterSpacing: '0.03em' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#7FE7DC', letterSpacing: '0.03em' }}>
               ACR122U · LIVE
             </span>
           </div>
         </div>
 
         {/* Middle: hero + focal stat + activity */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28, position: 'relative' }}>
 
           {/* Massive gradient headline with kinetic word-in */}
           <h1 style={{
@@ -203,7 +220,7 @@ export default function LoginPage({ onLogin }) {
             lineHeight: 0.98,
             letterSpacing: '-0.045em',
             margin: 0,
-            color: 'var(--text-primary)',
+            color: '#F7FDFC',
             fontWeight: 800,
           }}>
             <span className="heroWord" style={{ animationDelay: '0.05s' }}>Real-time.</span>{' '}
@@ -212,11 +229,11 @@ export default function LoginPage({ onLogin }) {
           </h1>
 
           <p style={{
-            fontSize: '1.02rem', color: 'var(--text-muted)',
+            fontSize: '1.02rem', color: 'rgba(214,240,238,0.72)',
             lineHeight: 1.6, maxWidth: 460, margin: 0,
           }}>
             Replace the 5-minute roll call with a single NFC tap. Every
-            classroom, every period, every parent - synced in under 100ms.
+            classroom, every period, every parent, synced in under 100ms.
           </p>
 
           {/* Focal stat: the one number that should burn in */}
@@ -224,19 +241,20 @@ export default function LoginPage({ onLogin }) {
             position: 'relative',
             padding: '22px 24px',
             borderRadius: 18,
-            background: 'linear-gradient(135deg, rgba(20,184,184,0.10) 0%, rgba(15,152,152,0.04) 100%)',
-            border: '1px solid var(--teal-border)',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)',
+            border: '1px solid rgba(255,255,255,0.14)',
+            backdropFilter: 'blur(6px)',
             overflow: 'hidden',
           }}>
             {/* Decorative corner glow */}
             <div aria-hidden="true" style={{
               position: 'absolute', top: -60, right: -60,
               width: 160, height: 160, borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(20,184,184,0.25), transparent 60%)',
+              background: 'radial-gradient(circle, rgba(45,212,191,0.30), transparent 60%)',
               filter: 'blur(8px)',
             }} />
             <div style={{ position: 'relative' }}>
-              <div className="label-caps" style={{ color: 'var(--teal-dark)', marginBottom: 6, fontSize: '0.62rem' }}>
+              <div className="label-caps" style={{ color: '#5EEAD4', marginBottom: 6, fontSize: '0.62rem' }}>
                 Per-school annual impact
               </div>
               <div style={{
@@ -245,18 +263,18 @@ export default function LoginPage({ onLogin }) {
                 fontSize: 'clamp(2.4rem, 5vw, 3.4rem)',
                 letterSpacing: '-0.04em',
                 lineHeight: 1,
-                background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 60%, #0a6e6e 100%)',
+                background: 'linear-gradient(135deg, #86EFAC 0%, #5EEAD4 45%, #2DD4BF 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }}>
-                300<span style={{ fontSize: '0.42em', color: 'var(--teal-dark)', WebkitTextFillColor: 'var(--teal-dark)' }}> hrs/yr</span>
+                300<span style={{ fontSize: '0.42em', color: '#5EEAD4', WebkitTextFillColor: '#5EEAD4' }}> hrs/yr</span>
               </div>
               <div style={{
-                fontSize: '0.88rem', color: 'var(--text-secondary)',
+                fontSize: '0.88rem', color: 'rgba(214,240,238,0.72)',
                 marginTop: 6, lineHeight: 1.5,
               }}>
-                of teaching time reclaimed when manual roll calls are replaced -
+                of teaching time reclaimed when manual roll calls are replaced,
                 across a typical 30-staff secondary school.
               </div>
             </div>
@@ -267,10 +285,10 @@ export default function LoginPage({ onLogin }) {
         </div>
 
         {/* Bottom: trust strip + footer */}
-        <div>
+        <div style={{ position: 'relative' }}>
           <div style={{
             display: 'flex', gap: 18, alignItems: 'center',
-            color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 700,
+            color: 'rgba(214,240,238,0.65)', fontSize: '0.74rem', fontWeight: 700,
             marginBottom: 14, flexWrap: 'wrap',
           }}>
             {[
@@ -279,12 +297,12 @@ export default function LoginPage({ onLogin }) {
               { icon: Wifi,   text: 'Offline-tolerant' },
             ].map(({ icon: Icon, text }) => (
               <span key={text} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <Icon size={12} strokeWidth={2.4} style={{ color: 'var(--teal)' }} />
+                <Icon size={12} strokeWidth={2.4} style={{ color: '#5EEAD4' }} />
                 {text}
               </span>
             ))}
           </div>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-soft)' }}>
+          <div style={{ fontSize: '0.7rem', color: 'rgba(214,240,238,0.4)' }}>
             © 2026 VERO · HSC Software Design & Development Major Project
           </div>
         </div>
@@ -297,7 +315,7 @@ export default function LoginPage({ onLogin }) {
             animation: heroWordIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
           }
           .heroWordAccent {
-            background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+            background: linear-gradient(135deg, #86EFAC 0%, #2DD4BF 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -320,7 +338,16 @@ export default function LoginPage({ onLogin }) {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: '40px 24px',
       }}>
-        <div style={{ width: '100%', maxWidth: 420 }}>
+        <div className="login-card" style={{
+          width: '100%', maxWidth: 448,
+          background: 'rgba(255,255,255,0.72)',
+          backdropFilter: 'blur(20px) saturate(1.4)',
+          WebkitBackdropFilter: 'blur(20px) saturate(1.4)',
+          border: '1px solid rgba(255,255,255,0.9)',
+          borderRadius: 24,
+          boxShadow: '0 4px 24px rgba(15,152,152,0.10), 0 24px 64px rgba(47,62,70,0.14)',
+          padding: '36px 34px',
+        }}>
 
           {/* Mobile-only logo */}
           <div className="login-mobile-logo" style={{ display: 'none', textAlign: 'center', marginBottom: 28, alignItems: 'center' }}>
@@ -337,7 +364,7 @@ export default function LoginPage({ onLogin }) {
             Welcome<span style={{ color: 'var(--teal)' }}>.</span>
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', marginBottom: 18, lineHeight: 1.5 }}>
-            Pick a role - every dashboard is fully wired with seeded data.
+            Pick a role. Every dashboard is fully wired with seeded data.
           </p>
 
           {/* Demo helper banner · makes it obvious what to do */}
@@ -359,11 +386,15 @@ export default function LoginPage({ onLogin }) {
               pointerEvents: 'none',
             }} />
             <span style={{
-              fontSize: '1.05rem', lineHeight: 1,
-              animation: 'pointHand 1.5s ease-in-out infinite',
+              width: 30, height: 30, borderRadius: 9,
+              background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)',
+              color: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+              boxShadow: '0 2px 8px rgba(20,184,184,0.35)',
               position: 'relative',
             }}>
-              👉
+              <Sparkles size={14} strokeWidth={2.4} />
             </span>
             <div style={{ flex: 1, fontSize: '0.82rem', lineHeight: 1.5, position: 'relative' }}>
               <strong style={{ color: 'var(--teal-dark)' }}>Demo ready.</strong>{' '}
@@ -379,23 +410,6 @@ export default function LoginPage({ onLogin }) {
             `}</style>
           </div>
 
-          <style>{`
-            @keyframes pointHand {
-              0%, 100% { transform: translateX(0); }
-              50%      { transform: translateX(3px); }
-            }
-            @keyframes signInPulse {
-              0%, 100% {
-                box-shadow: 0 4px 16px rgba(20, 184, 184, 0.3),
-                            0 0 0 0 rgba(20, 184, 184, 0.45);
-              }
-              50% {
-                box-shadow: 0 4px 16px rgba(20, 184, 184, 0.3),
-                            0 0 0 8px rgba(20, 184, 184, 0);
-              }
-            }
-          `}</style>
-
           {/* Role picker */}
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginBottom: 22,
@@ -406,6 +420,7 @@ export default function LoginPage({ onLogin }) {
               return (
                 <button
                   key={r.role}
+                  className="login-role"
                   onClick={() => pickRole(r)}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10,
@@ -475,7 +490,7 @@ export default function LoginPage({ onLogin }) {
                 <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6, letterSpacing: '0.02em' }}>
                   Email
                 </label>
-                <div style={{
+                <div className="login-field" style={{
                   display: 'flex', alignItems: 'center', gap: 9,
                   border: '1px solid var(--border)', borderRadius: 10,
                   padding: '0 13px', background: 'var(--surface-card)',
@@ -510,7 +525,7 @@ export default function LoginPage({ onLogin }) {
                   }}>
                     Password
                   </label>
-                  <a href="#" style={{
+                  <a href="mailto:it@millpond.nsw.edu.au?subject=VERO%20password%20reset" style={{
                     fontSize: '0.74rem',
                     color: 'var(--teal)',
                     fontWeight: 700,
@@ -520,7 +535,7 @@ export default function LoginPage({ onLogin }) {
                     Forgot?
                   </a>
                 </div>
-                <div style={{
+                <div className="login-field" style={{
                   display: 'flex', alignItems: 'center', gap: 9,
                   border: `1px solid ${error ? 'var(--red-border)' : 'var(--border)'}`,
                   borderRadius: 10, padding: '0 13px',
@@ -564,11 +579,11 @@ export default function LoginPage({ onLogin }) {
                   letterSpacing: '0.01em',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   marginTop: 6,
-                  animation: 'signInPulse 2s ease-in-out infinite',
-                  transition: 'transform 0.12s ease',
+                  boxShadow: '0 4px 16px rgba(20, 184, 184, 0.3)',
+                  transition: 'transform 0.12s ease, box-shadow 0.12s ease',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(20, 184, 184, 0.42)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(20, 184, 184, 0.3)'; }}
               >
                 Sign in as {selectedRole}
                 <ChevronRight size={17} strokeWidth={3} />
@@ -628,15 +643,33 @@ export default function LoginPage({ onLogin }) {
             textAlign: 'center',
             fontSize: '0.78rem', color: 'var(--text-muted)',
           }}>
-            Need help? <a href="#" style={{ color: 'var(--teal)', fontWeight: 700, textDecoration: 'none' }}>Contact IT</a>
+            Need help? <a href="mailto:it@millpond.nsw.edu.au?subject=VERO%20support" style={{ color: 'var(--teal)', fontWeight: 700, textDecoration: 'none' }}>Contact IT</a>
           </div>
         </div>
       </div>
 
       <style>{`
+        .login-field {
+          transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .login-field:focus-within {
+          border-color: var(--teal) !important;
+          box-shadow: 0 0 0 3px rgba(20,184,184,0.14);
+        }
+        .login-role {
+          cursor: pointer;
+        }
+        .login-role:hover {
+          transform: translateY(-1px);
+          box-shadow: var(--shadow-md);
+        }
         @media (max-width: 800px) {
           .login-brand { display: none !important; }
           .login-mobile-logo { display: block !important; }
+          .login-card {
+            background: rgba(255,255,255,0.85) !important;
+            padding: 28px 22px !important;
+          }
         }
       `}</style>
       </div>

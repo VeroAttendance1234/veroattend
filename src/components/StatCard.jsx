@@ -125,7 +125,7 @@ export default function StatCard({ label, value, sub, accent, icon: Icon, trend,
           marginTop: 6, opacity: 0.75,
           letterSpacing: '0.03em',
         }}>
-          Click to see who -&gt;
+          Click to see who &rarr;
         </div>
       )}
     </div>

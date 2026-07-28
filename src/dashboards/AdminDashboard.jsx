@@ -21,6 +21,7 @@ import AttendanceLeaders, { CurrentLeaderStrip } from '../components/AttendanceL
 import AttendanceHeatmap from '../components/AttendanceHeatmap';
 import StudentDetailModal from '../components/StudentDetailModal';
 import Reveal from '../components/Reveal';
+import { useIsMobile } from '../hooks/useMediaQuery';
 import { extraNotifications } from '../data/initialState';
 import {
   notifications, teachers, monthlyAttendance,
@@ -150,6 +151,7 @@ export default function AdminDashboard({
   const [leaderView, setLeaderView]   = useState('All Classes');
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [drill, setDrill]             = useState(null); // { title, accent, icon, students }
+  const isMobile = useIsMobile();
 
   const classOptions = useMemo(() => {
     if (yearFilter === 'All') return ['All'];
@@ -224,7 +226,7 @@ export default function AdminDashboard({
       {/* Left: hero + stat cards   Right: absence requests (key feature) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 400px',
+        gridTemplateColumns: isMobile ? '1fr' : '1fr 400px',
         gap: 20,
         marginBottom: 20,
         alignItems: 'start',
@@ -298,7 +300,7 @@ export default function AdminDashboard({
           </div>
 
           {/* Stat cards - 3 columns in this narrower layout */}
-          <div data-tour="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+          <div data-tour="stats-row" style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 12 }}>
             <StatCard
               label="Total Students" value={students.length} icon={Users} accent="var(--teal)"
               onClick={() => setDrill({ title: 'All Students', accent: 'var(--teal)', icon: Users, students, emptyText: 'No students' })}
@@ -404,7 +406,7 @@ export default function AdminDashboard({
       </div>
 
       {/* ── Leaderboard + Device + Actions ─────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 18, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 280px', gap: 18, marginBottom: 20 }}>
         {/* Leaderboard */}
         <Card>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
