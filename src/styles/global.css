@@ -4,29 +4,29 @@
    VERO DESIGN TOKENS
 ═══════════════════════════════════════════════ */
 :root {
-  /* Brand */
-  --teal:          #14B8B8;
-  --teal-dark:     #0F9898;
-  --teal-deeper:   #0A7A7A;
-  --teal-light:    #E6F6F5;
-  --teal-glow:     rgba(20,184,184,0.12);
-  --teal-border:   rgba(20,184,184,0.22);
+  /* Brand · grounded teal (deeper than the old neon mint) */
+  --teal:          #0D9488;
+  --teal-dark:     #0F766E;
+  --teal-deeper:   #115E59;
+  --teal-light:    #EEF4F3;
+  --teal-glow:     rgba(13,148,136,0.08);
+  --teal-border:   rgba(13,148,136,0.22);
 
-  /* Surfaces */
-  --surface:       #E6F6F5;
+  /* Surfaces · neutral cool grey (de-minted) */
+  --surface:       #F4F5F7;
   --surface-card:  #FFFFFF;
-  --surface-soft:  #F4FAFA;
-  --surface-hover: #F0FAFA;
+  --surface-soft:  #F7F8FA;
+  --surface-hover: #F1F3F5;
 
-  /* Borders */
-  --border:        #D0E8E6;
-  --border-strong: #B4D8D6;
+  /* Borders · neutral hairlines */
+  --border:        #E4E7EC;
+  --border-strong: #D3D8DF;
 
-  /* Text · charcoal system */
-  --text-primary:  #2F3E46;
-  --text-secondary:#3E5260;
-  --text-muted:    #607D8A;
-  --text-soft:     #90A8B4;
+  /* Text · neutral ink system */
+  --text-primary:  #1F2933;
+  --text-secondary:#3A4552;
+  --text-muted:    #667380;
+  --text-soft:     #98A2B0;
 
   /* Semantic */
   --green:         #16A34A;

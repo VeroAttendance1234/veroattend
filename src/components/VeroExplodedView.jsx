@@ -472,8 +472,13 @@ function Annotation({ position, label, sub, side = 'right' }) {
  *   nfc     → ACR122U reader board
  *   pi      → Raspberry Pi 3B
  */
+// The camera is fixed and the canvas is a fixed 520px tall, so the vertical
+// field of view - and therefore how much world-space height is visible - does
+// NOT grow with the window. 'exploded' values must stay inside that window or
+// the part silently leaves frame at full explode: the cap at 2.4 sat ~51px
+// above the canvas top and vanished for the hold phase of every cycle.
 const LAYERS = [
-  { key: 'cap',     stacked: 0.70,  exploded: 2.4,  label: 'VERO enclosure',      sub: '3D-printed PETG · the real CAD geometry', side: 'right' },
+  { key: 'cap',     stacked: 0.70,  exploded: 2.1,  label: 'VERO enclosure',      sub: '3D-printed PETG · the real CAD geometry', side: 'right' },
   { key: 'antenna', stacked: 0.35,  exploded: 1.1,  label: 'NFC antenna coil',    sub: '13.56 MHz · ISO 14443A',                  side: 'left'  },
   { key: 'nfc',     stacked: 0.05,  exploded: -0.2, label: 'ACR122U reader',      sub: 'USB NFC controller · PN532',              side: 'right' },
   { key: 'pi',      stacked: -0.30, exploded: -1.7, label: 'Raspberry Pi 3B',     sub: 'Flask-SocketIO + pyscard',                side: 'left'  },
@@ -603,7 +608,7 @@ export default function VeroExplodedView({
       <Canvas
         shadows
         dpr={[1, 2]}
-        camera={{ position: [4.5, 2.5, 5], fov: 36 }}
+        camera={{ position: [5.4, 3.0, 6.0], fov: 36 }}
         gl={{ antialias: true, alpha: true }}
       >
         {/* Pure-local lighting - no remote HDRI fetch */}

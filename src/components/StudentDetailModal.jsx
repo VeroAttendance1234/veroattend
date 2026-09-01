@@ -20,16 +20,30 @@ function generateHistory(s) {
   }));
 }
 
+const HOUSES = ['Burns', 'Dixon', 'Eldon', 'Forrest', 'Robson'];
+
+/* Deterministic pseudo-random int from a student id.
+   Ids come in two lengths - the four physical-card students are S001..S004
+   while the generated roster is S0001..S1050 - so anything that indexes a
+   fixed character position is wrong for one set or the other. Hashing the
+   whole string is stable across both, and stable across reloads, which
+   matters because these values get printed onto real prop cards. */
+function idHash(id) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h;
+}
+
 /* Mock contact + bio from student id */
 function generateProfile(s) {
   if (!s) return {};
   const slug = s.name.toLowerCase().replace(/\s+/g, '.');
   return {
     email:   s.email || `${slug}@students.millpond.nsw.edu.au`,
-    phone:   `+61 ${400 + (s.id.charCodeAt(2) % 100)} ${100 + s.id.charCodeAt(3) % 900} ${100 + s.id.charCodeAt(4) % 900}`,
+    phone:   `+61 ${400 + (idHash(s.id) % 100)} ${100 + (idHash(s.id + 'p') % 900)} ${100 + (idHash(s.id + 'q') % 900)}`,
     address: `${100 + (s.id.charCodeAt(2) % 800)} Pacific Hwy, Sydney NSW`,
     joined:  '2024',
-    house:   s.house || ['Burns', 'Eldon', 'Forrest', 'Robson'][s.id.charCodeAt(1) % 4],
+    house:   s.house || HOUSES[idHash(s.id) % HOUSES.length],
     streak:  18 + (s.id.charCodeAt(s.id.length - 1) % 14),
   };
 }
