@@ -21,17 +21,39 @@ import './styles/global.css';
    Vercel build stays in Simulator mode on purpose - it can't reach a
    .local address, and an https page can't talk to an http Pi anyway.
 
-   PI_URL points at the Raspberry Pi's Flask-SocketIO server. Override it
-   WITHOUT editing code by creating a `.env` file with a VITE_PI_URL line:
-       VITE_PI_URL=http://veroattendance.local:5000   ← Pi on the network (default)
-       VITE_PI_URL=http://localhost:5000              ← backend running on this Mac
-   Restart `npm run dev` after changing .env. The "VERO system" pill
-   reflects the real handshake + reader status, not where the app is hosted.
-─────────────────────────────────────────────── */
-const IS_LOCAL = typeof window !== 'undefined'
-  && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.endsWith('.local'));
+   By default we connect to the page's OWN origin (localhost:3000) and let the
+   Vite dev server proxy /socket.io through to the Pi - see vite.config.js.
+   That matters: a browser needs OS-level local-network permission to reach the
+   Pi directly, and without it the connection fails as ERR_INTERNET_DISCONNECTED
+   with nothing useful on screen. Node has no such restriction, so proxying
+   makes the page's only network peer localhost.
 
-const PI_URL = import.meta.env.VITE_PI_URL || 'http://veroattendance.local:5000';
+   Set VITE_PI_URL to bypass the proxy and dial the Pi directly (this needs the
+   browser permission above); set VITE_PI_TARGET to change where the proxy
+   points. The "VERO system" pill reflects the real handshake + reader status,
+   not where the app is hosted.
+─────────────────────────────────────────────── */
+/*  Whether attempting a Pi connection is worth anything from THIS origin.
+    Testing the protocol rather than allowlisting hostnames is the whole
+    point: a phone on the same Wi-Fi arrives on the laptop's LAN address
+    (192.168.x.x, or whatever the router handed out that morning), which no
+    hostname list could have predicted, and the old localhost-only check
+    silently dropped it into Simulator mode with no real taps ever.
+
+    Every http origin is either localhost or a LAN address serving this dev
+    build, and both reach the Pi through the dev server's bridge. The
+    deployed build is https, where the browser blocks a request to an http
+    Pi as mixed content before it leaves the page, so there is genuinely
+    nothing to attempt there and skipping it saves a pointless retry loop. */
+const CAN_REACH_PI = typeof window !== 'undefined'
+  && window.location.protocol === 'http:';
+
+// '' = same origin, which the dev-server proxy forwards to the Pi.
+const PI_URL = import.meta.env.VITE_PI_URL ?? '';
+// Plain HTTP calls take the '/pi' proxy prefix, which the dev server rewrites
+// away before handing the request to the bridge. When VITE_PI_URL is set the
+// browser is dialling the Pi directly and no prefix applies.
+const PI_HTTP = PI_URL || '/pi';
 
 /* ── Admin onboarding tour ────────────────── */
 const ADMIN_TOUR_STEPS = [
@@ -83,8 +105,27 @@ const ADMIN_TOUR_STEPS = [
 ];
 
 let tapCounter = 0;
+
+/* The live feed is a rolling window, not a ledger. Left running, the auto
+   simulator adds a tap every 12-22s (~4,500/day), and every entry here becomes
+   a rendered row carrying a cloned student object. Uncapped, a week-long run
+   accumulates tens of thousands of them and each new tap re-renders the lot,
+   so the cost of a tap grows with every tap already taken. The permanent
+   record lives in SQLite on the Pi; this is just what's on screen. */
+const MAX_TAPS = 200;
+
+/* Local calendar day. Deliberately not toISOString(), which is UTC and would
+   roll the day over at 10am AEST instead of midnight. */
+function localDayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function formatTime(d) {
+  return d.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: true });
+}
 function now() {
-  return new Date().toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: true });
+  return formatTime(new Date());
 }
 function timestamp() {
   return new Date().toISOString().slice(0, 16).replace('T', ' ');
@@ -135,9 +176,33 @@ function AppInner() {
   const studentsRef = useRef(initialStudents);
   useEffect(() => { studentsRef.current = students; }, [students]);
 
+  /* Daily rollover.
+     A demo left running for weeks crosses midnight, and nothing here used to
+     notice. `present` is only ever set true (on a tap) and never cleared, so
+     the whole roll read present within a fortnight, and the live feed kept
+     every scan since launch under a heading that said "today". The Pi already
+     scopes its own query to a single date - see get_today_attendance() in
+     backend/database.py - so this is the client catching up to what the
+     database already believes.
+
+     Polled once a minute rather than a timer armed for midnight: a laptop
+     that sleeps through midnight never fires that timer, and a kiosk that
+     does stay awake gets the same result either way. */
+  useEffect(() => {
+    let day = localDayKey();
+    const id = setInterval(() => {
+      const today = localDayKey();
+      if (today === day) return;
+      day = today;
+      setTaps([]);
+      setStudents(prev => prev.map(s => ({ ...s, present: false, status: 'absent' })));
+    }, 60_000);
+    return () => clearInterval(id);
+  }, []);
+
   /* Auto-simulated tap activity - fires every 12–22s while signed in so the
      live feed and dashboards never look frozen. Draws from the WHOLE school
-     (never Toby) and mixes on-time check-ins, late arrivals and students
+     (never Grace) and mixes on-time check-ins, late arrivals and students
      stepping out, so it never looks like a fixed handful of people looping.
      Pauses while the marker page is open so it doesn't fight the welcome demo. */
   useEffect(() => {
@@ -183,7 +248,7 @@ function AppInner() {
     const status = action === 'out' ? 'out' : (opts.status || 'on-time');
 
     setStudents(prev => prev.map(s => s.id === student.id ? { ...s, present: true, status } : s));
-    setTaps(prev => [{ ...student, id: `tap-${++tapCounter}`, action, status, ts: Date.now(), time: now() }, ...prev]);
+    setTaps(prev => [{ ...student, id: `tap-${++tapCounter}`, action, status, ts: Date.now(), time: now() }, ...prev].slice(0, MAX_TAPS));
 
     if (action === 'out') {
       toast.success(`${student.name} stepped out`, `Year ${student.year} · ${student.class} · out of class`);
@@ -197,7 +262,7 @@ function AppInner() {
   /* Anti-cheat demo trigger: simulate one person tapping a STACK of borrowed
      cards in quick succession (classic buddy-punching). The rapid burst is
      caught live by the Integrity Alerts detector - proving the limitation is
-     handled rather than ignored. Never uses Toby's card. */
+     handled rather than ignored. Never uses Grace's card. */
   function simulateCheatAttempt() {
     const pool = studentsRef.current.filter(s => s.id !== DEMO_STUDENT_ID && !s.present);
     if (pool.length < 3) return;
@@ -248,20 +313,81 @@ function AppInner() {
      a real `connect` event from the Pi's Flask-SocketIO server.
   ─────────────────────────────────────────────── */
   useEffect(() => {
-    if (!IS_LOCAL) return;
+    if (!CAN_REACH_PI) return;
 
     let cancelled = false;
     import('socket.io-client').then(({ io }) => {
       if (cancelled) return;
-      const socket = io(PI_URL, {
+      const socket = io(PI_URL || undefined, {
         reconnectionDelay: 2000,
         reconnectionAttempts: Infinity,
         timeout: 4000,
       });
       socketRef.current = socket;
 
+      /*  Replay the day on connect.
+          The socket only ever carries taps from this moment forward, so a
+          device that joins late - the phone picked up at 11am - started from
+          the seeded roster with an empty feed and disagreed with the laptop
+          about the entire morning, permanently. This pulls what actually
+          happened today from the Pi, which is the same source the laptop has
+          been building its feed from, so the two screens land on one story.  */
+      async function syncToday() {
+        try {
+          const res = await fetch(`${PI_HTTP}/attendance`, { cache: 'no-store' });
+          if (!res.ok) return;
+          const rows = await res.json();
+          if (!Array.isArray(rows) || rows.length === 0) return;
+
+          setTaps(rows.slice(0, MAX_TAPS).map(r => {
+            // SQLite CURRENT_TIMESTAMP is UTC in 'YYYY-MM-DD HH:MM:SS'. That
+            // space is not ISO 8601 and some browsers refuse to parse it, so
+            // normalise before letting Date near it.
+            const when = new Date(`${String(r.timestamp).replace(' ', 'T')}Z`);
+            const valid = !Number.isNaN(when.getTime());
+            return {
+              ...r,
+              // Keyed off the database row id, so reconnecting and syncing
+              // again cannot duplicate rows that are already on screen.
+              id: `tap-db-${r.id}`,
+              status: r.action === 'out' ? 'out' : 'on-time',
+              ts:   valid ? when.getTime() : Date.now(),
+              time: valid ? formatTime(when) : now(),
+            };
+          }));
+
+          // Rows arrive newest first, so the first entry seen for a student is
+          // their latest tap and decides where they currently are. A check-out
+          // still counts as having attended, matching handleTap.
+          const latest = new Map();
+          for (const r of rows) {
+            if (!latest.has(r.student_id)) latest.set(r.student_id, r.action);
+          }
+          setStudents(prev => prev.map(st => {
+            const action = latest.get(st.id);
+            if (!action) return st;
+            return { ...st, present: true, status: action === 'out' ? 'out' : 'on-time' };
+          }));
+        } catch {
+          // Pi vanished mid-fetch. The socket's own reconnect will call this
+          // again, so there is nothing useful to do here.
+        }
+      }
+
       socket.on('connect', () => {
         setPiConnected(true);
+        syncToday();
+        /*  Which transport won matters for how instant a tap feels, and it is
+            otherwise invisible. Socket.IO always opens on HTTP long-polling
+            and upgrades to a real WebSocket a moment later - but only if the
+            Pi can serve one, which needs simple-websocket installed there
+            (see backend/requirements.txt). Without it the upgrade never
+            happens and every tap pays a fresh request round trip. Logged so
+            that is a glance at the console rather than a guess. */
+        const logTransport = (label) =>
+          console.info(`[vero] socket ${label}: ${socket.io.engine.transport.name}`);
+        logTransport('connected on');
+        socket.io.engine.once('upgrade', () => logTransport('upgraded to'));
         // Honest: reaching the Pi does NOT mean the reader works. We wait
         // for `reader_status` before claiming the ACR122U is live.
         toast.success('Pi reachable', 'Checking for ACR122U reader…');
@@ -285,10 +411,18 @@ function AppInner() {
         });
       });
       // A REAL hardware tap from the ACR122U. This is the ONLY path that can
-      // surface Toby: the simulator deliberately excludes him, but when his
+      // surface Grace: the simulator deliberately excludes her, but when her
       // physical card (UID 67BDE33D) is tapped on the reader the Pi sends it
       // here and it flows straight onto the live feed like any other student.
-      socket.on('card_tap',  (studentData) => handleTap(studentData));
+      /*  The Pi now says whether the tap was an in or an out, and every
+          client gets that same answer in the same broadcast. Deciding it
+          locally instead meant a laptop and a phone whose rosters had
+          drifted could read one physical tap as opposite actions. Falls
+          back to the local toggle if an older Pi sends no action. */
+      socket.on('card_tap',  (studentData) => handleTap(
+        studentData,
+        studentData?.action ? { action: studentData.action } : {},
+      ));
     });
 
     return () => {

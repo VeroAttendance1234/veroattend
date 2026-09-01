@@ -47,12 +47,15 @@ function generateStudents() {
 const _raw = generateStudents();
 
 // ─── Canonical demo identity ──────────────────────────────────
-// The Student tab is viewed AS Toby; the Parent tab AS Toby's guardian.
-// Dashboards resolve this id (never students[0]) so the viewer is always Toby.
-export const DEMO_STUDENT_ID = 'S001';
+// The Student tab is viewed AS Grace; the Parent tab AS Grace's guardian.
+// Dashboards resolve this id (never students[0]) so the viewer is always Grace.
+// Starts absent on purpose: the simulator below refuses to tap the demo
+// student, so the only thing that can mark her present is a real card on the
+// reader, which is what makes the hardware demo land.
+export const DEMO_STUDENT_ID = 'S005';
 export const demoStudent = {
-  id: 'S001', name: 'Toby Crowther', year: 12, class: '12A', house: 'Dixon',
-  email: 'tc.160138@student.millpond.nsw.edu.au', uid: '67BDE33D', present: false, status: 'absent',
+  id: 'S005', name: 'Grace Turner', year: 11, class: '11A', house: 'Dixon',
+  email: 'gt.174892@student.millpond.nsw.edu.au', uid: '67BDE33D', present: false, status: 'absent',
 };
 
 // Stamp real RFID card UIDs onto real class rosters for the live Marker demo.
@@ -64,15 +67,21 @@ function overrideStudent(students, classCode, position, overrides) {
   }
 }
 
-// Order matters: place the 12A students BEFORE moving Toby into 12A, or the
-// class filter re-matches Toby (now in 12A, earlier in the array) and overwrites
-// his identity. Toby is stamped LAST so nothing can clobber him.
-overrideStudent(_raw, '11B', 0, { id: 'S002', name: 'Liam Chen',       uid: 'A139E43D', present: false, status: 'absent'  });
-overrideStudent(_raw, '12A', 0, { id: 'S003', name: 'Sofia Nguyen',    uid: 'C92BE43D', present: true,  status: 'on-time' });
-overrideStudent(_raw, '12A', 1, { id: 'S004', name: 'Marcus Williams', uid: '1CC9E33D', present: false, status: 'absent'  });
+// Every stamp below keeps the student in the class it already filtered on, so
+// nobody drops out of a filter mid-run and shifts the positions after them.
+// That used to be a real hazard here: the demo student was Year 12 but was
+// stamped over an 11A student, so claiming '11A' position 0 moved them into
+// 12A and shifted every later 11A position by one. Grace is Year 11 already,
+// which removes the problem rather than working around it.
+overrideStudent(_raw, '11B', 0, { id: 'S002', name: 'Jack Wilson',     uid: 'A139E43D', present: false, status: 'absent'  });
+overrideStudent(_raw, '12A', 0, { id: 'S003', name: 'Emily Clarke',    uid: 'C92BE43D', present: true,  status: 'on-time' });
+overrideStudent(_raw, '12A', 1, { id: 'S004', name: 'Thomas Baker',    uid: '1CC9E33D', present: false, status: 'absent'  });
+// Toby is no longer the persona, just an ordinary Year 12 student who still
+// holds a real card, so his tap resolves like anyone else's.
+overrideStudent(_raw, '12A', 2, { id: 'S001', name: 'Toby Crowther',   uid: '3041835B', present: false, status: 'absent'  });
 overrideStudent(_raw, '11A', 0, { ...demoStudent });
 
-// Foolproof: guarantee S001 = Toby exists even if generation/order ever changes.
+// Foolproof: guarantee the demo student exists even if generation order changes.
 if (!_raw.some(s => s.id === DEMO_STUDENT_ID)) {
   Object.assign(_raw[0], demoStudent);
 }
@@ -81,8 +90,8 @@ export const students = _raw;
 
 // ─── Simulated tap generator ──────────────────────────────────
 // Drives ALL fake activity (auto-feed + every "Simulate tap" button). It
-// never returns Toby: his physical card (UID 67BDE33D) is reserved for the
-// marker to test the real ACR122U reader, so Toby only ever appears via a
+// never returns Grace: her physical card (UID 67BDE33D) is reserved for the
+// marker to test the real ACR122U reader, so Grace only ever appears via a
 // genuine hardware `card_tap`. Returns realistic variety - mostly on-time
 // check-ins, some late arrivals, the odd student stepping out of class and
 // later tapping back in - so the feed never looks like a fixed 4-person loop.
@@ -117,18 +126,17 @@ export function pickSimulatedTap(roster = []) {
   return null;
 }
 
-// ─── Toby Crowther · 6-year record (Year 7 → Year 12) ─────────
+// ─── Grace Turner · 5-year record (Year 7 → Year 11) ──────────
 // Drives the attendance journey + grades cards on the Student/Parent tabs.
 export const studentYears = [
-  { year: 'Year 7',  level: 7,  attendance: 97.4, present: 187, absent: 4,  late: 5, average: 79 },
-  { year: 'Year 8',  level: 8,  attendance: 96.1, present: 184, absent: 7,  late: 6, average: 81 },
-  { year: 'Year 9',  level: 9,  attendance: 93.8, present: 180, absent: 12, late: 9, average: 80 },
-  { year: 'Year 10', level: 10, attendance: 95.2, present: 183, absent: 9,  late: 7, average: 84 },
-  { year: 'Year 11', level: 11, attendance: 94.6, present: 181, absent: 10, late: 8, average: 85 },
-  { year: 'Year 12', level: 12, attendance: 96.9, present: 186, absent: 5,  late: 3, average: 88 },
+  { year: 'Year 7',  level: 7,  attendance: 96.8, present: 186, absent: 5,  late: 5, average: 77 },
+  { year: 'Year 8',  level: 8,  attendance: 95.4, present: 183, absent: 8,  late: 6, average: 80 },
+  { year: 'Year 9',  level: 9,  attendance: 93.2, present: 179, absent: 13, late: 9, average: 79 },
+  { year: 'Year 10', level: 10, attendance: 95.9, present: 184, absent: 7,  late: 6, average: 83 },
+  { year: 'Year 11', level: 11, attendance: 96.4, present: 185, absent: 6,  late: 4, average: 86 },
 ];
 
-// Term-by-term attendance across all six years (deterministic, ~24 points)
+// Term-by-term attendance across all five years (deterministic, ~20 points)
 export const studentAttendanceByTerm = studentYears.flatMap(y =>
   [1, 2, 3, 4].map(t => ({
     period: `Y${y.level} T${t}`,
@@ -138,14 +146,16 @@ export const studentAttendanceByTerm = studentYears.flatMap(y =>
   }))
 );
 
-// Current Year 12 HSC course results
+// Current Year 11 Preliminary course results. HSC bands are a Year 12 concept
+// and reporting them here would be wrong, so Preliminary courses carry the
+// A-E common grade plus a course rank, which is what schools actually issue.
 export const studentGrades = [
-  { subject: 'Software Design & Development', mark: 91, grade: 'A', band: 'Band 6', trend: 4,  teacher: 'Mr D. Chen'     },
-  { subject: 'Mathematics Advanced',         mark: 88, grade: 'A', band: 'Band 6', trend: 2,  teacher: 'Ms L. Patel'    },
-  { subject: 'Mathematics Extension 1',      mark: 82, grade: 'A', band: 'E3',     trend: 5,  teacher: 'Ms L. Patel'    },
-  { subject: 'Physics',                      mark: 79, grade: 'B', band: 'Band 5', trend: 3,  teacher: 'Dr A. Nguyen'   },
-  { subject: 'English Advanced',             mark: 74, grade: 'B', band: 'Band 4', trend: -1, teacher: 'Ms E. Richards' },
-  { subject: 'Design & Technology',          mark: 94, grade: 'A', band: 'Band 6', trend: 6,  teacher: 'Mr S. Hill'     },
+  { subject: 'Software Design & Development', mark: 91, grade: 'A', rank: '2 / 54',  trend: 4,  teacher: 'Mr D. Chen'     },
+  { subject: 'Mathematics Advanced',         mark: 88, grade: 'A', rank: '6 / 88',  trend: 2,  teacher: 'Ms L. Patel'    },
+  { subject: 'Mathematics Extension 1',      mark: 82, grade: 'A', rank: '11 / 31', trend: 5,  teacher: 'Ms L. Patel'    },
+  { subject: 'Physics',                      mark: 79, grade: 'B', rank: '19 / 62', trend: 3,  teacher: 'Dr A. Nguyen'   },
+  { subject: 'English Advanced',             mark: 74, grade: 'B', rank: '34 / 96', trend: -1, teacher: 'Ms E. Richards' },
+  { subject: 'Design & Technology',          mark: 94, grade: 'A', rank: '1 / 47',  trend: 6,  teacher: 'Mr S. Hill'     },
 ];
 
 // ─── Teachers ─────────────────────────────────────────────────
@@ -194,7 +204,7 @@ export const teacherTimetable = {
   Fri: { 'Period 1':'Preparation','Period 2':'9C Maths','Recess':'·',   'Period 3':'11A Maths', 'Period 4':'10D Maths'    },
 };
 
-// ─── Student timetable (Toby Crowther, 12A) ─────────────────────
+// ─── Student timetable (Grace Turner, 11A) ──────────────────────
 export const timetable = {
   Mon: ['English',    'Mathematics','Recess','Science',    'PDHPE'      ],
   Tue: ['History',    'English',   'Recess','Visual Arts','Mathematics' ],
@@ -230,9 +240,9 @@ export const journalEntries = [
 ];
 
 export const notifications = [
-  { id:1, text:'Toby Crowther marked absent Period 2',  time:'10:05 AM', type:'warn' },
+  { id:1, text:'Grace Turner marked absent Period 2',   time:'10:05 AM', type:'warn' },
   { id:2, text:'12B · 3 students absent today',         time:'9:30 AM',  type:'warn' },
-  { id:3, text:'Wellbeing check submitted · Toby',      time:'9:02 AM',  type:'info' },
+  { id:3, text:'Wellbeing check submitted · Grace',     time:'9:02 AM',  type:'info' },
   { id:4, text:'New journal entry added',               time:'8:45 AM',  type:'info' },
   { id:5, text:'7C · 100% attendance today 🎉',         time:'9:10 AM',  type:'info' },
 ];

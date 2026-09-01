@@ -12,6 +12,13 @@ const STATUS_VIEW = {
   'out':     { badge: 'info',    label: 'Checked out', dot: 'absent',  out: true  },
 };
 
+/* Rows actually committed to the DOM. The panel is 340px tall, so this is
+   already several screens of scrollback; App.jsx caps the underlying array at
+   200, and two dashboards render this list at once. Every row carries an
+   Avatar and an SVG sparkline, and `maxHeight` only clips them visually -
+   without this they all stay in the DOM and get re-rendered on every tap. */
+const MAX_ROWS = 50;
+
 export default function LiveFeed({ taps }) {
   const listRef = useRef(null);
 
@@ -57,7 +64,7 @@ export default function LiveFeed({ taps }) {
           .livefeed-spark { display: flex !important; }
         }
       `}</style>
-      {taps.map((tap, i) => {
+      {taps.slice(0, MAX_ROWS).map((tap, i) => {
         const view = STATUS_VIEW[tap.status] || STATUS_VIEW['on-time'];
         return (
         <div

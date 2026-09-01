@@ -14,6 +14,23 @@ import time
 import binascii
 
 
+# ── Poll cadence ────────────────────────────────────────────────
+# IDLE_POLL_S is the one that decides how instant a tap feels. Every tap
+# begins from the no-card state, so this interval bounds how long the reader
+# can sit on a card before noticing it. At 0.3s a tap could lag by a third of
+# a second before the WebSocket hop even started; 0.12s puts detection at
+# roughly an eighth of a second without hammering pcscd.
+IDLE_POLL_S = 0.12
+
+# A card already sitting on the reader has been read and reported once, and
+# last_uid suppresses repeats, so re-reading it quickly achieves nothing.
+CARD_PRESENT_S = 0.5
+
+# How often to ask pcscd whether the reader is still physically attached.
+# The answer only changes when someone unplugs a USB cable.
+PRESENCE_CHECK_S = 2.0
+
+
 def uid_to_string(uid_bytes):
     return ''.join(f'{b:02X}' for b in uid_bytes)
 
@@ -72,13 +89,22 @@ def start_reader(on_tap_callback, status_callback=None):
         print(f"[rfid_reader] Using reader: {reader}")
 
         last_uid = None
+        next_presence_check = 0.0
         # ── Read loop: stays here while the reader remains attached ──
         while True:
-            if not list_readers():
-                # Reader was unplugged / PC/SC dropped — go back to discovery.
-                report(False)
-                print("[rfid_reader] Reader lost — waiting for reconnect...")
-                break
+            # Asking pcscd for the reader list is an IPC round trip. Running
+            # it on every pass spent one on each ~120ms poll to answer a
+            # question that only changes when a cable moves, so it is
+            # throttled. Worst case the status pill is 2s stale; the tap path
+            # below is untouched by this.
+            if time.monotonic() >= next_presence_check:
+                next_presence_check = time.monotonic() + PRESENCE_CHECK_S
+                if not list_readers():
+                    # Reader unplugged / PC/SC dropped — back to discovery.
+                    report(False)
+                    print("[rfid_reader] Reader lost — waiting for reconnect...")
+                    break
+            conn = None
             try:
                 conn = reader.createConnection()
                 conn.connect()
@@ -89,14 +115,25 @@ def start_reader(on_tap_callback, status_callback=None):
                         last_uid = uid
                         print(f"[rfid_reader] Card tapped: {uid}")
                         on_tap_callback(uid)
-                time.sleep(0.5)
+                time.sleep(CARD_PRESENT_S)
             except (NoCardException, CardConnectionException):
                 # No card on the reader right now — reader itself is still fine.
                 last_uid = None
-                time.sleep(0.3)
+                time.sleep(IDLE_POLL_S)
             except Exception as e:
                 print(f"[rfid_reader] Error: {e}")
                 time.sleep(1)
+            finally:
+                # Hand the PC/SC handle back explicitly instead of leaving it
+                # to the garbage collector's timing. At ~8 polls a second this
+                # is several hundred thousand handles a day, and trusting a
+                # destructor to return every one of them is the kind of thing
+                # that holds up for a demo and not for a term.
+                if conn is not None:
+                    try:
+                        conn.disconnect()
+                    except Exception:
+                        pass
 
 
 if __name__ == '__main__':

@@ -131,7 +131,7 @@ const DEMO_ACCOUNTS = [
     ],
   },
   {
-    role: 'Student', label: 'Toby Crowther', colour: '#16A34A', icon: Heart,
+    role: 'Student', label: 'Grace Turner', colour: '#16A34A', icon: Heart,
     description: 'Year 12A student · Dixon House · wellbeing, goals, journal, timetable.',
     features: [
       { t: 'Welcome banner',        d: 'Personalised greeting with today\'s status and current mood' },
@@ -143,8 +143,8 @@ const DEMO_ACCOUNTS = [
     ],
   },
   {
-    role: 'Parent', label: 'J. Crowther', colour: '#7C3AED', icon: Users,
-    description: 'Parent of Toby · attendance, wellbeing, absence requests.',
+    role: 'Parent', label: 'J. Turner', colour: '#7C3AED', icon: Users,
+    description: 'Parent of Grace · attendance, wellbeing, absence requests.',
     features: [
       { t: 'Child status card',     d: 'Border colour shows whether child is present today' },
       { t: 'Week attendance',       d: 'Mon-Fri breakdown with progress bar and weekly rate' },
@@ -1299,7 +1299,7 @@ export default function MarkerPage({ onClose, setRole }) {
                     fontWeight: 800, fontSize: '1.2rem',
                     color: 'var(--text-primary)', marginBottom: 3, letterSpacing: '-0.02em',
                   }}>
-                    Toby Crowther
+                    Grace Turner
                   </div>
                   <div style={{ fontSize: '0.86rem', color: 'var(--text-muted)' }}>
                     Millpond High School · HSC SDD 2026

@@ -1,0 +1,45 @@
+# VERO attendance backend, run as a supervised service on the Raspberry Pi.
+#
+# Install:
+#   sudo cp /home/vero/veroattend/backend/veroattend.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now veroattend
+#
+# Check:  systemctl status veroattend
+# Logs:   journalctl -u veroattend -f
+#
+# Adjust User= / WorkingDirectory= / ExecStart= if the repo is not at
+# /home/vero/veroattend or the venv lives somewhere else.
+
+[Unit]
+Description=VERO attendance backend (Flask-SocketIO + ACR122U reader)
+After=network-online.target pcscd.service
+Wants=network-online.target
+# Wants, not Requires: rfid_reader.py already degrades gracefully when PC/SC
+# is unavailable (it reports the reader offline and keeps retrying), so a dead
+# pcscd should not take the whole web app down with it.
+Wants=pcscd.service
+# systemd stops restarting a unit that fails 5 times in 10s. That default
+# turns one bad boot into a permanently dead service, which is exactly the
+# failure this unit exists to prevent. 0 disables the rate limit.
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=vero
+WorkingDirectory=/home/vero/veroattend/backend
+ExecStart=/home/vero/veroattend/backend/venv/bin/python3 app.py
+Restart=always
+RestartSec=5
+
+# print() to a pipe is block-buffered, so without this the log sits in a 4KB
+# buffer and arrives in bursts hours later - useless when you are trying to
+# see whether a tap registered.
+Environment=PYTHONUNBUFFERED=1
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=veroattend
+
+[Install]
+WantedBy=multi-user.target

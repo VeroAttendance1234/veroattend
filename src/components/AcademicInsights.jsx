@@ -5,6 +5,15 @@ import { TrendingUp, TrendingDown, GraduationCap, CalendarCheck, Award } from 'l
 import Card from './Card';
 import { studentYears, studentAttendanceByTerm, studentGrades } from '../data/sampleData';
 
+/*  How long the attendance record actually runs, read off the data rather
+    than written into the headings. These were hardcoded as "6-Year" and
+    "Year 7 → Year 12", so when the persona became a Year 11 student the
+    labels carried on claiming a Year 12 record and nothing failed to
+    flag it. Derived at module scope because both cards below need them. */
+const SPAN_YEARS = studentYears.length;
+const FIRST_YEAR = studentYears[0]?.year ?? 'Year 7';
+const LAST_YEAR  = studentYears[studentYears.length - 1]?.year ?? 'Year 11';
+
 /* Colour scales ─────────────────────────────────────────────── */
 function rateColour(r) {
   if (r >= 96) return { color: 'var(--green)', bg: 'var(--green-light)', border: 'var(--green-border)' };
@@ -45,7 +54,7 @@ const AcaTooltip = ({ active, payload, label }) => {
 };
 
 /* ── 6-year attendance journey ──────────────────────────────── */
-export function AttendanceJourney({ name = 'Toby' }) {
+export function AttendanceJourney({ name = 'Grace' }) {
   const first = name.split(' ')[0];
   const avg = Math.round(
     (studentYears.reduce((a, y) => a + y.attendance, 0) / studentYears.length) * 10
@@ -58,17 +67,17 @@ export function AttendanceJourney({ name = 'Toby' }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <CalendarCheck size={16} style={{ color: 'var(--teal)' }} />
-          <p className="section-title" style={{ marginBottom: 0 }}>Attendance · 6-Year History</p>
+          <p className="section-title" style={{ marginBottom: 0 }}>Attendance · {SPAN_YEARS}-Year History</p>
         </div>
         <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-          Year 7 → Year 12 · {first}
+          {FIRST_YEAR} → {LAST_YEAR} · {first}
         </span>
       </div>
 
       {/* Headline stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
         {[
-          { label: '6-Year Average', value: `${avg}%`,            colour: 'var(--teal)'  },
+          { label: `${SPAN_YEARS}-Year Average`, value: `${avg}%`,  colour: 'var(--teal)'  },
           { label: 'Best Year',      value: best.year.replace('Year ', 'Yr '), sub: `${best.attendance}%`, colour: 'var(--green)' },
           { label: 'Total Days Absent', value: totalAbsent,       colour: 'var(--amber)' },
         ].map(s => (
@@ -138,20 +147,22 @@ export function AttendanceJourney({ name = 'Toby' }) {
 }
 
 /* ── Academic results ───────────────────────────────────────── */
-export function AcademicResults({ name = 'Toby' }) {
+export function AcademicResults({ name = 'Grace' }) {
   const first = name.split(' ')[0];
   const avgMark = Math.round(studentGrades.reduce((a, g) => a + g.mark, 0) / studentGrades.length);
-  const band6 = studentGrades.filter(g => g.band === 'Band 6' || g.band === 'E4').length;
+  // Year 11 Preliminary reports an A-E common grade, not an HSC band, so the
+  // headline counts top grades rather than Band 6s.
+  const topGrades = studentGrades.filter(g => g.grade === 'A').length;
 
   return (
     <Card style={{ marginBottom: 20 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <GraduationCap size={17} style={{ color: 'var(--purple)' }} />
-          <p className="section-title" style={{ marginBottom: 0 }}>Academic Results · Year 12</p>
+          <p className="section-title" style={{ marginBottom: 0 }}>Academic Results · Year 11</p>
         </div>
         <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.78rem', fontWeight: 700, color: 'var(--purple)' }}>
-          <Award size={13} /> {band6} subjects at Band 6
+          <Award size={13} /> {topGrades} subjects at A grade
         </span>
       </div>
 
@@ -176,7 +187,7 @@ export function AcademicResults({ name = 'Toby' }) {
           borderRadius: 12, padding: '12px 14px 6px',
         }}>
           <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
-            Yearly average · Year 7 → 12
+            Yearly average · {FIRST_YEAR} → {LAST_YEAR.replace('Year ', '')}
           </div>
           <ResponsiveContainer width="100%" height={96}>
             <AreaChart data={studentYears} margin={{ top: 4, right: 4, left: -30, bottom: 0 }}>
@@ -217,7 +228,7 @@ export function AcademicResults({ name = 'Toby' }) {
                 fontSize: '0.66rem', fontWeight: 800, padding: '2px 9px', borderRadius: 99,
                 background: c.bg, color: c.color, border: `1px solid ${c.border}`,
               }}>
-                {g.band}
+                {g.rank}
               </span>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 3,

@@ -10,8 +10,8 @@ const ROLES = ['Admin', 'Teacher', 'Student', 'Parent'];
 const ROLE_META = {
   Admin:   { colour: 'var(--teal)',   initials: 'AD', label: 'Administrator', icon: Monitor },
   Teacher: { colour: 'var(--blue)',   initials: 'TC', label: 'Mr David Chen', icon: BookOpen },
-  Student: { colour: 'var(--green)',  initials: 'TC', label: 'Toby Crowther', icon: Heart },
-  Parent:  { colour: 'var(--purple)', initials: 'JC', label: 'J. Crowther',   icon: Users },
+  Student: { colour: 'var(--green)',  initials: 'GT', label: 'Grace Turner',  icon: Heart },
+  Parent:  { colour: 'var(--purple)', initials: 'JT', label: 'J. Turner',     icon: Users },
 };
 
 const PAGE_TITLES = {

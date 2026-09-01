@@ -30,6 +30,11 @@ dist-ssr
 # ── Backend (runs on Pi only) ──
 backend/__pycache__/
 backend/data/*.db
+# WAL mode keeps two sidecar files next to the database while the service is
+# running. They are not matched by the *.db pattern above and are pure runtime
+# state, so they must never be committed.
+backend/data/*.db-wal
+backend/data/*.db-shm
 backend/venv/
 *.pyc
 
@@ -38,3 +43,5 @@ backend/venv/
 .env
 .env.local
 .env*.local
+# Dated hand-made backups of the above, which the patterns miss.
+.env.backup-*

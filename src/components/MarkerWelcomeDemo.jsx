@@ -24,7 +24,7 @@ const STORAGE_KEY = 'vero.markerDemo.seen';
 const PIPELINE = [
   { ms: 38,  icon: CreditCard, label: 'Card detected',          detail: 'ACR122U USB interrupt fired',                  colour: '#14B8B8' },
   { ms: 122, icon: Cpu,        label: 'UID resolved',           detail: 'pyscard → 04:A3:9B:2C:7E:F1',                  colour: '#2563EB' },
-  { ms: 188, icon: Database,   label: 'Student matched',        detail: 'SQLite lookup → Toby Crowther · Year 12A',     colour: '#7C3AED' },
+  { ms: 188, icon: Database,   label: 'Student matched',        detail: 'SQLite lookup → Grace Turner · Year 11A',     colour: '#7C3AED' },
   { ms: 246, icon: Wifi,       label: 'Push via WebSocket',     detail: 'Flask-SocketIO emit "card_tap" → 4 dashboards', colour: '#16A34A' },
   { ms: 312, icon: CheckCircle,label: 'Status: Present (8:42am)', detail: 'React 19 batched 4 useState updates · 1 paint', colour: '#0F9898' },
 ];

@@ -8,7 +8,7 @@ import Tagline from '../components/Tagline';
 /* Rotates through simulated card-tap events to suggest the system is alive */
 function LiveActivityTicker() {
   const EVENTS = [
-    { name: 'Toby Crowther',   class: '12A · Maths',    when: 'just now', colour: 'var(--green)' },
+    { name: 'Grace Turner',    class: '11A · Maths',    when: 'just now', colour: 'var(--green)' },
     { name: 'Mr David Chen',   class: 'Year 11 home',   when: '4s ago',   colour: 'var(--blue)' },
     { name: 'Hassan Khan',     class: '8E · Geography', when: '11s ago',  colour: 'var(--teal)' },
     { name: 'Olivia Burns',    class: '12B · Physics',  when: '18s ago',  colour: 'var(--purple)' },
@@ -80,8 +80,8 @@ function LiveActivityTicker() {
 const ROLE_OPTIONS = [
   { role: 'Admin',   label: 'Administrator',   email: 'admin@millpond.nsw.edu.au',     colour: '#14B8B8', icon: Monitor },
   { role: 'Teacher', label: 'Mr David Chen',   email: 'd.chen@millpond.nsw.edu.au',    colour: '#2563EB', icon: BookOpen },
-  { role: 'Student', label: 'Toby Crowther',   email: 'tc.160138@student.millpond.nsw.edu.au', colour: '#16A34A', icon: Heart },
-  { role: 'Parent',  label: 'J. Crowther',     email: 'jcrowther@parents.millpond.nsw',        colour: '#7C3AED', icon: Users },
+  { role: 'Student', label: 'Grace Turner',    email: 'gt.174892@student.millpond.nsw.edu.au', colour: '#16A34A', icon: Heart },
+  { role: 'Parent',  label: 'J. Turner',       email: 'jturner@parents.millpond.nsw',          colour: '#7C3AED', icon: Users },
 ];
 
 export default function LoginPage({ onLogin }) {

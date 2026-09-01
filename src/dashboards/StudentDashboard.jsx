@@ -461,7 +461,7 @@ export default function StudentDashboard({ students, threads = [], onSendMessage
           <MessageSquare size={16} style={{ color: 'var(--purple)' }} />
           <p className="section-title" style={{ marginBottom: 0 }}>Messages</p>
         </div>
-        <MessagingPanel role="student" userName="Toby Crowther" threads={threads} onSend={onSendMessage} />
+        <MessagingPanel role="student" userName="Grace Turner" threads={threads} onSend={onSendMessage} />
       </Card>
       </Reveal>
     </div>
