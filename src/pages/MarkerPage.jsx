@@ -12,6 +12,7 @@ import CountUp from '../components/CountUp';
 import MarkerWelcomeDemo from '../components/MarkerWelcomeDemo';
 import RollImpactCalculator from '../components/RollImpactCalculator';
 import MessagingDemo from '../components/MessagingDemo';
+import MarkerLiveTaps from '../components/MarkerLiveTaps';
 
 // Heavy three.js bundle - lazy-load so the marker page paints fast
 const VeroTapAnimation = lazy(() => import('../components/VeroTapAnimation'));
@@ -463,7 +464,10 @@ function FeatureModal({ account, onClose, onOpen }) {
 /* ─────────────────────────────────────────────
    MAIN PAGE
 ───────────────────────────────────────────── */
-export default function MarkerPage({ onClose, setRole }) {
+/*  `taps` / `systemLive` / `piConnected` are threaded through purely so the
+    pipeline section can prove itself with a real scan - see MarkerLiveTaps.
+    They are read-only here; this page never writes attendance state.      */
+export default function MarkerPage({ onClose, setRole, taps = [], systemLive = false, piConnected = false }) {
   const [openModal, setOpenModal] = useState(null);
   const [copied, setCopied] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -917,6 +921,17 @@ export default function MarkerPage({ onClose, setRole }) {
               </Reveal>
             ))}
           </div>
+
+          {/*  The four cards above are a description. This is the same
+               pipeline actually running: one socket event from the Pi lands
+               here and on every dashboard at once.                        */}
+          <Reveal delay={420}>
+            <MarkerLiveTaps
+              taps={taps}
+              systemLive={systemLive}
+              piConnected={piConnected}
+            />
+          </Reveal>
         </div>
       </section>
 

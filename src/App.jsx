@@ -45,11 +45,20 @@ import './styles/global.css';
     deployed build is https, where the browser blocks a request to an http
     Pi as mixed content before it leaves the page, so there is genuinely
     nothing to attempt there and skipping it saves a pointless retry loop. */
-const CAN_REACH_PI = typeof window !== 'undefined'
-  && window.location.protocol === 'http:';
-
-// '' = same origin, which the dev-server proxy forwards to the Pi.
+/*  Declared BEFORE CAN_REACH_PI, which reads it. Order matters: this module
+    already shipped one temporal-dead-zone crash (blank white page in
+    production) from a const referenced above its declaration.
+    '' = same origin, which the dev-server proxy forwards to the Pi.       */
 const PI_URL = import.meta.env.VITE_PI_URL ?? '';
+
+/*  ...and one exception to the http-only rule: an https origin CAN reach the
+    Pi when VITE_PI_URL is itself https, i.e. the Pi sits behind a TLS tunnel
+    (Cloudflare) rather than being dialled at its LAN address. There is no
+    mixed content in that case, so the deployed build on Vercel is worth
+    connecting after all. Without such a URL an https page still has nothing
+    to attempt and should not burn a retry loop discovering that.          */
+const CAN_REACH_PI = typeof window !== 'undefined'
+  && (window.location.protocol === 'http:' || PI_URL.startsWith('https://'));
 // Plain HTTP calls take the '/pi' proxy prefix, which the dev server rewrites
 // away before handing the request to the bridge. When VITE_PI_URL is set the
 // browser is dialling the Pi directly and no prefix applies.
@@ -461,7 +470,18 @@ function AppInner() {
   return (
     <>
       {showMarker && (
-        <MarkerPage onClose={() => { delete document.body.dataset.markerOpen; setShowMarker(false); }} setRole={setRole} />
+        <MarkerPage
+          onClose={() => { delete document.body.dataset.markerOpen; setShowMarker(false); }}
+          setRole={setRole}
+          /*  Same array the dashboards render, so a single card_tap event
+              updates this page and everything behind it together. Passing
+              piConnected as well as systemLive lets the panel say WHICH half
+              is down (Pi unreachable vs reader unplugged) instead of just
+              showing nothing.                                             */
+          taps={taps}
+          systemLive={systemLive}
+          piConnected={piConnected}
+        />
       )}
 
       {/* Global command palette (⌘K) */}

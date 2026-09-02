@@ -20,8 +20,9 @@ dns.setDefaultResultOrder('ipv6first')
     2. The Pi's GLOBAL IPv6 address changes every time the hotspot reconnects,
        and the Mac accumulates several global addresses of its own, not all of
        which route. Connecting to the global address yields intermittent
-       EHOSTUNREACH. The LINK-LOCAL address is derived from the Pi's MAC, so it
-       never changes, and it forces a matching link-local source address.
+       EHOSTUNREACH. A LINK-LOCAL address avoids that: it is never routed and
+       it forces a matching link-local source address. It is stable per
+       network, but see the NOTE below - it is not stable ACROSS networks.
 
     3. Vite's proxy cannot use a link-local address: Node's WHATWG URL parser
        rejects the '%en0' zone index with ERR_INVALID_URL, which crashes the
@@ -31,24 +32,48 @@ dns.setDefaultResultOrder('ipv6first')
     them byte-for-byte to the Pi. Being TCP-level, WebSocket upgrades pass
     through untouched, so Socket.IO works without extra handling.
                                                                          */
-/*  Candidate addresses for the Pi, tried in order until one connects.
-    The Pi moves between networks (iPhone hotspot vs home Wi-Fi) and each
-    network only supports some of these, so hardcoding one address meant
-    re-editing this file every time the network changed:
+/*  Candidate addresses for the Pi, raced in parallel until one connects.
+    The Pi moves between networks (phone hotspot vs home Wi-Fi vs the Telstra
+    hotspot) and each network only supports some of these:
 
-      1. VITE_PI_HOST      - explicit override, wins when set.
-      2. veroattendance.local - mDNS. Works on a normal LAN. On the iPhone
-         hotspot the name resolves but adds ~5s while the IPv4 lookup times
-         out, so it is not first.
-      3. link-local IPv6   - derived from the Pi's MAC, so it never changes
-         and needs no DNS. Works on any shared layer-2 link, including the
-         hotspot. '%en0' is the interface; change it for Ethernet.
+      1. VITE_PI_HOST         - explicit override, wins when set.
+      2. veroattendance.local - mDNS. Works on any network carrying Bonjour,
+         which includes the Telstra hotspot and a normal LAN. On an iPhone
+         hotspot it still resolves but costs ~5s while the IPv4 lookup times
+         out - harmless now that candidates are raced rather than tried in
+         turn, so a slow candidate never delays a fast one.
+      3. link-local IPv6      - needs no DNS at all, so it covers a network
+         with no working mDNS. '%en0' is the Wi-Fi interface; change it for
+         Ethernet.
+
+    NOTE: the link-local address is NOT permanently tied to the MAC. This file
+    used to hardcode fe80::ba27:ebff:fe2e:f33d first, on the assumption that it
+    was EUI-64 derived and so fixed forever. NetworkManager on the Pi actually
+    defaults to RFC 7217 'stable-privacy' addressing, which hashes the
+    connection profile into the address - so joining a new Wi-Fi network gives
+    the Pi a NEW link-local address and the old one goes dead with no error
+    beyond the UI sitting in Simulator mode. That is precisely what the move to
+    the Telstra hotspot did. Hence mDNS first, and treat the address below as a
+    snapshot of the current network, not a constant.
+
+    To make it a constant, run on the Pi and reconnect:
+      sudo nmcli connection modify "<profile>" ipv6.addr-gen-mode eui64
+    which restores the MAC-derived address the original comment assumed.
 
     The address that works is remembered and tried first next time, so the
     fallback cost is paid once, not on every request.                        */
 const PI_CANDIDATES = process.env.VITE_PI_HOST
   ? [process.env.VITE_PI_HOST]
-  : ['fe80::ba27:ebff:fe2e:f33d%en0', 'veroattendance.local']
+  : [
+      'veroattendance.local',
+      // Current stable-privacy link-local on the TELSTRA4G profile.
+      'fe80::c7dc:25f3:5003:e58a%en0',
+      // MAC-derived (EUI-64) address. Dead while addr-gen-mode is the default
+      // stable-privacy, live the moment the nmcli pin above is applied. Listed
+      // permanently so the pin needs no edit here, and so a re-image that comes
+      // up EUI-64 still connects. Racing makes an unused candidate free.
+      'fe80::ba27:ebff:fe2e:f33d%en0',
+    ]
 const PI_PORT     = Number(process.env.VITE_PI_PORT || 5000)
 const BRIDGE_PORT = Number(process.env.VITE_BRIDGE_PORT || 5099)
 const CONNECT_TIMEOUT_MS = Number(process.env.VITE_PI_TIMEOUT || 3000)
@@ -126,12 +151,28 @@ function piBridge() {
         )
       })
 
-      bridge.on('error', (err) => {
-        log.error(`[pi-bridge] cannot listen on ${BRIDGE_PORT}: ${err.message}`)
-      })
-      bridge.listen(BRIDGE_PORT, '127.0.0.1', () => {
+      /*  Vite restarts this plugin on every edit to this file, and the new
+          instance's configureServer() runs BEFORE the outgoing httpServer's
+          'close' handler releases the bridge port. The bind loses the race,
+          fails EADDRINUSE, and the dev server comes back up with no route to
+          the Pi at all: every /socket.io request then dies as ECONNREFUSED
+          and the UI drops to Simulator mode with nothing on screen saying
+          why. That is the exact silent failure this bridge exists to prevent,
+          so retry the bind briefly rather than giving up on first collision. */
+      let bindAttempts = 0
+      const listenBridge = () => bridge.listen(BRIDGE_PORT, '127.0.0.1')
+
+      bridge.on('listening', () => {
         log.info(`  [pi-bridge] 127.0.0.1:${BRIDGE_PORT} -> ${PI_CANDIDATES.join(' | ')}:${PI_PORT}`)
       })
+      bridge.on('error', (err) => {
+        if (err.code === 'EADDRINUSE' && ++bindAttempts <= 20) {
+          setTimeout(listenBridge, 150)   // ~3s of grace, then report it
+          return
+        }
+        log.error(`[pi-bridge] cannot listen on ${BRIDGE_PORT}: ${err.message}`)
+      })
+      listenBridge()
 
       server.httpServer?.once('close', () => bridge.close())
     },
