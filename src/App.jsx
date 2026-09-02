@@ -474,10 +474,16 @@ function AppInner() {
 
   if (!authedRole) {
     return (
-      <LoginPage onLogin={(r) => {
-        setAuthedRole(r); setRole(r);
-        toast.success(`Welcome to VERO`, `Signed in as ${r}`);
-      }} />
+      <LoginPage
+        onLogin={(r) => {
+          setAuthedRole(r); setRole(r);
+          toast.success(`Welcome to VERO`, `Signed in as ${r}`);
+        }}
+        /*  The socket connects before sign-in, so the sign-in panel can report
+            the real hardware state to a visitor who never logs in at all.   */
+        taps={taps}
+        systemLive={systemLive}
+      />
     );
   }
 

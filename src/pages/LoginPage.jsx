@@ -5,22 +5,45 @@ import {
 } from 'lucide-react';
 import Tagline from '../components/Tagline';
 
-/* Rotates through simulated card-tap events to suggest the system is alive */
-function LiveActivityTicker() {
-  const EVENTS = [
-    { name: 'Grace Turner',    class: '11A · Maths',    when: 'just now', colour: 'var(--green)' },
-    { name: 'Mr David Chen',   class: 'Year 11 home',   when: '4s ago',   colour: 'var(--blue)' },
-    { name: 'Hassan Khan',     class: '8E · Geography', when: '11s ago',  colour: 'var(--teal)' },
-    { name: 'Olivia Burns',    class: '12B · Physics',  when: '18s ago',  colour: 'var(--purple)' },
-    { name: 'Marco Trovato',   class: '9F · English',   when: '24s ago',  colour: 'var(--green)' },
-  ];
+/*  Card-tap ticker on the sign-in panel.
+    ─────────────────────────────────────
+    This used to rotate a hardcoded list unconditionally, next to a chip that
+    always read "ACR122U · LIVE". So a visitor with the Pi switched off saw
+    invented students "checking in" under a claim that the reader was live,
+    with no way to tell the difference - the one thing a marker most needs to
+    be able to trust on this page.
+
+    Now: when the reader really is connected, this shows the REAL scan stream
+    coming off it. When it is not, it falls back to the sample rotation and
+    the caller labels it as sample data rather than claiming it is live.    */
+const SAMPLE_EVENTS = [
+  { name: 'Grace Turner',    class: '11A · Maths',    when: 'just now', colour: 'var(--green)' },
+  { name: 'Mr David Chen',   class: 'Year 11 home',   when: '4s ago',   colour: 'var(--blue)' },
+  { name: 'Hassan Khan',     class: '8E · Geography', when: '11s ago',  colour: 'var(--teal)' },
+  { name: 'Olivia Burns',    class: '12B · Physics',  when: '18s ago',  colour: 'var(--purple)' },
+  { name: 'Marco Trovato',   class: '9F · English',   when: '24s ago',  colour: 'var(--green)' },
+];
+
+function LiveActivityTicker({ taps = [], live = false }) {
   const [idx, setIdx] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setIdx(i => (i + 1) % EVENTS.length), 2400);
+    const t = setInterval(() => setIdx(i => (i + 1) % SAMPLE_EVENTS.length), 2400);
     return () => clearInterval(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const ev = EVENTS[idx];
+
+  /*  A real tap wins over the rotation whenever one exists. `action` is 'out'
+      for a check-OUT, which must not be captioned "CHECKED IN" - that mislabel
+      is exactly the kind of detail that makes a live demo look fake.        */
+  const realest = live ? taps[0] : null;
+  const ev = realest
+    ? {
+        name:   realest.name,
+        class:  `${realest.class} · ${realest.uid || 'card'}`,
+        when:   realest.time || 'just now',
+        colour: realest.action === 'out' ? 'var(--blue)' : 'var(--green)',
+        label:  realest.action === 'out' ? 'CHECKED OUT' : 'CHECKED IN',
+      }
+    : { ...SAMPLE_EVENTS[idx], label: 'CHECKED IN' };
   return (
     <div style={{
       border: '1px solid rgba(255,255,255,0.12)',
@@ -53,7 +76,7 @@ function LiveActivityTicker() {
             color: '#fff', background: ev.colour,
             padding: '2px 7px', borderRadius: 99, letterSpacing: '0.03em',
           }}>
-            CHECKED IN
+            {ev.label}
           </span>
         </div>
         <div style={{
@@ -84,7 +107,10 @@ const ROLE_OPTIONS = [
   { role: 'Parent',  label: 'J. Turner',       email: 'jturner@parents.millpond.nsw',          colour: '#7C3AED', icon: Users },
 ];
 
-export default function LoginPage({ onLogin }) {
+/*  `taps`/`systemLive` are threaded in so this page can tell the truth about
+    the hardware. It is the first thing any visitor sees, so a wrong claim here
+    is the most expensive wrong claim on the site.                          */
+export default function LoginPage({ onLogin, taps = [], systemLive = false }) {
   const [selectedRole, setSelectedRole]   = useState('Admin');
   const [email, setEmail]                 = useState('admin@millpond.nsw.edu.au');
   const [password, setPassword]           = useState('demo1234');
@@ -201,12 +227,19 @@ export default function LoginPage({ onLogin }) {
           }}>
             <div style={{
               width: 7, height: 7, borderRadius: '50%',
-              background: 'var(--green)',
+              background: systemLive ? 'var(--green)' : 'rgba(255,255,255,0.45)',
               boxShadow: '0 0 0 0 rgba(34,197,94,0.6)',
-              animation: 'heroHeartbeat 1.8s ease-out infinite',
+              // Only the genuinely-live state gets the heartbeat. A pulsing dot
+              // reads as "connected" from across a room, so animating it while
+              // the reader is absent is the same lie in a subtler form.
+              animation: systemLive ? 'heroHeartbeat 1.8s ease-out infinite' : 'none',
             }} />
-            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#7FE7DC', letterSpacing: '0.03em' }}>
-              ACR122U · LIVE
+            <span style={{
+              fontSize: '0.72rem', fontWeight: 800,
+              color: systemLive ? '#7FE7DC' : 'rgba(233,247,245,0.66)',
+              letterSpacing: '0.03em',
+            }}>
+              {systemLive ? 'ACR122U · LIVE' : 'ACR122U · OFFLINE'}
             </span>
           </div>
         </div>
@@ -281,7 +314,7 @@ export default function LoginPage({ onLogin }) {
           </div>
 
           {/* Live activity ticker - rotates through simulated taps */}
-          <LiveActivityTicker />
+          <LiveActivityTicker taps={taps} live={systemLive} />
         </div>
 
         {/* Bottom: trust strip + footer */}
