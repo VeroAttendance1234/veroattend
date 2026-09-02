@@ -9,7 +9,6 @@ import Modal from '../components/Modal';
 import Tagline from '../components/Tagline';
 import Reveal from '../components/Reveal';
 import CountUp from '../components/CountUp';
-import MarkerWelcomeDemo from '../components/MarkerWelcomeDemo';
 import RollImpactCalculator from '../components/RollImpactCalculator';
 import MessagingDemo from '../components/MessagingDemo';
 import MarkerLiveTaps from '../components/MarkerLiveTaps';
@@ -525,8 +524,12 @@ export default function MarkerPage({ onClose, setRole, taps = [], systemLive = f
         }} />
       </div>
 
-      {/* First-visit welcome overlay with live pipeline demo */}
-      <MarkerWelcomeDemo />
+      {/*  The first-visit "tap to scan" overlay used to sit here. It replayed
+           a canned pipeline trace on timers, down to an invented UID, and it
+           opened over the top of a page that now carries a REAL scan feed
+           further down. Two competing demonstrations of the same thing, one
+           of them fake and shown first, undercut the real one. Removed; the
+           live panel under the pipeline cards is the demonstration now.   */}
 
       {/* Close FAB */}
       <button

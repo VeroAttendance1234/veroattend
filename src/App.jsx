@@ -45,50 +45,85 @@ import './styles/global.css';
     deployed build is https, where the browser blocks a request to an http
     Pi as mixed content before it leaves the page, so there is genuinely
     nothing to attempt there and skipping it saves a pointless retry loop. */
-/*  Public https address of the Pi, for the DEPLOYED build only.
-    ─────────────────────────────────────────────────────────────
+/*  Public https addresses of the Pi, for the DEPLOYED build only.
+    ───────────────────────────────────────────────────────────────
     veroattend.vercel.app is https and the Pi is http on a private LAN, so the
     deployed site has two separate walls between it and the reader: the browser
     blocks http from an https page as mixed content, and 192.168.x.x is not
-    routable from outside the Wi-Fi regardless. A Cloudflare tunnel on the Pi
-    solves both at once by publishing port 5000 at a public TLS hostname.
+    routable from outside the Wi-Fi regardless. A TLS tunnel on the Pi solves
+    both at once by publishing port 5000 at a public https hostname.
 
-    HEADS UP - this is a QUICK tunnel, so Cloudflare mints a NEW random
-    hostname every time cloudflared restarts, including on every Pi reboot.
-    When the deployed site stops seeing taps, this constant is almost certainly
-    stale: read the current one from the Pi and update this line.
-        ssh vero@veroattendance.local 'cat ~/backend/tunnel-url.txt'
-    For a hostname that survives a reboot, create a NAMED tunnel instead (free,
-    one Cloudflare login) and this stops needing edits:
-        cloudflared tunnel login && cloudflared tunnel create veroattend      */
-const PI_TUNNEL_URL = 'https://your-higher-nashville-inclusion.trycloudflare.com';
+    TWO tunnels are listed because each fails in a way the other survives, and
+    both were observed failing during setup:
+
+      1. Tailscale Funnel - PERMANENT hostname, so it survives a Pi reboot,
+         which is the failure that silently kills the deployed site. But it is
+         a *.ts.net name, and the Telstra hotspot's own resolver returned
+         NXDOMAIN for it while a public resolver answered correctly, so it
+         cannot be relied on as the only address.
+      2. Cloudflare quick tunnel - resolves on every network tried, including
+         that hotspot, but the hostname is REGENERATED whenever cloudflared
+         restarts, so it goes stale on a reboot and this line needs editing:
+             ssh vero@veroattendance.local 'cat ~/backend/tunnel-url.txt'
+
+    Listing both means the site keeps working if either one is unreachable.  */
+const PI_TUNNELS = [
+  'https://veroattend.tail1cef38.ts.net',
+  'https://your-higher-nashville-inclusion.trycloudflare.com',
+];
 
 /*  Declared BEFORE CAN_REACH_PI, which reads it. Order matters: this module
     already shipped one temporal-dead-zone crash (blank white page in
     production) from a const referenced above its declaration.
 
-    In dev this stays '' - meaning same origin - so the page keeps talking only
+    In dev this is [''] - meaning same origin - so the page keeps talking only
     to localhost and the dev server's TCP bridge does the reaching. Falling
-    back to the tunnel there would send the browser out to the internet and
-    back for a Pi sitting on the same desk, and would need the OS local-network
+    back to a tunnel there would send the browser out to the internet and back
+    for a Pi sitting on the same desk, and would need the OS local-network
     permission the bridge exists to avoid.                                   */
-const PI_URL = import.meta.env.VITE_PI_URL
-  ?? (typeof window !== 'undefined' && window.location.protocol === 'https:'
-        ? PI_TUNNEL_URL
-        : '');
+const PI_CANDIDATES = import.meta.env.VITE_PI_URL
+  ? [import.meta.env.VITE_PI_URL]
+  : (typeof window !== 'undefined' && window.location.protocol === 'https:')
+      ? PI_TUNNELS
+      : [''];
+
+/*  Race the candidates and take whichever answers first, rather than trying
+    them in turn. Serial attempts cost the SUM of the timeouts, and a dead
+    first candidate would delay every page load by that much before the good
+    one is even attempted. Same reasoning as the dev-server bridge in
+    vite.config.js, which had to solve this exact problem for link-local vs
+    mDNS. /students is used as the probe because it is a plain GET the server
+    already serves and needs no socket.                                     */
+async function resolvePiUrl() {
+  if (PI_CANDIDATES.length === 1) return PI_CANDIDATES[0];
+  return Promise.any(PI_CANDIDATES.map(async (base) => {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 6000);
+    try {
+      const res = await fetch(`${base}/students`, { signal: ctl.signal });
+      if (!res.ok) throw new Error(`${base} -> ${res.status}`);
+      return base;
+    } finally {
+      clearTimeout(timer);
+    }
+  }));
+}
 
 /*  ...and one exception to the http-only rule: an https origin CAN reach the
-    Pi when VITE_PI_URL is itself https, i.e. the Pi sits behind a TLS tunnel
-    (Cloudflare) rather than being dialled at its LAN address. There is no
-    mixed content in that case, so the deployed build on Vercel is worth
-    connecting after all. Without such a URL an https page still has nothing
-    to attempt and should not burn a retry loop discovering that.          */
+    Pi when the candidates are themselves https, i.e. the Pi sits behind a TLS
+    tunnel rather than being dialled at its LAN address. There is no mixed
+    content in that case, so the deployed build on Vercel is worth connecting
+    after all. Without such a URL an https page still has nothing to attempt
+    and should not burn a retry loop discovering that.                      */
 const CAN_REACH_PI = typeof window !== 'undefined'
-  && (window.location.protocol === 'http:' || PI_URL.startsWith('https://'));
+  && (window.location.protocol === 'http:'
+      || PI_CANDIDATES.some(u => u.startsWith('https://')));
+
 // Plain HTTP calls take the '/pi' proxy prefix, which the dev server rewrites
-// away before handing the request to the bridge. When VITE_PI_URL is set the
-// browser is dialling the Pi directly and no prefix applies.
-const PI_HTTP = PI_URL || '/pi';
+// away before handing the request to the bridge. Against a tunnel the browser
+// is dialling the Pi directly and no prefix applies; that URL is only known
+// once the race above settles, so this is resolved at call time, not here.
+const PI_HTTP_FALLBACK = '/pi';
 
 /* ── Admin onboarding tour ────────────────── */
 const ADMIN_TOUR_STEPS = [
@@ -351,13 +386,20 @@ function AppInner() {
     if (!CAN_REACH_PI) return;
 
     let cancelled = false;
-    import('socket.io-client').then(({ io }) => {
+    /*  Settle the candidate race BEFORE importing socket.io, so the socket is
+        pointed at an address already known to answer. Connecting first and
+        failing over afterwards would mean fighting socket.io's own reconnect
+        loop, which retries the SAME url forever by design.                 */
+    Promise.all([import('socket.io-client'), resolvePiUrl()]).then(([{ io }, piUrl]) => {
       if (cancelled) return;
-      const socket = io(PI_URL || undefined, {
+      // Same origin in dev ('' -> undefined), an explicit tunnel when deployed.
+      const socket = io(piUrl || undefined, {
         reconnectionDelay: 2000,
         reconnectionAttempts: Infinity,
         timeout: 4000,
       });
+      // Whichever candidate won also serves the plain HTTP endpoints.
+      const PI_HTTP = piUrl || PI_HTTP_FALLBACK;
       socketRef.current = socket;
 
       /*  Replay the day on connect.
@@ -458,6 +500,16 @@ function AppInner() {
         studentData,
         studentData?.action ? { action: studentData.action } : {},
       ));
+    }).catch(() => {
+      /*  Every candidate failed (Promise.any rejects with an AggregateError),
+          or socket.io itself would not load. Without this the rejection is
+          unhandled and the app just sits in Simulator mode with a console
+          error nobody is looking at - the same silent failure mode that made
+          the original hotspot problem so hard to spot. Say it plainly and
+          leave the pill grey, which is the honest state.                   */
+      if (cancelled) return;
+      setPiConnected(false);
+      setReaderConnected(false);
     });
 
     return () => {

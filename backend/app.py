@@ -17,6 +17,29 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 # reachable does NOT mean the reader works, so we track it separately.
 reader_connected = False
 
+
+@app.after_request
+def add_cors_headers(resp):
+    """Allow the deployed site to read the plain JSON routes.
+
+    cors_allowed_origins above applies to Flask-SocketIO's own /socket.io
+    endpoint ONLY. The routes below are ordinary Flask views and were served
+    with no CORS headers at all, so from https://veroattend.vercel.app the
+    socket connected fine while every fetch() to /students or /attendance was
+    blocked by the browser as a cross-origin request.
+
+    That silently broke the deployed site's replay-the-day sync: a device
+    opening the site mid-morning got an empty feed and disagreed with every
+    other client about the whole day, with nothing but a console error to say
+    why. curl never showed it because CORS is enforced by browsers, not
+    servers.
+
+    setdefault, not assignment, so Flask-SocketIO's own per-origin header on
+    /socket.io responses is left exactly as it set it.
+    """
+    resp.headers.setdefault('Access-Control-Allow-Origin', '*')
+    return resp
+
 # ---------------------------------------------------------------
 # Called by rfid_reader.py when a physical card is tapped
 # ---------------------------------------------------------------
