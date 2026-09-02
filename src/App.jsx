@@ -45,11 +45,37 @@ import './styles/global.css';
     deployed build is https, where the browser blocks a request to an http
     Pi as mixed content before it leaves the page, so there is genuinely
     nothing to attempt there and skipping it saves a pointless retry loop. */
+/*  Public https address of the Pi, for the DEPLOYED build only.
+    ─────────────────────────────────────────────────────────────
+    veroattend.vercel.app is https and the Pi is http on a private LAN, so the
+    deployed site has two separate walls between it and the reader: the browser
+    blocks http from an https page as mixed content, and 192.168.x.x is not
+    routable from outside the Wi-Fi regardless. A Cloudflare tunnel on the Pi
+    solves both at once by publishing port 5000 at a public TLS hostname.
+
+    HEADS UP - this is a QUICK tunnel, so Cloudflare mints a NEW random
+    hostname every time cloudflared restarts, including on every Pi reboot.
+    When the deployed site stops seeing taps, this constant is almost certainly
+    stale: read the current one from the Pi and update this line.
+        ssh vero@veroattendance.local 'cat ~/backend/tunnel-url.txt'
+    For a hostname that survives a reboot, create a NAMED tunnel instead (free,
+    one Cloudflare login) and this stops needing edits:
+        cloudflared tunnel login && cloudflared tunnel create veroattend      */
+const PI_TUNNEL_URL = 'https://your-higher-nashville-inclusion.trycloudflare.com';
+
 /*  Declared BEFORE CAN_REACH_PI, which reads it. Order matters: this module
     already shipped one temporal-dead-zone crash (blank white page in
     production) from a const referenced above its declaration.
-    '' = same origin, which the dev-server proxy forwards to the Pi.       */
-const PI_URL = import.meta.env.VITE_PI_URL ?? '';
+
+    In dev this stays '' - meaning same origin - so the page keeps talking only
+    to localhost and the dev server's TCP bridge does the reaching. Falling
+    back to the tunnel there would send the browser out to the internet and
+    back for a Pi sitting on the same desk, and would need the OS local-network
+    permission the bridge exists to avoid.                                   */
+const PI_URL = import.meta.env.VITE_PI_URL
+  ?? (typeof window !== 'undefined' && window.location.protocol === 'https:'
+        ? PI_TUNNEL_URL
+        : '');
 
 /*  ...and one exception to the http-only rule: an https origin CAN reach the
     Pi when VITE_PI_URL is itself https, i.e. the Pi sits behind a TLS tunnel
